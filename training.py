@@ -28,7 +28,7 @@ class Trainer:
 
             # if this is because the data loading module
             # Sampling nodes
-            sampled_nodes = sampler.resample(500, 0.5) #0.5; else: error
+            sampled_nodes = sampler.resample(500, 0.8) #0.5; else: error
             sampled_adj = self.adj[sampled_nodes][:, sampled_nodes]
             sampled_features = self.features[sampled_nodes]
             sampled_labels = self.labels[sampled_nodes]
@@ -77,7 +77,7 @@ class Trainer:
                   "accuracy= {:.4f}".format(test_acc.item()))
 
 machine = "cpu"
-dataset = "citeseer"
+dataset = "pubmed"
 
 # Creating a trainer instance
 trainer = Trainer(machine,dataset)

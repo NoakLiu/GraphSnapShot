@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from data_preprocessing import accuracy
 
 # GraphSampleSAGE class
-# -------------> k-hop GraphSAGE
+# -------------> k-hop Native-GraphSAGE
 class GraphSampleSAGE:
     def __init__(self, data, N):
         self.data = data
@@ -22,12 +22,16 @@ class GraphSampleSAGE:
         static_resampled_nodes = random.sample(self.static_sampled_nodes, int(alpha*n))
         combined_resampled_nodes = dynamic_resampled_nodes + static_resampled_nodes
         cutoff_dynamic_resampled_nodes = random.sample(static_resampled_nodes, int(alpha*n))
+
+        dynamic_resampled_nodes_swap_in = random.sample(non_static_nodes, int(alpha*n))
+
         for node in cutoff_dynamic_resampled_nodes:
             self.static_sampled_nodes.remove(node)
-        self.static_sampled_nodes.extend(dynamic_resampled_nodes)
+        self.static_sampled_nodes.extend(dynamic_resampled_nodes_swap_in)
+
         return combined_resampled_nodes
 
-# GraphSAGE model
+# Native-GraphSAGE model
 class GraphSAGE(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(GraphSAGE, self).__init__()
