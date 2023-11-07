@@ -1,11 +1,9 @@
-import random
 import torch
-import torch.nn as nn
 import torch.optim as optim
 from data_preprocessing import load_data
 import torch.nn.functional as F
 from data_preprocessing import accuracy
-from models import GraphSampleSAGE, GraphSAGE
+from models import GraphSDSampler, MLP
 
 
 class Trainer:
@@ -13,14 +11,14 @@ class Trainer:
         self.machine = machine
         self.adj, self.features, self.labels, self.idx_train, self.idx_val, self.idx_test = load_data(dataset=dataset)
         if(self.machine == "gpu"):
-            self.model = GraphSAGE(self.features.size(1), max(self.labels) + 1).cuda()
+            self.model = MLP(self.features.size(1), max(self.labels) + 1).cuda()
         else:
-            self.model = GraphSAGE(self.features.size(1), max(self.labels) + 1)
+            self.model = MLP(self.features.size(1), max(self.labels) + 1)
         self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)
 
     def train(self):
         # Training
-        sampler = GraphSampleSAGE(list(range(self.adj[self.idx_test].size(0))), 600)
+        sampler = GraphSDSampler(list(range(self.adj[self.idx_test].size(0))), presampled_nodes)
 
         for epoch in range(100):
             self.model.train()
@@ -28,7 +26,7 @@ class Trainer:
 
             # if this is because the data loading module
             # Sampling nodes
-            sampled_nodes = sampler.resample(500, 0.8) #0.5; else: error
+            sampled_nodes = sampler.resample(resampled_nodes, alpha=alpha) #0.5; else: error
             sampled_adj = self.adj[sampled_nodes][:, sampled_nodes]
             sampled_features = self.features[sampled_nodes]
             sampled_labels = self.labels[sampled_nodes]
@@ -77,7 +75,10 @@ class Trainer:
                   "accuracy= {:.4f}".format(test_acc.item()))
 
 machine = "cpu"
-dataset = "pubmed"
+dataset = "citeseer"
+alpha = 0.8
+presampled_nodes = 600
+resampled_nodes = 500
 
 # Creating a trainer instance
 trainer = Trainer(machine,dataset)
@@ -87,4 +88,3 @@ trainer.train()
 
 # Test the model
 trainer.test()
-

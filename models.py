@@ -1,14 +1,9 @@
 import random
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from data_preprocessing import load_data
 import torch.nn.functional as F
-from data_preprocessing import accuracy
 
-# GraphSampleSAGE class
-# -------------> k-hop Native-GraphSAGE
-class GraphSampleSAGE:
+class GraphSDSampler:
     def __init__(self, data, N):
         self.data = data
         self.static_sampled_nodes = self.preprocess_static_sampling(N)
@@ -31,10 +26,10 @@ class GraphSampleSAGE:
 
         return combined_resampled_nodes
 
-# Native-GraphSAGE model
-class GraphSAGE(nn.Module):
+# Native MLP model
+class MLP(nn.Module):
     def __init__(self, input_dim, output_dim):
-        super(GraphSAGE, self).__init__()
+        super(MLP, self).__init__()
         self.fc1 = nn.Linear(input_dim, 128)
         self.fc2 = nn.Linear(128, output_dim)
 
