@@ -4,6 +4,9 @@ from data_preprocessing import load_data
 import torch.nn.functional as F
 from data_preprocessing import accuracy
 from models import GraphSDSampler, MLP
+import numpy as np
+import time
+from plot import draw_pic
 
 
 class Trainer:
@@ -26,7 +29,7 @@ class Trainer:
 
             # if this is because the data loading module
             # Sampling nodes
-            sampled_nodes = sampler.resample(resampled_nodes, alpha=alpha) #0.5; else: error
+            sampled_nodes = sampler.resample(resampled_nodes, alpha=alpha)
             sampled_adj = self.adj[sampled_nodes][:, sampled_nodes]
             sampled_features = self.features[sampled_nodes]
             sampled_labels = self.labels[sampled_nodes]
@@ -74,17 +77,43 @@ class Trainer:
             print("Test set results:", "loss= {:.4f}".format(test_loss.item()),
                   "accuracy= {:.4f}".format(test_acc.item()))
 
+            return test_loss.item(), test_acc.item()
+
 machine = "cpu"
 dataset = "citeseer"
-alpha = 0.8
-presampled_nodes = 600
-resampled_nodes = 500
+alpha = 0
+presampled_nodes = 500
+resampled_nodes = 400
 
-# Creating a trainer instance
-trainer = Trainer(machine,dataset)
+test_loss_list = []
+test_acc_list = []
+train_time_list = []
+i_list = []
 
-# Train the model
-trainer.train()
+for i in np.arange(0.1,1,0.1):
+    alpha = i
 
-# Test the model
-trainer.test()
+    start_time = time.time()
+    # Creating a trainer instance
+    trainer = Trainer(machine,dataset)
+
+    print(alpha)
+
+    # Train the model
+    trainer.train()
+
+    end_time = time.time()
+    train_time = end_time - start_time
+
+    # Test the model
+    test_loss, test_acc = trainer.test()
+
+    test_loss_list.append(test_loss)
+    test_acc_list.append(test_acc)
+    train_time_list.append(train_time)
+    i_list.append(i)
+
+draw_pic(i_list, test_loss_list, "Test Loss versus Alpha Changes","red","alpha","test loss")
+draw_pic(i_list, test_acc_list, "Test Accuracy versus Alpha Changes","blue","alpha","test accuracy")
+draw_pic(i_list, train_time_list, "Training Time versus Alpha Changes","green","alpha","Training Time")
+
