@@ -10,7 +10,7 @@ Result Analysis
 
 2. Test Accuracy versus Alpha Changes
 
-   ![Test Accuracy versus Alpha Changes](./results/Test_Accuracy_versus_Alpha Changes.png)
+   ![Test Accuracy versus Alpha Changes](./results/Test_Accuracy_versus_Alpha_Changes.png)
 
 3. Training Time versus Alpha Changes
 
