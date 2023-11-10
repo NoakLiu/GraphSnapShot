@@ -6,12 +6,12 @@ Result Analysis
 
 1. Test Loss versus Alpha Changes
 
-   ![Test Loss versus Alpha Changes](./results/Test Loss versus Alpha Changes.png)
+   ![Test Loss versus Alpha Changes](./results/Test_Loss_versus_Alpha_Changes.png)
 
 2. Test Accuracy versus Alpha Changes
 
-   ![Test Accuracy versus Alpha Changes](./results/Test Accuracy versus Alpha Changes.png)
+   ![Test Accuracy versus Alpha Changes](./results/Test_Accuracy_versus_Alpha Changes.png)
 
 3. Training Time versus Alpha Changes
 
-   ![Training Time versus Alpha Changes](./results/Training Time versus Alpha Changes.png)
+   ![Training Time versus Alpha Changes](./results/Training_Time_versus_Alpha_Changes.png)
