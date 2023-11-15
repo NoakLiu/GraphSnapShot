@@ -4,6 +4,7 @@ from data_preprocessing import load_data
 import torch.nn.functional as F
 from data_preprocessing import accuracy
 from models import GraphSDSampler, MLP
+from models_khop_ty import GraphKSDSampler
 import numpy as np
 import time
 from plot import draw_pic
@@ -20,13 +21,10 @@ class Trainer:
         self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)
 
     def train(self):
-
-        print(self.adj.dtype)
-
-        print(self.idx_train)
-
+        # print(list(range(self.adj[self.idx_test].size(0))))
+        print(self.idx_test)
         # Training
-        sampler = GraphSDSampler(list(range(self.adj[self.idx_train].size(0))), presampled_nodes)
+        sampler = GraphKSDSampler(self.adj[self.idx_train][self.idx_train], presampled_nodes, sampled_depth, presampled_perexpansion)
 
         for epoch in range(100):
             self.model.train()
@@ -34,8 +32,8 @@ class Trainer:
 
             # if this is because the data loading module
             # Sampling nodes
-            sampled_nodes = sampler.resample(resampled_nodes, alpha=alpha)
-            sampled_adj = self.adj[sampled_nodes][:, sampled_nodes]
+            sampled_nodes, comp_list = sampler.resample(resampled_nodes, alpha, 2)
+            sampled_adj = comp_list[0][sampled_nodes][:, sampled_nodes]
             sampled_features = self.features[sampled_nodes]
             sampled_labels = self.labels[sampled_nodes]
 
@@ -87,8 +85,10 @@ class Trainer:
 machine = "cpu"
 dataset = "citeseer"
 alpha = 0
-presampled_nodes = 50
-resampled_nodes = 40
+presampled_nodes = 20
+presampled_perexpansion = 2
+resampled_nodes = 10
+sampled_depth = 3
 
 test_loss_list = []
 test_acc_list = []

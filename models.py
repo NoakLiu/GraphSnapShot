@@ -2,6 +2,7 @@ import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 class GraphSDSampler:
     def __init__(self, data, N):
@@ -25,6 +26,7 @@ class GraphSDSampler:
         self.static_sampled_nodes.extend(dynamic_resampled_nodes_swap_in)
 
         return combined_resampled_nodes
+
 
 # Native MLP model
 class MLP(nn.Module):
