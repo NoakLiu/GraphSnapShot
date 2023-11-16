@@ -1,6 +1,10 @@
-This project implements the Static Pre-Sampling and Dynamic Re-Sampling for Efficient Graph Learning Storage and Retrieval.
+### GraphSnapShot
+
+GraphSnapShot is a framework for fast storage, retrieval and computation for graph learning, developed by Shawn Dong Liu.
 
 ![model construction](./assets/SSDReS.png)
+
+The main idea of this framework is `Static Pre-Sampling and Dynamic Re-Sampling` for Efficient Graph Learning Storage and Retrieval.
 
 Result Analysis
 
