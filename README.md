@@ -1,6 +1,6 @@
 ### GraphSnapShot
 
-GraphSnapShot is a framework for fast storage, retrieval and computation for graph learning, developed by Shawn Dong Liu.
+GraphSnapShot is a framework for fast storage, retrieval and computation for graph learning, developed by Shawn Dong Liu. It can quickly store and update the local topology of graph structure, just like take snapshots of the graph.
 
 ![model construction](./assets/SSDReS.png)
 
