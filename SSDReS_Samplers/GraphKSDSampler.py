@@ -1,12 +1,11 @@
 import random
 import numpy as np
+from Disk_Mem_Simulation.simulation_benchmark import benchmark
 
-from models import GraphSDSampler
 
-
-class GraphKSDSampler(GraphSDSampler):
+class GraphKSDSampler:
     def __init__(self, data, adj_matrix, N, k, n):
-        super().__init__(data, N)  # Call to the __init__ of the super class
+        # super().__init__(data, N)  # Call to the __init__ of the super class
         self.data = data
         self.adj_matrix = adj_matrix
         self.k = k
@@ -24,14 +23,23 @@ class GraphKSDSampler(GraphSDSampler):
 
         current_layer = set(initial_sample)
 
+        cnt = 0
+
         for i in range(self.k):
             next_layer = set()
             for node in current_layer:
-                neighbors = set(self.adj_matrix[node].nonzero()[1].tolist())
+                cnt += 1
+                if cnt % 50 == 0:
+                    benchmark.simulate_disk_read()
+                nonzero_indices = self.adj_matrix[node].nonzero()
+                neighbors = set(nonzero_indices.reshape(-1).tolist())
+
                 sampled_neighbors = random.sample(neighbors, min(len(neighbors), self.n))
                 next_layer.update(sampled_neighbors)
 
                 # Record edges in the adjacency matrix for the i-th hop
+                if cnt % 50 == 0:
+                    benchmark.simulate_disk_write()
                 for neighbor in sampled_neighbors:
                     adjacency_matrices[i][node, neighbor] += 1
                     adjacency_matrices[i][neighbor, node] += 1  # Assuming undirected graph
@@ -44,16 +52,23 @@ class GraphKSDSampler(GraphSDSampler):
     def k_hop_retrieval(self, initial_sample):
         # Start with the initial sample set
         current_layer = set(initial_sample)
+        cnt = 0
 
         for i in range(self.k):
             next_layer = set()
             for node in current_layer:
+                cnt += 1
+                if (cnt % 50 == 0):
+                    benchmark.simulate_memory_access()
                 # Retrieve neighbors from the i-th adjacency matrix
-                neighbors = set(self.k_hop_adjacency_matrices[i][node].nonzero()[1].tolist())
+                neighbors = set(self.k_hop_adjacency_matrices[i][node].nonzero()[0].tolist())
+                # neighbors = set(self.k_hop_adjacency_matrices[i][node].nonzero().reshape(-1).tolist())
                 sampled_neighbors = random.sample(neighbors, min(len(neighbors), self.n))
                 next_layer.update(sampled_neighbors)
 
                 # Update adjacency matrices
+                if (cnt % 50 == 0):
+                    benchmark.simulate_memory_access()
                 for neighbor in sampled_neighbors:
                     # Subtract the edge from the original adjacency matrix
                     self.k_hop_adjacency_matrices[i][node, neighbor] -= 1
@@ -70,15 +85,24 @@ class GraphKSDSampler(GraphSDSampler):
         adjacency_matrices = [np.zeros_like(self.adj_matrix, dtype=int) for _ in range(self.k)]
 
         current_layer = set(initial_sample)
+        cnt = 0
 
         for i in range(self.k):
             next_layer = set()
             for node in current_layer:
-                neighbors = set(self.adj_matrix[node].nonzero()[1].tolist())
+                cnt += 1
+
+                if (cnt % 50 == 0):
+                    benchmark.simulate_disk_read()
+                nonzero_indices = self.adj_matrix[node].nonzero()
+                neighbors = set(nonzero_indices.reshape(-1).tolist())
+
                 sampled_neighbors = random.sample(neighbors, min(len(neighbors), self.n))
                 next_layer.update(sampled_neighbors)
 
                 # Record edges in the adjacency matrix for the i-th hop
+                if (cnt % 50 == 0):
+                    benchmark.simulate_disk_write()
                 for neighbor in sampled_neighbors:
                     self.k_hop_adjacency_matrices[i][node, neighbor] += 1
                     self.k_hop_adjacency_matrices[i][neighbor, node] += 1  # Assuming undirected graph
@@ -92,7 +116,10 @@ class GraphKSDSampler(GraphSDSampler):
         return initial_sample, adjacency_matrices
 
     def resample(self, n, alpha, n_per_hop=3):
-        non_static_nodes = list(set(list(self.adj_matrix[0])) - set(self.static_sampled_nodes))
+        self.reset_compute_matrices()
+
+        # non_static_nodes = list(set(list(self.adj_matrix[0])) - set(self.static_sampled_nodes))
+        non_static_nodes = list(set(list(self.data)) - set(self.static_sampled_nodes))
 
         dynamic_resampled_nodes = random.sample(non_static_nodes, int((1 - alpha) * n))
         _, _ = self.k_hop_sampling(

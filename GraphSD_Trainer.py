@@ -1,13 +1,12 @@
 import torch
 import torch.optim as optim
-from data_preprocessing import load_data
+from data_processing.data_preprocessing import load_data
 import torch.nn.functional as F
-from data_preprocessing import accuracy
-from models import GraphSDSampler, MLP
-from models_khop_ty import GraphKSDSampler
+from data_processing.data_preprocessing import accuracy
+from SSDReS_Samplers.GraphSDSampler import GraphSDSampler, MLP
 import numpy as np
 import time
-from plot import draw_pic
+from data_processing.plot import draw_pic
 
 
 class Trainer:
@@ -21,10 +20,9 @@ class Trainer:
         self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)
 
     def train(self):
-        # print(list(range(self.adj[self.idx_test].size(0))))
-        print(self.idx_test)
+
         # Training
-        sampler = GraphKSDSampler(self.adj[self.idx_train][self.idx_train], presampled_nodes, sampled_depth, presampled_perexpansion)
+        sampler = GraphSDSampler(list(range(self.adj.size(0))), presampled_nodes) #[self.idx_train]
 
         for epoch in range(100):
             self.model.train()
@@ -32,8 +30,8 @@ class Trainer:
 
             # if this is because the data loading module
             # Sampling nodes
-            sampled_nodes, comp_list = sampler.resample(resampled_nodes, alpha, 2)
-            sampled_adj = comp_list[0][sampled_nodes][:, sampled_nodes]
+            sampled_nodes = sampler.resample(resampled_nodes, alpha=alpha, mode="exchange")
+            sampled_adj = self.adj[sampled_nodes][:, sampled_nodes]
             sampled_features = self.features[sampled_nodes]
             sampled_labels = self.labels[sampled_nodes]
 
@@ -77,7 +75,7 @@ class Trainer:
                                     self.adj[self.idx_test][:, self.idx_test])
                 test_loss = F.nll_loss(output, self.labels[self.idx_test])
                 test_acc = accuracy(output, self.labels[self.idx_test])
-            print("Test set results:", "loss= {:.4f}".format(test_loss.item()),
+            print("Test set results_1hop:", "loss= {:.4f}".format(test_loss.item()),
                   "accuracy= {:.4f}".format(test_acc.item()))
 
             return test_loss.item(), test_acc.item()
@@ -85,10 +83,8 @@ class Trainer:
 machine = "cpu"
 dataset = "citeseer"
 alpha = 0
-presampled_nodes = 20
-presampled_perexpansion = 2
-resampled_nodes = 10
-sampled_depth = 3
+presampled_nodes = 50
+resampled_nodes = 40
 
 test_loss_list = []
 test_acc_list = []
