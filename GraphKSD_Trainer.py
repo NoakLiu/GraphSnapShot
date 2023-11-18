@@ -91,7 +91,7 @@ alpha = 0
 presampled_nodes = 20
 presampled_perexpansion = 2
 resampled_nodes = 10
-sampled_depth = 4
+sampled_depth = 2
 
 test_loss_list = []
 test_acc_list = []

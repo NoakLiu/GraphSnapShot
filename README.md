@@ -37,6 +37,29 @@ setting 2:
 presampled_nodes = 20
 presampled_perexpansion = 2
 resampled_nodes = 10
+sampled_depth = 2
+```
+
+
+
+1. Test Loss versus Alpha Changes
+
+   ![Test Loss versus Alpha Changes](results_2hop/Test_Loss_versus_Alpha_Changes.png)
+
+2. Test Accuracy versus Alpha Changes
+
+   ![Test Accuracy versus Alpha Changes](results_2hop/Test_Accuracy_versus_Alpha_Changes.png)
+
+3. Training Time versus Alpha Changes
+
+   ![Training Time versus Alpha Changes](results_2hop/Training_Time_versus_Alpha_Changes.png)
+
+setting 3:
+
+```Python
+presampled_nodes = 20
+presampled_perexpansion = 2
+resampled_nodes = 10
 sampled_depth = 3
 ```
 
@@ -56,7 +79,7 @@ sampled_depth = 3
 
    
 
-setting 3:
+setting 4:
 
 ```Python
 presampled_nodes = 20
