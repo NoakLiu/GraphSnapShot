@@ -4,7 +4,7 @@ from data_processing.data_preprocessing import load_data
 import torch.nn.functional as F
 from data_processing.data_preprocessing import accuracy
 from SSDReS_Samplers.GraphSDSampler import MLP
-# from SSDReS_Samplers.GraphKSDSampler_sswap import GraphKSDSampler
+# from SSDReS_Samplers.GraphKSDSampler_sswp import GraphKSDSampler
 # from SSDReS_Samplers.GraphKSDSampler_dswp import GraphKSDSampler
 from SSDReS_Samplers.GraphKSDSampler_cswp import GraphKSDSampler
 import numpy as np
