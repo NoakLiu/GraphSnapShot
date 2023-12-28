@@ -4,7 +4,9 @@ from data_processing.data_preprocessing import load_data
 import torch.nn.functional as F
 from data_processing.data_preprocessing import accuracy
 from SSDReS_Samplers.GraphSDSampler import MLP
-from SSDReS_Samplers.GraphKSDSampler import GraphKSDSampler
+# from SSDReS_Samplers.GraphKSDSampler_sswap import GraphKSDSampler
+# from SSDReS_Samplers.GraphKSDSampler_dswp import GraphKSDSampler
+from SSDReS_Samplers.GraphKSDSampler_cswp import GraphKSDSampler
 import numpy as np
 import time
 from data_processing.plot import draw_pic
@@ -34,19 +36,22 @@ class Trainer:
 
             # if this is because the data loading module
             # Sampling nodes
-            sampled_nodes, comp_list = sampler.resample(resampled_nodes, alpha, 2)
-            sampled_adj = comp_list[0][sampled_nodes][:, sampled_nodes]
-            sampled_adj = torch.tensor(sampled_adj, dtype=torch.float32)
-            sampled_features = self.features[sampled_nodes]
-            sampled_labels = self.labels[sampled_nodes]
+
+            # 改进training的时候如何调用各个程序，是否正确调用
+
+            comp_nodes, comp_list = sampler.resample(resampled_nodes, alpha, 2)
+            comp_adj = comp_list[0][comp_nodes][:, comp_nodes]
+            comp_adj = torch.tensor(comp_adj, dtype=torch.float32)
+            comp_features = self.features[comp_nodes]
+            comp_labels = self.labels[comp_nodes]
 
             # Forward
             if(self.machine=="gpu"):
-                output = self.model(sampled_features.cuda(), sampled_adj.cuda())
-                loss = F.nll_loss(output, sampled_labels.cuda())
+                output = self.model(comp_features.cuda(), comp_adj.cuda())
+                loss = F.nll_loss(output, comp_labels.cuda())
             else:
-                output = self.model(sampled_features, sampled_adj)
-                loss = F.nll_loss(output, sampled_labels)
+                output = self.model(comp_features, comp_adj)
+                loss = F.nll_loss(output, comp_labels)
 
             # Backward
             loss.backward()
@@ -91,14 +96,14 @@ alpha = 0
 presampled_nodes = 20
 presampled_perexpansion = 2
 resampled_nodes = 10
-sampled_depth = 2
+sampled_depth = 4
 
 test_loss_list = []
 test_acc_list = []
 train_time_list = []
 i_list = []
 
-for i in np.arange(0.1,1,0.1):
+for i in np.arange(0.1,1.05,0.1):
     alpha = i
 
     start_time = time.time()
