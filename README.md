@@ -4,9 +4,15 @@ GraphSnapShot is a framework for fast storage, retrieval and computation for gra
 
 ![model construction](./assets/Disk_Cache_Memory_GraphSnapShot.png)
 
-![model construction](./assets/SSDReS.png)
+![model construction](./assets/SSDReS.png)3 system design strategies
 
-![model construction](./assets/res.png)
+```
+FBS: full batch load
+OTF: partial cache refresh (on the fly) snapshot
+FCR: full cache refresh snapshot
+```
+
+results
 
 ```
 time = [252.6, 143.4, 107.8]  
@@ -14,6 +20,8 @@ memory = [20.3, 18.2, 22.5]
 accuracy = [71.3, 62.9, 67.5]  
 posttrain_time = [0, 23.6, 82.5]  
 ```
+
+![model construction](./assets/res.png)
 
 The main idea of this framework is `Static Pre-Sampling and Dynamic Re-Sampling` for Efficient Graph Learning Storage and Retrieval.
 
