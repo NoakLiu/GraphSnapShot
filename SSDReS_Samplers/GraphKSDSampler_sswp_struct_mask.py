@@ -20,14 +20,14 @@ class GraphKSDSampler:
     def preprocess_static_sampling(self):
         # --->这里最好每次是batch输入
         initial_sample = random.sample(list(self.data), self.nodes_batch)
-        _, adjacency_matrices = self.k_hop_sampling(initial_sample)
+        _, adjacency_matrices = self.k_hop_presampling_disk2cache(initial_sample)
         return initial_sample, adjacency_matrices
 
     def reset_compute_matrices(self):
         # Reset compute_matrices to zero matrices for new calculations
         self.compute_matrices = [np.zeros_like(self.adj_matrix, dtype=int) for _ in range(self.k)]
 
-    def k_hop_sampling(self, initial_sample):
+    def k_hop_presampling_disk2cache(self, initial_sample):
         layers = [initial_sample]
         adjacency_matrices = [np.zeros_like(self.adj_matrix, dtype=int) for _ in range(self.k)]
 
@@ -117,7 +117,7 @@ class GraphKSDSampler:
         benchmark.simulate_cache_access(cnt)
 
 
-    def k_hop_retrieval_erase(self):
+    def k_hop_erase_cache(self):
         # Start with the initial sample set
         current_layer = set(self.batch_base_nodes)
         cnt = len(current_layer)
@@ -146,7 +146,7 @@ class GraphKSDSampler:
         # erase data from cache
         benchmark.simulate_cache_access(cnt)
 
-    def k_hop_resampling(self):
+    def k_hop_resampling_disk2cache(self):
         layers = [self.batch_base_nodes]
         adjacency_matrices = [np.zeros_like(self.adj_matrix, dtype=int) for _ in range(self.k)]
 
@@ -173,29 +173,12 @@ class GraphKSDSampler:
         # load the structure embedding to the cache
         benchmark.simulate_disk_read(cnt)
 
-    def resample(self, n, alpha, n_per_hop=3):
+    def resample(self):
         self.reset_compute_matrices()
 
-        # # non_static_nodes = list(set(list(self.adj_matrix[0])) - set(self.static_sampled_nodes))
-        # non_static_nodes = list(set(list(self.data)) - set(self.batch_base_nodes))
-        #
-        # dynamic_resampled_nodes = random.sample(non_static_nodes, int((1 - alpha) * n))
+        self.k_hop_retrieval_cache()
+        self.k_hop_retrieval_disk()
+        self.k_hop_erase_cache()
+        self.k_hop_resampling_disk2cache()
 
-        _, _ = self.k_hop_sampling(dynamic_resampled_nodes)  # , int((1-alpha) * n_per_hop)) # (1-alpha)*nph from disk --> just compute
-
-        static_resampled_nodes = random.sample(self.batch_base_nodes, int(alpha * n))
-        self.k_hop_retrieval_cache(static_resampled_nodes)  # , int(alpha * n_per_hop)) # alpha*nph from memory->remove
-
-        combined_resampled_nodes = dynamic_resampled_nodes + static_resampled_nodes
-
-        cutoff_dynamic_resampled_nodes = random.sample(static_resampled_nodes, int(alpha * n))
-
-        dynamic_resampled_nodes_swap_in = random.sample(non_static_nodes, int(alpha * n))
-        self.k_hop_resampling(
-            dynamic_resampled_nodes_swap_in)  # , int(alpha * n_per_hop)) #alpha*nph from disk to memory
-
-        for node in cutoff_dynamic_resampled_nodes:
-            self.batch_base_nodes.remove(node)
-        self.batch_base_nodes.extend(dynamic_resampled_nodes_swap_in)
-
-        return combined_resampled_nodes, self.compute_matrices
+        return self.batch_base_nodes, self.compute_matrices
