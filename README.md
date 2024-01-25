@@ -12,7 +12,21 @@ OTF: partial cache refresh (on the fly) snapshot
 FCR: full cache refresh snapshot
 ```
 
-results
+Design of FBL
+
+![model construction](./assets/FBL.png)
+
+Design of OTF
+
+![model construction](./assets/OTF.png)
+
+Design of FCR
+
+![model construction](./assets/FCR.png)
+
+
+
+Results
 
 ```
 time = [252.6, 143.4, 107.8]  
