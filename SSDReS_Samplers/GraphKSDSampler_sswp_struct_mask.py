@@ -1,5 +1,7 @@
 import random
 import numpy as np
+import torch
+
 # from Disk_Mem_Simulation.simulation_benchmark import benchmark
 from Disk_Mem_Simulation.simulation_disk_cache_benchmark import benchmark
 
@@ -15,7 +17,8 @@ class GraphKSDSampler:
         self.disk_retrieval_nodes_per_hop = rdn
         self.cached_erase_nodes_per_hop = ecn
         self.batch_base_nodes, self.k_hop_adjacency_matrices = self.preprocess_static_sampling()
-        self.compute_matrices = [np.zeros_like(self.adj_matrix, dtype=int) for _ in range(self.k)]
+        # self.compute_matrices = [np.zeros_like(self.adj_matrix, dtype=int) for _ in range(self.k)]
+        self.compute_matrices = [torch.zeros_like(self.adj_matrix) for _ in range(self.k)]
 
     def preprocess_static_sampling(self):
         # --->这里最好每次是batch输入
@@ -25,7 +28,8 @@ class GraphKSDSampler:
 
     def reset_compute_matrices(self):
         # Reset compute_matrices to zero matrices for new calculations
-        self.compute_matrices = [np.zeros_like(self.adj_matrix, dtype=int) for _ in range(self.k)]
+        # self.compute_matrices = [np.zeros_like(self.adj_matrix, dtype=int) for _ in range(self.k)]
+        self.compute_matrices = [torch.zeros_like(self.adj_matrix, dtype=int) for _ in range(self.k)]
 
     def k_hop_presampling_disk2cache(self, initial_sample):
         layers = [initial_sample]
