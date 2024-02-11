@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from dgl.nn import GraphConv
+import dgl
+print(dgl.__version__)
 from dgl.dataloading import MultiLayerNeighborSampler, NodeDataLoader
 from ogb.nodeproppred import DglNodePropPredDataset
 

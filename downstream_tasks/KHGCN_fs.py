@@ -1,39 +1,3 @@
-"""
-This script trains and tests a GraphSAGE model for node classification on
-large graphs using efficient neighbor sampling.
-
-Paper: [Inductive Representation Learning on Large Graphs]
-(https://arxiv.org/abs/1706.02216)
-
-Before reading this example, please familiar yourself with graphsage node
-classification by reading the example in the
-`examples/core/graphsage/node_classification.py`
-
-If you want to train graphsage on a large graph in a distributed fashion, read
-the example in the `examples/distributed/graphsage/`.
-
-This flowchart describes the main functional sequence of the provided example.
-main
-│
-├───> Load and preprocess dataset
-│
-├───> Instantiate SAGE model
-│
-├───> train
-│     │
-│     ├───> NeighborSampler (HIGHLIGHT)
-│     │
-│     └───> Training loop
-│           │
-│           └───> SAGE.forward
-│
-└───> layerwise_infer
-      │
-      └───> SAGE.inference
-            │
-            └───> MultiLayerFullNeighborSampler (HIGHLIGHT)
-"""
-
 import argparse
 import time
 
@@ -52,63 +16,61 @@ from dgl.dataloading import (
 )
 from ogb.nodeproppred import DglNodePropPredDataset
 
-
 class SAGE(nn.Module):
-    def __init__(self, in_size, hidden_size, out_size):
-        super().__init__()
+    def __init__(self, in_feats, hidden_size, out_feats):
+        super(SAGE, self).__init__()
         self.layers = nn.ModuleList()
-        # Three-layer GraphSAGE-mean.
-        self.layers.append(dglnn.SAGEConv(in_size, hidden_size, "mean"))
-        self.layers.append(dglnn.SAGEConv(hidden_size, hidden_size, "mean"))
-        self.layers.append(dglnn.SAGEConv(hidden_size, out_size, "mean"))
-        self.dropout = nn.Dropout(0.5)
+        self.layers.append(dglnn.GraphConv(in_feats, hidden_size))
+        num_layers = 3
+        for _ in range(num_layers - 2):
+            self.layers.append(dglnn.GraphConv(hidden_size, hidden_size))
+        self.layers.append(dglnn.GraphConv(hidden_size, out_feats))
+
         self.hidden_size = hidden_size
-        self.out_size = out_size
+        self.out_size = out_feats
 
     def forward(self, blocks, x):
-        hidden_x = x
-        for layer_idx, (layer, block) in enumerate(zip(self.layers, blocks)):
-            hidden_x = layer(block, hidden_x)
-            is_last_layer = layer_idx == len(self.layers) - 1
-            if not is_last_layer:
-                hidden_x = F.relu(hidden_x)
-                hidden_x = self.dropout(hidden_x)
-        return hidden_x
+        for layer, block in zip(self.layers, blocks):
+            x = layer(block, x)
+            x = F.relu(x)
+        return x
+
+#     def inference(self, g, device, fused_sampling: bool = True):
+#         with g.local_scope():
+#             for layer in self.layers:
+#                 h = g.ndata['h'].to(device)
+#                 g.ndata['h'] = layer(g, h)
+#                 g.apply_edges(fn.copy_u('h', 'm'), etype=None)
+#                 g.update_all(fn.mean('m', 'h'), fn.sum('h', 'neigh'))
+#             return g.ndata.pop('neigh')
+
+
+# class SAGE(nn.Module):
+#     def __init__(self, in_size, hidden_size, out_size):
+#         super().__init__()
+#         self.layers = nn.ModuleList()
+#         # Three-layer GraphSAGE-mean.
+#         self.layers.append(dglnn.SAGEConv(in_size, hidden_size, "mean"))
+#         self.layers.append(dglnn.SAGEConv(hidden_size, hidden_size, "mean"))
+#         self.layers.append(dglnn.SAGEConv(hidden_size, out_size, "mean"))
+#         self.dropout = nn.Dropout(0.5)
+#         self.hidden_size = hidden_size
+#         self.out_size = out_size
+
+#     def forward(self, blocks, x):
+#         hidden_x = x
+#         for layer_idx, (layer, block) in enumerate(zip(self.layers, blocks)):
+#             hidden_x = layer(block, hidden_x)
+#             is_last_layer = layer_idx == len(self.layers) - 1
+#             if not is_last_layer:
+#                 hidden_x = F.relu(hidden_x)
+#                 hidden_x = self.dropout(hidden_x)
+#         return hidden_x
 
     def inference(self, g, device, batch_size, fused_sampling: bool = True):
         """Conduct layer-wise inference to get all the node embeddings."""
         feat = g.ndata["feat"]
-        #####################################################################
-        # (HIGHLIGHT) Creating a MultiLayerFullNeighborSampler instance.
-        # This sampler is used in the Graph Neural Networks (GNN) training
-        # process to provide neighbor sampling, which is crucial for
-        # efficient training of GNN on large graphs.
-        #
-        # The first argument '1' indicates the number of layers for
-        # the neighbor sampling. In this case, it's set to 1, meaning
-        # only the direct neighbors of each node will be included in the
-        # sampling.
-        #
-        # The 'prefetch_node_feats' parameter specifies the node features
-        # that need to be pre-fetched during sampling. In this case, the
-        # feature named 'feat' will be pre-fetched.
-        #
-        # `prefetch` in DGL initiates data fetching operations in parallel
-        # with model computations. This ensures data is ready when the
-        # computation needs it, thereby eliminating waiting times between
-        # fetching and computing steps and reducing the I/O overhead during
-        # the training process.
-        #
-        # The difference between whether to use prefetch or not is shown:
-        #
-        # Without Prefetch:
-        # Fetch1 ──> Compute1 ──> Fetch2 ──> Compute2 ──> Fetch3 ──> Compute3
-        #
-        # With Prefetch:
-        # Fetch1 ──> Fetch2 ──> Fetch3
-        #    │          │          │
-        #    └─Compute1 └─Compute2 └─Compute3
-        #####################################################################
+        
         sampler = MultiLayerFullNeighborSampler(
             1, prefetch_node_feats=["feat"], fused=fused_sampling
         )
@@ -185,20 +147,6 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     # Create sampler & dataloader.
     train_idx = dataset.train_idx.to(g.device if not use_uva else device)
     val_idx = dataset.val_idx.to(g.device if not use_uva else device)
-    #####################################################################
-    # (HIGHLIGHT) Instantiate a NeighborSampler object for efficient
-    # training of Graph Neural Networks (GNNs) on large-scale graphs.
-    #
-    # The argument [10, 10, 10] sets the number of neighbors (fanout)
-    # to be sampled at each layer. Here, we have three layers, and
-    # 10 neighbors will be randomly selected for each node at each
-    # layer.
-    #
-    # The 'prefetch_node_feats' and 'prefetch_labels' parameters
-    # specify the node features and labels that need to be pre-fetched
-    # during sampling. More details about `prefetch` can be found in the
-    # `SAGE.inference` function.
-    #####################################################################
     sampler = NeighborSampler(
         [10, 10, 10],  # fanout for [layer-0, layer-1, layer-2]
         prefetch_node_feats=["feat"],
@@ -239,11 +187,6 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
         t0 = time.time()
         model.train()
         total_loss = 0
-        # A block is a graph consisting of two sets of nodes: the
-        # source nodes and destination nodes. The source and destination
-        # nodes can have multiple node types. All the edges connect from
-        # source nodes to destination nodes.
-        # For more details: https://discuss.dgl.ai/t/what-is-the-block/2932.
         for it, (input_nodes, output_nodes, blocks) in enumerate(
             train_dataloader
         ):
@@ -297,6 +240,12 @@ if __name__ == "__main__":
     dataset = AsNodePredDataset(dataset)
 
     g = dataset[0]
+
+
+    # Add self-loops to the graph
+    g = dgl.add_self_loop(g)
+
+
     if args.compare_to_graphbolt == "false":
         g = g.to("cuda" if args.mode == "gpu" else "cpu")
     num_classes = dataset.num_classes
