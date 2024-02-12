@@ -16,9 +16,9 @@ from dgl.dataloading import (
 )
 from ogb.nodeproppred import DglNodePropPredDataset
 
-class SAGE(nn.Module):
+class GCN(nn.Module):
     def __init__(self, in_feats, hidden_size, out_feats):
-        super(SAGE, self).__init__()
+        super(GCN, self).__init__()
         self.layers = nn.ModuleList()
         self.layers.append(dglnn.GraphConv(in_feats, hidden_size))
         num_layers = 3
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     # Create GraphSAGE model.
     in_size = g.ndata["feat"].shape[1]
     out_size = dataset.num_classes
-    model = SAGE(in_size, 256, out_size).to(device)
+    model = GCN(in_size, 256, out_size).to(device)
 
     # Model training.
     print("Training...")

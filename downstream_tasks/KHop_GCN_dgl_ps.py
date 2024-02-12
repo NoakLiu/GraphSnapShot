@@ -53,7 +53,7 @@ def compute_accuracy(logits, labels, mask):
     return correct.item() * 1.0 / sum(mask)
 
 # Define the sampler and dataloader for training
-sampler = MultiLayerNeighborSampler([15, 10])
+sampler = MultiLayerNeighborSampler([100, 100])
 train_dataloader = NodeDataLoader(
     g,
     train_idx,
