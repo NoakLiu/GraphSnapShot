@@ -28,6 +28,7 @@ class GCN(nn.Module):
 
         self.hidden_size = hidden_size
         self.out_size = out_feats
+        self.dropout = nn.Dropout(0.5)
 
     def forward(self, blocks, x):
         for layer, block in zip(self.layers, blocks):
@@ -72,8 +73,15 @@ class GCN(nn.Module):
         feat = g.ndata["feat"]
         
         sampler = MultiLayerFullNeighborSampler(
-            1, prefetch_node_feats=["feat"], fused=fused_sampling
+            2, prefetch_node_feats=["feat"], fused=fused_sampling
         )
+
+        # sampler = NeighborSampler(
+        # [1000, 500],  # fanout for [layer-0, layer-1, layer-2]
+        # prefetch_node_feats=["feat"],
+        # prefetch_labels=["label"],
+        # fused=fused_sampling,
+        # )
 
         dataloader = DataLoader(
             g,
@@ -90,6 +98,16 @@ class GCN(nn.Module):
         # model is running on a GPU.
         pin_memory = buffer_device != device
 
+        print(self.layers)
+
+        """
+        ModuleList(
+        (0): GraphConv(in=100, out=256, normalization=both, activation=None)
+        (1): GraphConv(in=256, out=256, normalization=both, activation=None)
+        (2): GraphConv(in=256, out=47, normalization=both, activation=None)
+        )
+        """
+
         for layer_idx, layer in enumerate(self.layers):
             is_last_layer = layer_idx == len(self.layers) - 1
             y = torch.empty(
@@ -100,8 +118,16 @@ class GCN(nn.Module):
             )
             feat = feat.to(device)
             for input_nodes, output_nodes, blocks in tqdm.tqdm(dataloader):
+                # print(input_nodes, output_nodes, blocks)
                 x = feat[input_nodes]
-                hidden_x = layer(blocks[0], x)  # len(blocks) = 1
+                # hidden_x = layer(blocks[0], x)  # len(blocks) = 1
+
+                hidden_x = x
+
+                for block in blocks:
+                    # Perform message passing on the current block
+                    hidden_x = layer(block, hidden_x)
+
                 if layer_idx != len(self.layers) - 1:
                     hidden_x = F.relu(hidden_x)
                     hidden_x = self.dropout(hidden_x)
@@ -148,7 +174,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     train_idx = dataset.train_idx.to(g.device if not use_uva else device)
     val_idx = dataset.val_idx.to(g.device if not use_uva else device)
     sampler = NeighborSampler(
-        [10, 10, 10],  # fanout for [layer-0, layer-1, layer-2]
+        [5, 5, 5],  # fanout for [layer-0, layer-1, layer-2]
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
@@ -183,7 +209,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
 
     opt = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=5e-4)
 
-    for epoch in range(10):
+    for epoch in range(1):
         t0 = time.time()
         model.train()
         total_loss = 0
