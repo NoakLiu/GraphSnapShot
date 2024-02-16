@@ -41,23 +41,27 @@ class NeighborSampler_OTF(NeighborSampler):
     def cache_refresh(self):
         """Refresh a fraction (beta) of the static subgraph's nodes by swapping them with nodes from the dynamic subgraph."""
         if self.epoch_counter % self.k == 0:
-            num_static_nodes = self.g_static.number_of_nodes()
-            num_nodes_to_replace = int(num_static_nodes * self.beta)
+            self.disk_cache_swap()
 
-            # Nodes to discard from the static graph and to add from the dynamic graph
-            nodes_to_discard = torch.randperm(num_static_nodes)[:num_nodes_to_replace]
-            nodes_to_add = torch.randperm(self.g_dynamic.number_of_nodes())[:num_nodes_to_replace]
+    def disk_cache_swap(self):
+        """Performs the actual swapping of nodes between g_static and g_dynamic."""
+        num_static_nodes = self.g_static.number_of_nodes()
+        num_nodes_to_replace = int(num_static_nodes * self.beta)
 
-            # Update the static and dynamic subgraphs
-            remaining_static_nodes = torch.tensor(list(set(range(num_static_nodes)) - set(nodes_to_discard.tolist())))
-            new_static_nodes = torch.cat([self.g_static.ndata[dgl.NID][remaining_static_nodes], self.g_dynamic.ndata[dgl.NID][nodes_to_add]])
-            self.g_static = self.g.subgraph(new_static_nodes).to('cuda')
+        # Nodes to discard from the static graph and to add from the dynamic graph
+        nodes_to_discard = torch.randperm(num_static_nodes)[:num_nodes_to_replace]
+        nodes_to_add = torch.randperm(self.g_dynamic.number_of_nodes())[:num_nodes_to_replace]
 
-            remaining_dynamic_nodes = torch.tensor(list(set(range(self.g_dynamic.number_of_nodes())) - set(nodes_to_add.tolist())))
-            new_dynamic_nodes = torch.cat([self.g_dynamic.ndata[dgl.NID][remaining_dynamic_nodes], self.g_static.ndata[dgl.NID][nodes_to_discard]])
-            self.g_dynamic = self.g.subgraph(new_dynamic_nodes)
+        # Update the static and dynamic subgraphs
+        remaining_static_nodes = torch.tensor(list(set(range(num_static_nodes)) - set(nodes_to_discard.tolist())))
+        new_static_nodes = torch.cat([self.g_static.ndata[dgl.NID][remaining_static_nodes], self.g_dynamic.ndata[dgl.NID][nodes_to_add]])
+        self.g_static = self.g.subgraph(new_static_nodes).to('cuda')
 
-    def sample_blocks(self, seed_nodes, exclude_eids=None):
+        remaining_dynamic_nodes = torch.tensor(list(set(range(self.g_dynamic.number_of_nodes())) - set(nodes_to_add.tolist())))
+        new_dynamic_nodes = torch.cat([self.g_dynamic.ndata[dgl.NID][remaining_dynamic_nodes], self.g_static.ndata[dgl.NID][nodes_to_discard]])
+        self.g_dynamic = self.g.subgraph(new_dynamic_nodes)
+
+    def sample_blocks_OTF(self, seed_nodes, exclude_eids=None):
         """Sample blocks from both static and dynamic subgraphs and combine the results."""
         # Refresh the cache if needed
         self.cache_refresh()

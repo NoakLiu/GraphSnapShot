@@ -71,7 +71,7 @@ class NeighborSampler_FCR(NeighborSampler):
         new_dynamic_nodes = torch.cat([self.g_dynamic.ndata[dgl.NID][remaining_dynamic_nodes], self.g_static.ndata[dgl.NID][nodes_to_discard]])
         self.g_dynamic = self.g.subgraph(new_dynamic_nodes)
 
-    def sample_blocks(self, seed_nodes, exclude_eids=None):
+    def sample_blocks_FCR(self, seed_nodes, exclude_eids=None):
         """
         Overrides the sample_blocks method to incorporate the logic of updating g_static
         every k epochs.
