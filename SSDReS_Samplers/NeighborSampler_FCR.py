@@ -5,7 +5,7 @@ import torch
 class NeighborSampler_FCR(NeighborSampler):
     def __init__(self, g, alpha, beta, k, fanouts, **kwargs):
         """
-        Initialize the GraphKSDSampler.
+        Initialize the NeighborSampler_FCR.
 
         Parameters:
         g (DGLGraph): The input graph.
@@ -22,10 +22,10 @@ class NeighborSampler_FCR(NeighborSampler):
         self.k = k
         self.epoch_counter = 0
 
-        # Split the graph
-        self.g_static, self.g_dynamic = self._split_graph()
+        # Preprocess to split the graph
+        self.preprocess()
 
-    def _split_graph(self):
+    def preprocess(self):
         """
         Splits the input graph into g_static and g_dynamic based on alpha.
         """
@@ -40,27 +40,33 @@ class NeighborSampler_FCR(NeighborSampler):
         dynamic_nodes = torch.tensor(list(set(range(num_nodes)) - set(static_nodes.tolist())))
         g_dynamic = self.g.subgraph(dynamic_nodes)
 
-        return g_static, g_dynamic
+        self.g_static, self.g_dynamic = g_static, g_dynamic
 
-    def update_static_graph(self):
+    def cache_refresh(self):
         """
         Updates g_static by discarding beta fraction of its nodes and replacing
-        them with the same number of nodes from g_dynamic.
+        them with the same number of nodes from g_dynamic through disk_cache_swap.
         """
         num_static_nodes = self.g_static.number_of_nodes()
         num_nodes_to_replace = int(num_static_nodes * self.beta)
 
-        # Nodes to discard from g_static
+        # Nodes to discard from g_static and to add from g_dynamic
         nodes_to_discard = torch.randperm(num_static_nodes)[:num_nodes_to_replace]
-
-        # Nodes to add from g_dynamic
         nodes_to_add = torch.randperm(self.g_dynamic.number_of_nodes())[:num_nodes_to_replace]
 
-        # Update g_static and g_dynamic
-        remaining_static_nodes = torch.tensor(list(set(range(num_static_nodes)) - set(nodes_to_discard.tolist())))
+        # Perform the swap
+        self.disk_cache_swap(nodes_to_discard, nodes_to_add)
+
+    def disk_cache_swap(self, nodes_to_discard, nodes_to_add):
+        """
+        Performs the actual swapping of nodes between g_static and g_dynamic.
+        """
+        # Update g_static
+        remaining_static_nodes = torch.tensor(list(set(range(self.g_static.number_of_nodes())) - set(nodes_to_discard.tolist())))
         new_static_nodes = torch.cat([self.g_static.ndata[dgl.NID][remaining_static_nodes], self.g_dynamic.ndata[dgl.NID][nodes_to_add]])
         self.g_static = self.g.subgraph(new_static_nodes).to('cuda')
 
+        # Update g_dynamic
         remaining_dynamic_nodes = torch.tensor(list(set(range(self.g_dynamic.number_of_nodes())) - set(nodes_to_add.tolist())))
         new_dynamic_nodes = torch.cat([self.g_dynamic.ndata[dgl.NID][remaining_dynamic_nodes], self.g_static.ndata[dgl.NID][nodes_to_discard]])
         self.g_dynamic = self.g.subgraph(new_dynamic_nodes)
@@ -71,7 +77,7 @@ class NeighborSampler_FCR(NeighborSampler):
         every k epochs.
         """
         if self.epoch_counter % self.k == 0:
-            self.update_static_graph()
+            self.cache_refresh()
 
         self.epoch_counter += 1
 
