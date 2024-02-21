@@ -1,0 +1,113 @@
+from .. import backend as F
+from ..base import EID, NID
+from ..heterograph import DGLGraph
+from ..transforms import to_block
+from ..utils import get_num_threads
+from .base import BlockSampler
+import torch
+
+class NeighborSampler_FCR_struct:
+    """
+    A neighbor sampler that supports cache-refreshing (FCR) for efficient sampling, 
+    tailored for multi-layer GNNs. This sampler augments the sampling process by 
+    maintaining a cache of pre-sampled neighborhoods that can be reused across 
+    multiple sampling iterations. It introduces cache amplification (via the alpha 
+    parameter) and cache refresh cycles (via the T parameter) to manage the balance 
+    between sampling efficiency and freshness of the sampled neighborhoods.
+
+    Parameters
+    ----------
+    g : DGLGraph
+        The input graph.
+    fanouts : list[int] or list[dict[etype, int]]
+        List of neighbors to sample per edge type for each GNN layer, with the i-th
+        element being the fanout for the i-th GNN layer.
+    edge_dir : str, default "in"
+        Direction of sampling. Can be either "in" for incoming edges or "out" for outgoing edges.
+    prob : str, optional
+        Name of the edge feature in g.edata used as the probability for edge sampling.
+    alpha : int, default 2
+        Cache amplification ratio. Determines the size of the pre-sampled cache relative
+        to the actual sampling needs. A larger alpha means more neighbors are pre-sampled.
+    T : int, default 1
+        Cache refresh cycle. Specifies how often (in terms of sampling iterations) the
+        cache should be refreshed.
+
+    Examples
+    --------
+    Initialize a graph and a NeighborSampler_FCR_struct for a 2-layer GNN with fanouts
+    [5, 10]. Assume alpha=2 for double the size of pre-sampling and T=3 for refreshing
+    the cache every 3 iterations.
+
+    >>> import dgl
+    >>> import torch
+    >>> g = dgl.rand_graph(100, 200)  # Random graph with 100 nodes and 200 edges
+    >>> g.ndata['feat'] = torch.randn(100, 10)  # Random node features
+    >>> sampler = NeighborSampler_FCR_struct(g, [5, 10], alpha=2, T=3)
+    
+    To perform sampling:
+
+    >>> seed_nodes = torch.tensor([1, 2, 3])  # Nodes for which neighbors are sampled
+    >>> for i in range(5):  # Simulate 5 sampling iterations
+    ...     seed_nodes, output_nodes, blocks = sampler.sample_blocks(seed_nodes)
+    ...     # Process the sampled blocks
+    """
+    
+    def __init__(self, g, fanouts, edge_dir='in', prob=None, alpha=2, T=1):
+        self.g = g
+        self.fanouts = fanouts
+        self.edge_dir = edge_dir
+        self.prob = prob
+        self.alpha = alpha
+        self.T = T
+        self.cycle = 0  # Initialize sampling cycle counter
+        self.amplified_fanouts = [f * alpha for f in fanouts]  # Amplified fanouts for pre-sampling
+        self.cache_struct = []  # Initialize cache structure
+        self.cache_refresh()  # Pre-sample and populate the cache
+
+    def cache_refresh(self):
+        """
+        Pre-samples neighborhoods with amplified fanouts and refreshes the cache. This method
+        is automatically called upon initialization and after every T sampling iterations to
+        ensure that the cache is periodically updated with fresh samples.
+        """
+        self.cache_struct.clear()  # Clear existing cache
+        for fanout in self.amplified_fanouts:
+            # Sample neighbors for each layer with amplified fanout
+            frontier = sample_neighbors(
+                self.g,
+                torch.arange(0, self.g.number_of_nodes()),  # Consider all nodes as seeds for pre-sampling
+                fanout,
+                edge_dir=self.edge_dir,
+                prob=self.prob if self.prob in self.g.edata else None
+            )
+            self.cache_struct.append(frontier)  # Update cache with new samples
+
+    def sample_blocks(self, seed_nodes):
+        """
+        Samples blocks from the graph for the specified seed nodes using the cache.
+
+        Parameters
+        ----------
+        seed_nodes : Tensor
+            The nodes for which the neighborhoods are to be sampled.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the seed nodes for the next layer, the output nodes, and
+            the list of blocks sampled from the graph.
+        """
+        self.cycle += 1
+        if self.cycle % self.T == 0:
+            self.cache_refresh()  # Refresh cache every T cycles
+
+        blocks = []
+        for layer, frontier in enumerate(self.cache_struct):
+            # Directly use pre-sampled frontier from the cache
+            block = to_block(frontier, seed_nodes)
+            blocks.insert(0, block)
+            seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
+
+        output_nodes = seed_nodes
+        return seed_nodes, output_nodes, blocks
