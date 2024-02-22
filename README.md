@@ -8,28 +8,29 @@ GraphSnapShot is a framework for fast storage, retrieval and computation for gra
 
 
 ```
-FBS: full batch load
+FBL: full batch load
 OTF: partial cache refresh (on the fly) snapshot
 FCR: full cache refresh snapshot
 ```
 
-Samplers in SSDReS_Sampler
-```
-OTF-struct
-OTF-node
-
-FCR-struct
-FCR-node
-
-```
-
 Deployment:
+
+FBL implementation is same as the `MultiLayerSampler` implemented in dgl.
+
+To deploy our projects, we can reach to the Samplers in SSDReS_Sampler by `cd SSDReS_Samplers`, and then find the following file
+```
+NeighborSampler_OTF_struct.py
+NeighborSampler_OTF_nodes.py
+NeighborSampler_FCR_struct.py
+NeighborSampler_FCR_nodes.py
+```
+
+Add samplers code in SSDReS_Sampler into the neighbor_sampler.py in dgl as in the path above and save the changes.
 
 ```
 cd ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neighbor_sampler.py
 ```
-
-add our sampler in SSDReS_Sampler into the neighbor_sampler.py in dgl as in the path above and save the changes.
+Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers
 
 Design of FBL
 
