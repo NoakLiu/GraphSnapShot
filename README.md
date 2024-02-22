@@ -47,9 +47,9 @@ ogbn_proteins
 ```
 
 <p float="left">
-  <img src="./ogbn-arxiv_degree_distribution.png" width="100" />
-  <img src="./ogbn-products_degree_distribution.png" width="100" />
-  <img src="./ogbn-proteins_degree_distribution.png" width="100" />
+  <img src="./ogbn-arxiv_degree_distribution.png" width="200" />
+  <img src="./ogbn-products_degree_distribution.png" width="200" />
+  <img src="./ogbn-proteins_degree_distribution.png" width="200" />
 </p>
 
 Design of FBL
