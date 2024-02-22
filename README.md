@@ -7,6 +7,22 @@ GraphSnapShot is a framework for fast storage, retrieval and computation for gra
 ![model construction](./assets/SSDReS.png)3 system design strategies
 
 
+```
+FBS: full batch load
+OTF: partial cache refresh (on the fly) snapshot
+FCR: full cache refresh snapshot
+```
+
+Samplers in SSDReS_Sampler
+```
+OTF-struct
+OTF-node
+
+FCR-struct
+FCR-node
+
+```
+
 Deployment:
 
 ```
@@ -14,12 +30,6 @@ cd ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neigh
 ```
 
 add our sampler in SSDReS_Sampler into the neighbor_sampler.py in dgl as in the path above and save the changes.
-
-```
-FBS: full batch load
-OTF: partial cache refresh (on the fly) snapshot
-FCR: full cache refresh snapshot
-```
 
 Design of FBL
 
