@@ -53,11 +53,43 @@ class NeighborSampler_FCR_struct:
     ...     # Process the sampled blocks
     """
     
-    def __init__(self, g, fanouts, edge_dir='in', prob=None, alpha=2, T=1):
+    def __init__(
+            self, 
+            g, 
+            fanouts, 
+            edge_dir='in', 
+            alpha=2, 
+            T=1,
+            prob=None,
+            mask=None,
+            replace=False,
+            prefetch_node_feats=None,
+            prefetch_labels=None,
+            prefetch_edge_feats=None,
+            output_device=None,
+            fused=True,
+        ):
         self.g = g
+
+        super().__init__(
+            prefetch_node_feats=prefetch_node_feats,
+            prefetch_labels=prefetch_labels,
+            prefetch_edge_feats=prefetch_edge_feats,
+            output_device=output_device,
+        )
         self.fanouts = fanouts
         self.edge_dir = edge_dir
-        self.prob = prob
+        if mask is not None and prob is not None:
+            raise ValueError(
+                "Mask and probability arguments are mutually exclusive. "
+                "Consider multiplying the probability with the mask "
+                "to achieve the same goal."
+            )
+        self.prob = prob or mask
+        self.replace = replace
+        self.fused = fused
+        self.mapping = {}
+
         self.alpha = alpha
         self.T = T
         self.cycle = 0  # Initialize sampling cycle counter
@@ -83,7 +115,7 @@ class NeighborSampler_FCR_struct:
             )
             self.cache_struct.append(frontier)  # Update cache with new samples
 
-    def sample_blocks(self, seed_nodes):
+    def sample_blocks(self, seed_nodes, exclude_eids=None):
         """
         Samples blocks from the graph for the specified seed nodes using the cache.
 
@@ -103,7 +135,19 @@ class NeighborSampler_FCR_struct:
             self.cache_refresh()  # Refresh cache every T cycles
 
         blocks = []
-        for layer, frontier in enumerate(self.cache_struct):
+        k = 0
+        for k in range(len(self.cache_struct)-1,-1,-1):
+            frontier_large = self.cache_struct[k]
+            fanout = self.fanouts[k]
+            frontier = frontier_large.sample_neighbors(
+                seed_nodes,
+                fanout,
+                edge_dir=self.edge_dir,
+                prob=self.prob,
+                replace=self.replace,
+                output_device=self.output_device,
+                exclude_edges=exclude_eids
+            )
             # Directly use pre-sampled frontier from the cache
             block = to_block(frontier, seed_nodes)
             blocks.insert(0, block)
