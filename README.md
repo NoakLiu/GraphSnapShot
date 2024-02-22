@@ -30,7 +30,21 @@ Add samplers code in SSDReS_Sampler into the neighbor_sampler.py in dgl as in th
 ```
 cd ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neighbor_sampler.py
 ```
-Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers
+Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers.
+
+Downsteam Task: 
+```
+MultiLayer GCN
+MultiLayer SGC
+MultiLayer GraphSAGE
+```
+
+Datasets:
+```
+ogbn_arxiv
+ogbn_products
+ogbn_proteins
+```
 
 Design of FBL
 
