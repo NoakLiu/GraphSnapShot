@@ -46,7 +46,7 @@ ogbn_products
 ogbn_proteins
 ```
 
-<p float="center">
+<p align="center">
   <img src="./ogbn-arxiv_degree_distribution.png" width="200" />
   <img src="./ogbn-products_degree_distribution.png" width="200" />
   <img src="./ogbn-proteins_degree_distribution.png" width="200" />
