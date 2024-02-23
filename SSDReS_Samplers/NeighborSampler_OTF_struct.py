@@ -1,7 +1,14 @@
 import dgl
+# import torch
+# from dgl.sampling import sample_neighbors
+# from dgl.transforms import to_block
+from .. import backend as F
+from ..base import EID, NID
+from ..heterograph import DGLGraph
+from ..transforms import to_block
+from ..utils import get_num_threads
+from .base import BlockSampler
 import torch
-from dgl.sampling import sample_neighbors
-from dgl.transforms import to_block
 
 def graph_difference(g1, g2):
     """
@@ -46,8 +53,7 @@ class NeighborSampler_OTF_struct:
         """
         Initializes the cache for each layer based on the amplified fanouts.
         """
-        cached_graph = sample_neighbors(
-            self.g,
+        cached_graph = self.g.sample_neighbors(
             torch.arange(0, self.g.number_of_nodes(), dtype=torch.int64),
             fanout_cache_storage,
             edge_dir=self.edge_dir,
@@ -131,7 +137,7 @@ class NeighborSampler_OTF_struct:
             )
             
             # Merge frontiers
-            merged_frontier = dgl.batch([frontier_cache, frontier_disk])
+            merged_frontier = dgl.mege([frontier_cache, frontier_disk]) #merge batch
             
             # Convert the merged frontier to a block
             block = to_block(self.g, merged_frontier, seed_nodes)
