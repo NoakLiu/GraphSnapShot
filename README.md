@@ -41,9 +41,10 @@ MultiLayer GraphSAGE
 
 Datasets:
 ```
-ogbn_arxiv
-ogbn_products
-ogbn_proteins
+ogbn_arxiv - struct / nodes
+ogbn_products - struct / nodes
+ogbn_proteins - struct / nodes
+FB-15K - nodes
 ```
 
 <p align="center">
