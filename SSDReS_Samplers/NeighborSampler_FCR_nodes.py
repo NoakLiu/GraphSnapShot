@@ -2,7 +2,7 @@ import dgl
 from dgl.dataloading import NeighborSampler
 import torch
 
-class NeighborSampler_FCR(NeighborSampler):
+class NeighborSampler_FCR_nodes(NeighborSampler):
     def __init__(self, g, alpha, beta, k, fanouts, **kwargs):
         """
         Initialize the NeighborSampler_FCR.

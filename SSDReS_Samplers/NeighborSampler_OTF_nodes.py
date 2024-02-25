@@ -2,7 +2,7 @@ import dgl
 from dgl.dataloading import NeighborSampler
 import torch
 
-class NeighborSampler_OTF(NeighborSampler):
+class NeighborSampler_OTF_nodes(NeighborSampler):
     def __init__(self, g, alpha, beta, k, fanouts, **kwargs):
         """
         Initialize the on-the-fly neighbor sampler.

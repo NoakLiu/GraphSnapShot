@@ -21,7 +21,7 @@ from dgl.dataloading import (
     BlockSampler
 )
 
-class NeighborSampler_OTF(NeighborSampler):
+class NeighborSampler_OTF_nodes(NeighborSampler):
     def __init__(self, g, alpha, beta, k, fanouts, **kwargs):
         """
         Initialize the on-the-fly neighbor sampler.
@@ -236,7 +236,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     # Create sampler & dataloader.
     train_idx = dataset.train_idx.to(g.device if not use_uva else device)
     val_idx = dataset.val_idx.to(g.device if not use_uva else device)
-    sampler_cuda = NeighborSampler_OTF(
+    sampler_cuda = NeighborSampler_OTF_nodes(
         g=g,
         fanouts=[2, 2, 2],  # fanout for [layer-0, layer-1, layer-2]
         alpha=0.2,
@@ -247,7 +247,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
         fused=fused_sampling,
     )
 
-    sampler = NeighborSampler_OTF(
+    sampler = NeighborSampler_OTF_nodes(
         g=g,
         fanouts=[4, 4, 4],  # fanout for [layer-0, layer-1, layer-2]
         alpha=0.2,

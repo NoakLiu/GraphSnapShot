@@ -21,7 +21,7 @@ from dgl.dataloading import (
     BlockSampler
 )
 
-class NeighborSampler_FCR(NeighborSampler):
+class NeighborSampler_FCR_nodes(NeighborSampler):
     def __init__(self, g, alpha, beta, k, fanouts, **kwargs):
         """
         Initialize the NeighborSampler_FCR.
@@ -226,7 +226,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     # Create sampler & dataloader.
     train_idx = dataset.train_idx.to(g.device if not use_uva else device)
     val_idx = dataset.val_idx.to(g.device if not use_uva else device)
-    sampler_cuda = NeighborSampler_FCR(
+    sampler_cuda = NeighborSampler_FCR_nodes(
         g=g,
         fanouts=[2, 2, 2],  # fanout for [layer-0, layer-1, layer-2]
         alpha=0.2,
@@ -237,7 +237,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
         fused=fused_sampling,
     )
 
-    sampler = NeighborSampler_FCR(
+    sampler = NeighborSampler_FCR_nodes(
         g=g,
         fanouts=[4, 4, 4],  # fanout for [layer-0, layer-1, layer-2]
         alpha=0.2,
