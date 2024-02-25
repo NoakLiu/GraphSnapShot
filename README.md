@@ -32,6 +32,12 @@ cd ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neigh
 ```
 Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers.
 
+Two types of samplers:
+```
+node-level: split graph into graph_static and graph_dynamic, enhance the capability for CPU-GPU co-utilization.
+structure-level: reduce the inefficiency of resample whole k-hop structure for each node, use static-presample and dynamic-resample for structure retrieval acceleration.
+```
+
 Downsteam Task: 
 ```
 MultiLayer GCN
