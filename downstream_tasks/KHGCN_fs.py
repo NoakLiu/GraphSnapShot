@@ -13,8 +13,53 @@ from dgl.dataloading import (
     DataLoader,
     MultiLayerFullNeighborSampler,
     NeighborSampler,
+    MultiLayerNeighborSampler,
+    BlockSampler
 )
 from ogb.nodeproppred import DglNodePropPredDataset
+
+# class NeighborSampler(BlockSampler):
+#     def __init__(
+#         self,
+#         fanouts,
+#         edge_dir="in",
+#         prob=None,
+#         mask=None,
+#         replace=False,
+#         prefetch_node_feats=None,
+#         prefetch_labels=None,
+#         prefetch_edge_feats=None,
+#         output_device=None,
+#         fused=True,
+#     ):
+#         super().__init__(
+#             prefetch_node_feats=prefetch_node_feats,
+#             prefetch_labels=prefetch_labels,
+#             prefetch_edge_feats=prefetch_edge_feats,
+#             output_device=output_device,
+#         )
+#         self.fanouts = fanouts
+#         self.edge_dir = edge_dir
+#         self.prob = prob
+#         self.mask = mask  # Add mask parameter
+#         self.replace = replace
+#         self.fused = fused
+#         self.mapping = {}
+#         self.g = None
+
+def merge_neighbor_samplers(sampler1, sampler2, seed_nodes1, seed_nodes2, output_nodes1, output_nodes2, blocks1, blocks2):
+    # 合并 seed_nodes 和 output_nodes
+    merged_seed_nodes = torch.cat([seed_nodes1, seed_nodes2], dim=0)
+    merged_output_nodes = torch.cat([output_nodes1, output_nodes2], dim=0)
+
+    # 合并 blocks
+    merged_blocks = []
+    for block1, block2 in zip(blocks1, blocks2):
+        new_block = dgl.block([block1, block2])
+        merged_blocks.append(new_block)
+
+    return merged_seed_nodes, merged_output_nodes, merged_blocks
+
 
 class GCN(nn.Module):
     def __init__(self, in_feats, hidden_size, out_feats):
@@ -73,7 +118,7 @@ class GCN(nn.Module):
         feat = g.ndata["feat"]
         
         sampler = MultiLayerFullNeighborSampler(
-            2, prefetch_node_feats=["feat"], fused=fused_sampling
+            1, prefetch_node_feats=["feat"], fused=fused_sampling
         )
 
         # sampler = NeighborSampler(
@@ -173,17 +218,47 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     # Create sampler & dataloader.
     train_idx = dataset.train_idx.to(g.device if not use_uva else device)
     val_idx = dataset.val_idx.to(g.device if not use_uva else device)
-    sampler = NeighborSampler(
-        [5, 5, 5],  # fanout for [layer-0, layer-1, layer-2]
+    sampler_cuda = NeighborSampler(
+        [2, 2, 2],  # fanout for [layer-0, layer-1, layer-2]
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
     )
 
+    sampler = NeighborSampler(
+        [4, 4, 4],  # fanout for [layer-0, layer-1, layer-2]
+        prefetch_node_feats=["feat"],
+        prefetch_labels=["label"],
+        fused=fused_sampling,
+    )
+
+    # 调用示例
+    seed_nodes1, output_nodes1, blocks1 = sampler.sample_blocks(g, seed_nodes)
+    seed_nodes2, output_nodes2, blocks2 = sampler_cuda.sample_blocks(g, seed_nodes)
+
+    merged_seed_nodes, merged_output_nodes, merged_blocks = merge_neighbor_samplers(sampler, sampler_cuda, seed_nodes1, seed_nodes2, output_nodes1, output_nodes2, blocks1, blocks2)
+
+
+    sampler_res = merge_neighbor_samplers(sampler, sampler_cuda)
+
     train_dataloader = DataLoader(
         g,
         train_idx,
-        sampler,
+        sampler_res,
+        device=device,
+        batch_size=1024,
+        shuffle=True,
+        drop_last=False,
+        # If `g` is on gpu or `use_uva` is True, `num_workers` must be zero,
+        # otherwise it will cause error.
+        num_workers=0,
+        use_uva=use_uva,
+    )
+
+    train_dataloader_cuda = DataLoader(
+        g,
+        train_idx,
+        sampler_cuda,
         device=device,
         batch_size=1024,
         shuffle=True,
@@ -197,12 +272,26 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     val_dataloader = DataLoader(
         g,
         val_idx,
-        sampler,
+        sampler_res,
         device=device,
         batch_size=1024,
         # No need to shuffle for validation.
         shuffle=False,
         drop_last=False,
+        num_workers=0,
+        use_uva=use_uva,
+    )
+
+    val_dataloader_cuda = DataLoader(
+        g,
+        val_idx,
+        sampler_cuda,
+        device=device,
+        batch_size=1024,
+        shuffle=True,
+        drop_last=False,
+        # If `g` is on gpu or `use_uva` is True, `num_workers` must be zero,
+        # otherwise it will cause error.
         num_workers=0,
         use_uva=use_uva,
     )
@@ -224,6 +313,8 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
             # in the last layer's computation graph.
             y = blocks[-1].dstdata["label"]
 
+            print(blocks)
+
             y_hat = model(blocks, x)
             loss = F.cross_entropy(y_hat, y)
             opt.zero_grad()
@@ -237,6 +328,38 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
             f"Accuracy {acc.item():.4f} | Time {t1 - t0:.4f}"
         )
 
+    print("middle")
+
+    for epoch in range(1):
+        t0 = time.time()
+        model.train()
+        total_loss = 0
+        for it, (input_nodes, output_nodes, blocks) in enumerate(
+            train_dataloader_cuda
+        ):
+            # The input features from the source nodes in the first layer's
+            # computation graph.
+
+            print(blocks)
+
+            x = blocks[0].srcdata["feat"]
+
+            # The ground truth labels from the destination nodes
+            # in the last layer's computation graph.
+            y = blocks[-1].dstdata["label"]
+
+            y_hat = model(blocks, x)
+            loss = F.cross_entropy(y_hat, y)
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+            total_loss += loss.item()
+        t1 = time.time()
+        acc = evaluate(model, g, val_dataloader_cuda, num_classes)
+        print(
+            f"Epoch {epoch:05d} | Loss {total_loss / (it + 1):.4f} | "
+            f"Accuracy {acc.item():.4f} | Time {t1 - t0:.4f}"
+        )
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
