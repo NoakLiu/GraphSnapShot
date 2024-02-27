@@ -5,8 +5,9 @@ from ..transforms import to_block
 from ..utils import get_num_threads
 from .base import BlockSampler
 import torch
+import dgl
 
-class NeighborSampler_FCR_struct:
+class NeighborSampler_FCR_struct(BlockSampler):
     """
     A neighbor sampler that supports cache-refreshing (FCR) for efficient sampling, 
     tailored for multi-layer GNNs. This sampler augments the sampling process by 
@@ -97,7 +98,7 @@ class NeighborSampler_FCR_struct:
         self.cache_struct = []  # Initialize cache structure
         self.cache_refresh()  # Pre-sample and populate the cache
 
-    def cache_refresh(self):
+    def cache_refresh(self,exclude_eids=None):
         """
         Pre-samples neighborhoods with amplified fanouts and refreshes the cache. This method
         is automatically called upon initialization and after every T sampling iterations to
@@ -106,16 +107,27 @@ class NeighborSampler_FCR_struct:
         self.cache_struct.clear()  # Clear existing cache
         for fanout in self.amplified_fanouts:
             # Sample neighbors for each layer with amplified fanout
-            frontier = sample_neighbors(
-                self.g,
+            print("large")
+            print(fanout)
+            print("---")
+            frontier = self.g.sample_neighbors(
                 torch.arange(0, self.g.number_of_nodes()),  # Consider all nodes as seeds for pre-sampling
+                # self.g.number_of_nodes(),
+                # 10,
                 fanout,
                 edge_dir=self.edge_dir,
-                prob=self.prob if self.prob in self.g.edata else None
+                prob=self.prob,
+                replace=self.replace,
+                output_device=self.output_device,
+                exclude_edges=exclude_eids
             )
+            frontier = dgl.add_self_loop(frontier)
+            print(frontier)
+            print(self.cache_struct)
+            print("then append")
             self.cache_struct.append(frontier)  # Update cache with new samples
 
-    def sample_blocks(self, seed_nodes, exclude_eids=None):
+    def sample_blocks(self, g,seed_nodes, exclude_eids=None):
         """
         Samples blocks from the graph for the specified seed nodes using the cache.
 
@@ -135,10 +147,50 @@ class NeighborSampler_FCR_struct:
             self.cache_refresh()  # Refresh cache every T cycles
 
         blocks = []
+
+        if self.fused and get_num_threads() > 1:
+            # print("fused")
+            cpu = F.device_type(g.device) == "cpu"
+            if isinstance(seed_nodes, dict):
+                for ntype in list(seed_nodes.keys()):
+                    if not cpu:
+                        break
+                    cpu = (
+                        cpu and F.device_type(seed_nodes[ntype].device) == "cpu"
+                    )
+            else:
+                cpu = cpu and F.device_type(seed_nodes.device) == "cpu"
+            if cpu and isinstance(g, DGLGraph) and F.backend_name == "pytorch":
+                if self.g != g:
+                    self.mapping = {}
+                    self.g = g
+                for fanout in reversed(self.fanouts):
+                    block = g.sample_neighbors_fused(
+                        seed_nodes,
+                        fanout,
+                        edge_dir=self.edge_dir,
+                        prob=self.prob,
+                        replace=self.replace,
+                        exclude_edges=exclude_eids,
+                        mapping=self.mapping,
+                    )
+                    seed_nodes = block.srcdata[NID]
+                    blocks.insert(0, block)
+                return seed_nodes, output_nodes, blocks
+
         k = 0
+        print("cache struct")
+        print(self.cache_struct)
+        print(len(self.cache_struct))
+        print("---")
         for k in range(len(self.cache_struct)-1,-1,-1):
             frontier_large = self.cache_struct[k]
             fanout = self.fanouts[k]
+            print("small")
+            print("seed",seed_nodes)
+            print("fanout",fanout)
+            print("frontier_large",frontier_large)
+            print("---")
             frontier = frontier_large.sample_neighbors(
                 seed_nodes,
                 fanout,
@@ -148,6 +200,7 @@ class NeighborSampler_FCR_struct:
                 output_device=self.output_device,
                 exclude_edges=exclude_eids
             )
+
             # Directly use pre-sampled frontier from the cache
             block = to_block(frontier, seed_nodes)
             blocks.insert(0, block)
