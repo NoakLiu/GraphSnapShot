@@ -75,7 +75,7 @@ Design of FCR
 
 Results
 
-OTF - Setting: sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15
+OTF - Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15
 ```
 Epoch 00000 | Loss 1.6886 | Accuracy 0.5821 | Time 98.2462
 Testing...
@@ -89,7 +89,7 @@ ModuleList(
 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:29<00:00, 20.30it/s]
 Test accuracy 0.7021
 ```
-FCR Setting: sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=3
+FCR Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=3
 ```
 Epoch 00000 | Loss 0.8631 | Accuracy 0.8006 | Time 69.2330
 Testing...
@@ -104,7 +104,7 @@ ModuleList(
 Test accuracy 0.7251
 ```
 
-FBL
+FBL Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4]
 ```
 Epoch 00000 | Loss 0.9333 | Accuracy 0.7865 | Time 3.6946
 Testing...
