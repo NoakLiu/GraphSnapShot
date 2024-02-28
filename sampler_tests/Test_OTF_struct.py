@@ -118,6 +118,7 @@ def evaluate(model, graph, dataloader, num_classes):
     ys = []
     y_hats = []
     for it, (input_nodes, output_nodes, blocks) in enumerate(dataloader):
+        blocks = blocks[::-1]
         x = blocks[0].srcdata["feat"]
         ys.append(blocks[-1].dstdata["label"])
         y_hats.append(model(blocks, x))
@@ -267,6 +268,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
         for it, (input_nodes, output_nodes, blocks) in enumerate(
             train_dataloader
         ):
+            blocks = blocks[::-1]
             # The input features from the source nodes in the first layer's
             # computation graph.
             x = blocks[0].srcdata["feat"]
@@ -301,7 +303,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
         ):
             # The input features from the source nodes in the first layer's
             # computation graph.
-
+            blocks = blocks[::-1]
             print(blocks)
 
             x = blocks[0].srcdata["feat"]
