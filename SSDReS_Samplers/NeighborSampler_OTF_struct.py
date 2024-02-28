@@ -1,45 +1,14 @@
-import dgl
+"""Data loading components for neighbor sampling"""
 from .. import backend as F
 from ..base import EID, NID
 from ..heterograph import DGLGraph
 from ..transforms import to_block
 from ..utils import get_num_threads
 from .base import BlockSampler
+import dgl
 import torch
 
-def graph_difference(g1, g2):
-    """
-    Computes the set difference of edges between two DGL graphs g1 and g2. 
-    It returns a new graph containing only the edges that are present in g1 
-    but not in g2. This function is useful for operations like cache refreshing 
-    in graph sampling where unique edges need to be identified.
-
-    Parameters
-    ----------
-    g1 : DGLGraph
-        The first graph from which edges are to be subtracted.
-    g2 : DGLGraph
-        The second graph whose edges are to be considered for subtraction from g1.
-
-    Returns
-    -------
-    DGLGraph
-        A new DGLGraph containing only the edges that are in g1 but not in g2.
-
-    """
-    # Convert edges to sets of tuples for easy comparison
-    edges_g1 = set(zip(*g1.edges()))
-    edges_g2 = set(zip(*g2.edges()))
-    
-    # Find edges present in g1 but not in g2
-    unique_edges = edges_g1 - edges_g2
-    unique_src, unique_dst = zip(*unique_edges) if unique_edges else ([], [])
-    
-    # Create a new graph from the unique edges
-    g_unique = dgl.graph((torch.tensor(unique_src), torch.tensor(unique_dst)), num_nodes=g1.number_of_nodes())
-    return g_unique
-
-class NeighborSampler_OTF_struct:
+class NeighborSampler_OTF_struct(BlockSampler):
     """
     Implements an on-the-fly (OTF) neighbor sampling strategy for Deep Graph Library (DGL) graphs. 
     This sampler dynamically samples neighbors while balancing efficiency through caching and 
@@ -100,18 +69,50 @@ class NeighborSampler_OTF_struct:
     for sampling, and then performing neighbor sampling. The sampled blocks can be used for constructing GNN layers.
     """
     
-    def __init__(self, g, fanouts, edge_dir='in', alpha=0.6, beta=2, gamma=0.4, prob=None, replace=False, output_device=None, exclude_eids=None):
+    def __init__(self, g, 
+                fanouts, 
+                edge_dir='in', 
+                alpha=0.6, 
+                beta=2, 
+                gamma=0.4, 
+                prob=None, 
+                replace=False, 
+                output_device=None, 
+                exclude_eids=None,
+                mask=None,
+                prefetch_node_feats=None,
+                prefetch_labels=None,
+                prefetch_edge_feats=None,
+                fused=True,
+                 ):
+        super().__init__(
+            prefetch_node_feats=prefetch_node_feats,
+            prefetch_labels=prefetch_labels,
+            prefetch_edge_feats=prefetch_edge_feats,
+            output_device=output_device,
+        )
         self.g = g
         self.fanouts = fanouts
         self.edge_dir = edge_dir
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma
-        self.prob = prob
         self.replace = replace
         self.output_device = output_device
         self.exclude_eids = exclude_eids
-        
+
+        if mask is not None and prob is not None:
+            raise ValueError(
+                "Mask and probability arguments are mutually exclusive. "
+                "Consider multiplying the probability with the mask "
+                "to achieve the same goal."
+            )
+        self.prob = prob or mask
+        self.fused = fused
+        self.mapping = {}
+        self.cache_size = [fanout * alpha * beta for fanout in fanouts]
+        print(self.cache_size)
+
         # Initialize cache with amplified fanouts
         self.cached_graph_structures = [self.initialize_cache(fanout * alpha * beta) for fanout in fanouts]
 
@@ -121,8 +122,12 @@ class NeighborSampler_OTF_struct:
         set of neighbors. This pre-sampling helps in reducing the need for dynamic sampling 
         at every iteration, thereby improving efficiency.
         """
+        print("begin init")
         cached_graph = self.g.sample_neighbors(
-            torch.arange(0, self.g.number_of_nodes(), dtype=torch.int64),
+            # torch.arange(0, self.g.number_of_nodes(), dtype=torch.int64),
+            torch.arange(0, self.g.number_of_nodes()),
+            # self.g.number_of_nodes(),
+            # 10,
             fanout_cache_storage,
             edge_dir=self.edge_dir,
             prob=self.prob,
@@ -130,29 +135,42 @@ class NeighborSampler_OTF_struct:
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
         )
+        print("end init")
         return cached_graph
 
-    def refresh_cache(self, cached_graph_structure, seed_nodes, fanout_cache_retrieval, fanout_cache_refresh):
+    def refresh_cache(self,layer_id, cached_graph_structure, seed_nodes, fanout_cache_retrieval, fanout_cache_refresh):
         """
         Refreshes a portion of the cache based on the gamma parameter by replacing some of the 
         cached edges with new samples from the graph. This method ensures the cache remains 
         relatively fresh and reflects changes in the dynamic graph structure or sampling needs.
         """
+        print("begin refresh")
+        print("begin remove")
+        fanout_cache_sample=[]
+        print(self.cache_size)
+        print(fanout_cache_refresh)
+        # for i in range(len(self.cache_size)):
+        fanout_cache_sample = self.cache_size[layer_id]-fanout_cache_refresh
+        print(fanout_cache_sample)
         # Sample edges to remove from cache
-        to_remove = cached_graph_structure.sample_neighbors(
+        removed = cached_graph_structure.sample_neighbors(
             seed_nodes,
-            fanout_cache_refresh,
+            #fanout_cache_refresh,
+            fanout_cache_sample,
             edge_dir=self.edge_dir,
             prob=self.prob,
             replace=self.replace,
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
         )
+        print("end remove")
         
         # Compute the difference and update the cache
-        removed = graph_difference(cached_graph_structure, to_remove)
+        print("removed")
+        print("end removed")
         
         # Add new edges from the disk to the cache
+        print("add graph")
         to_add = self.g.sample_neighbors(
             seed_nodes,
             fanout_cache_refresh,
@@ -162,58 +180,287 @@ class NeighborSampler_OTF_struct:
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
         )
+        print("end add graph")
         
         # Merge the updated cache with new samples
-        refreshed_cache = dgl.graph((torch.cat([removed.edges()[0], to_add.edges()[0]]),
-                                     torch.cat([removed.edges()[1], to_add.edges()[1]])),
-                                    num_nodes=self.g.number_of_nodes())
+        print("begin refresh cache")
+        # refreshed_cache = dgl.graph((torch.cat([removed.edges()[0], to_add.edges()[0]]),
+        #                              torch.cat([removed.edges()[1], to_add.edges()[1]])),
+        #                             num_nodes=self.g.number_of_nodes())
+        refreshed_cache = dgl.merge([removed, to_add])
+        print("end refresh cache")
         return refreshed_cache
 
-    def sample_blocks(self, seed_nodes):
+    def sample_blocks(self, g, seed_nodes, exclude_eids=None):
         """
         Samples blocks for GNN layers by combining cached samples with dynamically sampled 
         neighbors. This method also partially refreshes the cache based on specified parameters 
         to balance between sampling efficiency and the freshness of the samples.
         """
         blocks = []
-        for i, (fanout, cached_graph_structure) in enumerate(zip(self.fanouts, self.cached_graph_structures)):
+        output_nodes = seed_nodes
+        print("in sample blocks")
+        for i, (fanout, cached_graph_structure) in enumerate(zip(reversed(self.fanouts), reversed(self.cached_graph_structures))):
             fanout_cache_retrieval = int(fanout * self.alpha)
             fanout_disk = fanout - fanout_cache_retrieval
             fanout_cache_refresh = int(fanout_cache_retrieval * self.beta * self.gamma)
-            
+
+            print("fanout_size:",fanout)
+
             # Refresh cache partially
-            self.cached_graph_structures[i] = self.refresh_cache(cached_graph_structure, seed_nodes, fanout_cache_retrieval, fanout_cache_refresh)
+            self.cached_graph_structures[i] = self.refresh_cache(i, cached_graph_structure, seed_nodes, fanout_cache_retrieval, fanout_cache_refresh)
             
             # Sample from cache
             frontier_cache = self.cached_graph_structures[i].sample_neighbors(
                 seed_nodes,
-                fanout_cache_retrieval,
+                #fanout_cache_retrieval,
+                fanout,
                 edge_dir=self.edge_dir,
                 prob=self.prob,
                 replace=self.replace,
                 output_device=self.output_device,
                 exclude_edges=self.exclude_eids,
             )
+            print("merged_cache",frontier_cache)
+
+            merged_frontier = frontier_cache
             
-            # Sample remaining from disk
-            frontier_disk = self.g.sample_neighbors(
-                seed_nodes,
-                fanout_disk,
-                edge_dir=self.edge_dir,
-                prob=self.prob,
-                replace=self.replace,
-                output_device=self.output_device,
-                exclude_edges=self.exclude_eids,
-            )
+            # # Sample remaining from disk
+            # frontier_disk = g.sample_neighbors(
+            #     seed_nodes,
+            #     fanout_disk,
+            #     edge_dir=self.edge_dir,
+            #     prob=self.prob,
+            #     replace=self.replace,
+            #     output_device=self.output_device,
+            #     exclude_edges=self.exclude_eids,
+            # )
+            # print("frontier_disk",frontier_disk)
             
-            # Merge frontiers
-            merged_frontier = dgl.mege([frontier_cache, frontier_disk]) #merge batch
+            # # Merge frontiers
+            # merged_frontier = dgl.merge([frontier_cache, frontier_disk]) #merge batch
             
             # Convert the merged frontier to a block
-            block = to_block(self.g, merged_frontier, seed_nodes)
+            block = to_block(merged_frontier, seed_nodes)
             blocks.append(block)
             seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
 
             print(f"Layer {i}: Merged frontier edges:", merged_frontier.edges())
+        
 
-        return seed_nodes, blocks
+        return seed_nodes,output_nodes, blocks
+
+
+class NeighborSampler_FCR_struct(BlockSampler):
+    """
+    A neighbor sampler that supports cache-refreshing (FCR) for efficient sampling, 
+    tailored for multi-layer GNNs. This sampler augments the sampling process by 
+    maintaining a cache of pre-sampled neighborhoods that can be reused across 
+    multiple sampling iterations. It introduces cache amplification (via the alpha 
+    parameter) and cache refresh cycles (via the T parameter) to manage the balance 
+    between sampling efficiency and freshness of the sampled neighborhoods.
+
+    Parameters
+    ----------
+    g : DGLGraph
+        The input graph.
+    fanouts : list[int] or list[dict[etype, int]]
+        List of neighbors to sample per edge type for each GNN layer, with the i-th
+        element being the fanout for the i-th GNN layer.
+    edge_dir : str, default "in"
+        Direction of sampling. Can be either "in" for incoming edges or "out" for outgoing edges.
+    prob : str, optional
+        Name of the edge feature in g.edata used as the probability for edge sampling.
+    alpha : int, default 2
+        Cache amplification ratio. Determines the size of the pre-sampled cache relative
+        to the actual sampling needs. A larger alpha means more neighbors are pre-sampled.
+    T : int, default 1
+        Cache refresh cycle. Specifies how often (in terms of sampling iterations) the
+        cache should be refreshed.
+
+    Examples
+    --------
+    Initialize a graph and a NeighborSampler_FCR_struct for a 2-layer GNN with fanouts
+    [5, 10]. Assume alpha=2 for double the size of pre-sampling and T=3 for refreshing
+    the cache every 3 iterations.
+
+    >>> import dgl
+    >>> import torch
+    >>> g = dgl.rand_graph(100, 200)  # Random graph with 100 nodes and 200 edges
+    >>> g.ndata['feat'] = torch.randn(100, 10)  # Random node features
+    >>> sampler = NeighborSampler_FCR_struct(g, [5, 10], alpha=2, T=3)
+    
+    To perform sampling:
+
+    >>> seed_nodes = torch.tensor([1, 2, 3])  # Nodes for which neighbors are sampled
+    >>> for i in range(5):  # Simulate 5 sampling iterations
+    ...     seed_nodes, output_nodes, blocks = sampler.sample_blocks(seed_nodes)
+    ...     # Process the sampled blocks
+    """
+    
+    def __init__(
+            self, 
+            g, 
+            fanouts, 
+            edge_dir='in', 
+            alpha=2, 
+            T=1,
+            prob=None,
+            mask=None,
+            replace=False,
+            prefetch_node_feats=None,
+            prefetch_labels=None,
+            prefetch_edge_feats=None,
+            output_device=None,
+            fused=True,
+        ):
+        self.g = g
+
+        super().__init__(
+            prefetch_node_feats=prefetch_node_feats,
+            prefetch_labels=prefetch_labels,
+            prefetch_edge_feats=prefetch_edge_feats,
+            output_device=output_device,
+        )
+        self.fanouts = fanouts
+        self.edge_dir = edge_dir
+        if mask is not None and prob is not None:
+            raise ValueError(
+                "Mask and probability arguments are mutually exclusive. "
+                "Consider multiplying the probability with the mask "
+                "to achieve the same goal."
+            )
+        self.prob = prob or mask
+        self.replace = replace
+        self.fused = fused
+        self.mapping = {}
+
+        self.alpha = alpha
+        self.T = T
+        self.cycle = 0  # Initialize sampling cycle counter
+        self.amplified_fanouts = [f * alpha for f in fanouts]  # Amplified fanouts for pre-sampling
+        self.cache_struct = []  # Initialize cache structure
+        self.cache_refresh()  # Pre-sample and populate the cache
+
+    def cache_refresh(self,exclude_eids=None):
+        """
+        Pre-samples neighborhoods with amplified fanouts and refreshes the cache. This method
+        is automatically called upon initialization and after every T sampling iterations to
+        ensure that the cache is periodically updated with fresh samples.
+        """
+        self.cache_struct.clear()  # Clear existing cache
+        for fanout in self.amplified_fanouts:
+            # Sample neighbors for each layer with amplified fanout
+            print("large")
+            print(fanout)
+            print("---")
+            frontier = self.g.sample_neighbors(
+                torch.arange(0, self.g.number_of_nodes()),  # Consider all nodes as seeds for pre-sampling
+                # self.g.number_of_nodes(),
+                # 10,
+                fanout,
+                edge_dir=self.edge_dir,
+                prob=self.prob,
+                replace=self.replace,
+                output_device=self.output_device,
+                exclude_edges=exclude_eids
+            )
+            frontier = dgl.add_self_loop(frontier)
+            print(frontier)
+            print(self.cache_struct)
+            print("then append")
+            self.cache_struct.append(frontier)  # Update cache with new samples
+
+    def sample_blocks(self, g,seed_nodes, exclude_eids=None):
+        """
+        Samples blocks from the graph for the specified seed nodes using the cache.
+
+        Parameters
+        ----------
+        seed_nodes : Tensor
+            The nodes for which the neighborhoods are to be sampled.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the seed nodes for the next layer, the output nodes, and
+            the list of blocks sampled from the graph.
+        """
+        self.cycle += 1
+        if self.cycle % self.T == 0:
+            self.cache_refresh()  # Refresh cache every T cycles
+
+        blocks = []
+
+        if self.fused and get_num_threads() > 1:
+            # print("fused")
+            cpu = F.device_type(g.device) == "cpu"
+            if isinstance(seed_nodes, dict):
+                for ntype in list(seed_nodes.keys()):
+                    if not cpu:
+                        break
+                    cpu = (
+                        cpu and F.device_type(seed_nodes[ntype].device) == "cpu"
+                    )
+            else:
+                cpu = cpu and F.device_type(seed_nodes.device) == "cpu"
+            if cpu and isinstance(g, DGLGraph) and F.backend_name == "pytorch":
+                if self.g != g:
+                    self.mapping = {}
+                    self.g = g
+                for fanout in reversed(self.fanouts):
+                    block = g.sample_neighbors_fused(
+                        seed_nodes,
+                        fanout,
+                        edge_dir=self.edge_dir,
+                        prob=self.prob,
+                        replace=self.replace,
+                        exclude_edges=exclude_eids,
+                        mapping=self.mapping,
+                    )
+                    seed_nodes = block.srcdata[NID]
+                    blocks.insert(0, block)
+                return seed_nodes, output_nodes, blocks
+
+        k = 0
+        print("cache struct")
+        print(self.cache_struct)
+        print(len(self.cache_struct))
+        print("---")
+        for k in range(len(self.cache_struct)-1,-1,-1):
+            frontier_large = self.cache_struct[k]
+            fanout = self.fanouts[k]
+            print("small")
+            print("seed",seed_nodes)
+            print("fanout",fanout)
+            print("frontier_large",frontier_large)
+            print("---")
+            frontier = frontier_large.sample_neighbors(
+                seed_nodes,
+                fanout,
+                edge_dir=self.edge_dir,
+                prob=self.prob,
+                replace=self.replace,
+                output_device=self.output_device,
+                exclude_edges=exclude_eids
+            )
+
+            # frontier = g.sample_neighbors(
+            #     # torch.arange(0, self.g.number_of_nodes()),  # Consider all nodes as seeds for pre-sampling
+            #     # self.g.number_of_nodes(),
+            #     seed_nodes,
+            #     fanout,
+            #     edge_dir=self.edge_dir,
+            #     prob=self.prob,
+            #     replace=self.replace,
+            #     output_device=self.output_device,
+            #     exclude_edges=exclude_eids
+            # )
+
+            # Directly use pre-sampled frontier from the cache
+            block = to_block(frontier, seed_nodes)
+            blocks.insert(0, block)
+            seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
+
+        output_nodes = seed_nodes
+        return seed_nodes, output_nodes, blocks
