@@ -38,7 +38,8 @@ https://github.com/NoakLiu/GraphSnapShot/assets/116571268/ed701012-9267-4860-845
 
 OTF in execution
 
-https://github.com/NoakLiu/GraphSnapShot/assets/116571268/29402445-5010-44c2-bada-609fd8ae5f7b
+https://github.com/NoakLiu/GraphSnapShot/assets/116571268/6fe1a566-d4e9-45ae-b654-676a2e4d6a58
+
 
 Two types of samplers:
 ```
