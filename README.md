@@ -33,9 +33,11 @@ cd ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neigh
 Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers.
 
 FCR in execution
+
 https://github.com/NoakLiu/GraphSnapShot/assets/116571268/ed701012-9267-4860-845b-baf1c39c317c
 
 OTF in execution
+
 https://github.com/NoakLiu/GraphSnapShot/assets/116571268/c419f073-272f-41f7-af33-08d0b8a9f7c7
 
 Two types of samplers:
