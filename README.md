@@ -33,12 +33,12 @@ cd ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neigh
 Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers.
 
 <video controls>
-  <source src="recordings/FCR_recording.mov" type="video/quicktime">
+  <source src="recordings/FCR_recording.mov" type="video/movie/mp4">
   FCR: Your browser does not support the video tag.
 </video>
 
 <video controls>
-  <source src="recordings/OTF_recording.mov" type="video/quicktime">
+  <source src="recordings/OTF_recording.mov" type="video/mp4">
   OTF: Your browser does not support the video tag.
 </video>
 
@@ -46,6 +46,11 @@ Then you can deploy OTF and FCR samplers at node-level and struct-level from nei
 </video>
 
 <video src="recordings/OTF_recording.mov" controls="controls" style="max-width: 730px;">
+</video>
+
+![](recordings/OTF_recording.mov)
+
+<video src="https://github.com/NoakLiu/GraphSnapShot/blob/main/recordings/FCR_recording.mov" controls="controls" style="max-width: 730px;">
 </video>
 
 Two types of samplers:
