@@ -32,37 +32,11 @@ cd ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neigh
 ```
 Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers.
 
-
+FCR in execution
 https://github.com/NoakLiu/GraphSnapShot/assets/116571268/ed701012-9267-4860-845b-baf1c39c317c
 
+OTF in execution
 https://github.com/NoakLiu/GraphSnapShot/assets/116571268/c419f073-272f-41f7-af33-08d0b8a9f7c7
-
-<video controls>
-  <source src="https://github.com/NoakLiu/GraphSnapShot/assets/116571268/c419f073-272f-41f7-af33-08d0b8a9f7c7" type="video/mp4">
-  OTF: Your browser does not support the video tag.
-</video>
-
-
-<video controls>
-  <source src="recordings/FCR_recording.mov" type="video/movie/mp4">
-  FCR: Your browser does not support the video tag.
-</video>
-
-<video controls>
-  <source src="recordings/OTF_recording.mov" type="video/mp4">
-  OTF: Your browser does not support the video tag.
-</video>
-
-<video src="recordings/FCR_recording.mov" controls="controls" style="max-width: 730px;">
-</video>
-
-<video src="recordings/OTF_recording.mov" controls="controls" style="max-width: 730px;">
-</video>
-
-![](recordings/OTF_recording.mov)
-
-<video src="https://github.com/NoakLiu/GraphSnapShot/blob/main/recordings/FCR_recording.mov" controls="controls" style="max-width: 730px;">
-</video>
 
 Two types of samplers:
 ```
