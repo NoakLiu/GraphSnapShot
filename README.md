@@ -56,10 +56,10 @@ MultiLayer GraphSAGE
 
 Datasets:
 ```
-ogbn_arxiv - struct / nodes
-ogbn_products - struct / nodes
-ogbn_proteins - struct / nodes
-FB-15K - nodes
+ogbn_arxiv - node classification
+ogbn_products - node classification
+ogbn_proteins - node classification
+
 ```
 
 <p align="center">
@@ -98,6 +98,20 @@ ModuleList(
 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:29<00:00, 20.30it/s]
 Test accuracy 0.7021
 ```
+OTF Shared Cache Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15
+```
+Epoch 00000 | Loss 1.1858 | Accuracy 0.7172 | Time 39.8936
+Testing...
+ModuleList(
+  (0): GraphConv(in=100, out=256, normalization=both, activation=None)
+  (1): GraphConv(in=256, out=256, normalization=both, activation=None)
+  (2): GraphConv(in=256, out=47, normalization=both, activation=None)
+)
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:22<00:00, 26.10it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:39<00:00, 15.28it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:30<00:00, 19.56it/s]
+Test accuracy 0.6963
+```
 FCR Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=3
 ```
 Epoch 00000 | Loss 0.8631 | Accuracy 0.8006 | Time 69.2330
@@ -111,6 +125,20 @@ ModuleList(
 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:36<00:00, 16.37it/s]
 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:26<00:00, 22.48it/s]
 Test accuracy 0.7251
+```
+FCR Shared Cache Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=3
+```
+Epoch 00000 | Loss 0.9660 | Accuracy 0.7919 | Time 25.3724
+Testing...
+ModuleList(
+  (0): GraphConv(in=100, out=256, normalization=both, activation=None)
+  (1): GraphConv(in=256, out=256, normalization=both, activation=None)
+  (2): GraphConv(in=256, out=47, normalization=both, activation=None)
+)
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:21<00:00, 27.22it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:36<00:00, 16.31it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:28<00:00, 21.17it/s]
+Test accuracy 0.7136
 ```
 
 FBL Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4]
