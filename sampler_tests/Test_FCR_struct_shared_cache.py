@@ -161,7 +161,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     sampler_cuda = NeighborSampler_FCR_struct_shared_cache(
         g=g,
         fanouts=[2,2,2],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-        alpha=2, T=30,
+        alpha=2, T=797,
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
@@ -170,7 +170,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     sampler = NeighborSampler_FCR_struct_shared_cache(
         g=g,
         fanouts=[4,4,4],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
-        alpha=2, T=30,
+        alpha=2, T=797,
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
