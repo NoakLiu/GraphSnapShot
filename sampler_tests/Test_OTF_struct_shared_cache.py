@@ -179,7 +179,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
         fused=fused_sampling,
     )
 
-    # 调用示例
+    # example
     seed_nodes1, output_nodes1, blocks1 = sampler.sample_blocks(g,2)
     print("1sampler")
     print(seed_nodes1)
