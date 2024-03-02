@@ -164,7 +164,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     sampler_cuda = NeighborSampler_OTF_struct(
         g=g,
         fanouts=[2,2,2],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-        alpha=2, beta=2, gamma=0.15,
+        alpha=2, beta=2, gamma=0.15, T=50,
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
@@ -173,7 +173,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     sampler = NeighborSampler_OTF_struct(
         g=g,
         fanouts=[4,4,4],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
-        alpha=2, beta=2, gamma=0.15, #3, 0.4
+        alpha=2, beta=2, gamma=0.15, T=50, #3, 0.4
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,

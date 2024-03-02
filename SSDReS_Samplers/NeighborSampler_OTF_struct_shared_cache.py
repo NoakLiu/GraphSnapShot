@@ -74,6 +74,7 @@ class NeighborSampler_OTF_struct_shared_cache(BlockSampler):
                 alpha=0.6, 
                 beta=2, 
                 gamma=0.4, 
+                T=50,
                 prob=None, 
                 replace=False, 
                 output_device=None, 
@@ -114,6 +115,8 @@ class NeighborSampler_OTF_struct_shared_cache(BlockSampler):
 
         # Initialize cache with amplified fanouts
         self.cached_graph_structure = self.initialize_cache(self.cache_size) 
+        self.T = T
+        self.cycle = 0
 
     def initialize_cache(self, fanout_cache_storage):
         """
@@ -190,7 +193,7 @@ class NeighborSampler_OTF_struct_shared_cache(BlockSampler):
         #                             num_nodes=self.g.number_of_nodes())
         refreshed_cache = dgl.merge([removed, to_add])
         refreshed_cache = dgl.add_self_loop(refreshed_cache)
-        print("end refresh cache")
+        # print("end refresh cache")
         return refreshed_cache
 
     def sample_blocks(self, g, seed_nodes, exclude_eids=None):
@@ -201,13 +204,15 @@ class NeighborSampler_OTF_struct_shared_cache(BlockSampler):
         """
         blocks = []
         output_nodes = seed_nodes
-        print("in sample blocks")
-        fanout_cache_retrieval = max(fanout * self.alpha for fanout in self.fanouts)
-        fanout_disk = max(self.fanouts) - fanout_cache_retrieval
-        fanout_cache_refresh = int(fanout_cache_retrieval * self.beta * self.gamma)
+        # print("in sample blocks")
+        self.cycle+=1
+        if(self.cycle%self.T==0):
+            fanout_cache_retrieval = max(fanout * self.alpha for fanout in self.fanouts)
+            fanout_disk = max(self.fanouts) - fanout_cache_retrieval
+            fanout_cache_refresh = int(fanout_cache_retrieval * self.beta * self.gamma)
 
-        print("fanout_size:",fanout_disk)
-        self.cached_graph_structure = self.refresh_cache(self.cached_graph_structure, seed_nodes, fanout_cache_retrieval, fanout_cache_refresh)
+            # print("fanout_size:",fanout_disk)
+            self.cached_graph_structure = self.refresh_cache(self.cached_graph_structure, seed_nodes, fanout_cache_retrieval, fanout_cache_refresh)
         for i, (fanout) in enumerate(reversed(self.fanouts)):
 
             # # Refresh cache partially
@@ -224,7 +229,7 @@ class NeighborSampler_OTF_struct_shared_cache(BlockSampler):
                 output_device=self.output_device,
                 exclude_edges=self.exclude_eids,
             )
-            print("merged_cache",frontier_cache)
+            # print("merged_cache",frontier_cache)
 
             merged_frontier = frontier_cache
             
@@ -242,7 +247,7 @@ class NeighborSampler_OTF_struct_shared_cache(BlockSampler):
             
             # # Merge frontiers
             # merged_frontier = dgl.merge([frontier_cache, frontier_disk]) #merge batch
-            print(f"Merged frontier edges:", merged_frontier.edges())
+            # print(f"Merged frontier edges:", merged_frontier.edges())
             
             # Convert the merged frontier to a block
             block = to_block(merged_frontier, seed_nodes)

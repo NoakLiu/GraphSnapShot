@@ -84,7 +84,7 @@ Design of FCR
 
 Results
 
-OTF - Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15
+OTF - Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=1
 ```
 Epoch 00000 | Loss 1.6886 | Accuracy 0.5821 | Time 98.2462
 Testing...
@@ -98,7 +98,21 @@ ModuleList(
 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:29<00:00, 20.30it/s]
 Test accuracy 0.7021
 ```
-OTF Shared Cache Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15
+OTF - Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50
+```
+Epoch 00000 | Loss 0.9100 | Accuracy 0.7954 | Time 3.9952
+Testing...
+ModuleList(
+  (0): GraphConv(in=100, out=256, normalization=both, activation=None)
+  (1): GraphConv(in=256, out=256, normalization=both, activation=None)
+  (2): GraphConv(in=256, out=47, normalization=both, activation=None)
+)
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:23<00:00, 25.64it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:40<00:00, 14.87it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:30<00:00, 19.84it/s]
+Test accuracy 0.7267
+```
+OTF Shared Cache Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=1
 ```
 Epoch 00000 | Loss 1.1858 | Accuracy 0.7172 | Time 39.8936
 Testing...
@@ -111,6 +125,20 @@ ModuleList(
 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:39<00:00, 15.28it/s]
 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:30<00:00, 19.56it/s]
 Test accuracy 0.6963
+```
+OTF Shared Cache Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50
+```
+Epoch 00000 | Loss 1.1994 | Accuracy 0.6723 | Time 2.4863
+Testing...
+ModuleList(
+  (0): GraphConv(in=100, out=256, normalization=both, activation=None)
+  (1): GraphConv(in=256, out=256, normalization=both, activation=None)
+  (2): GraphConv(in=256, out=47, normalization=both, activation=None)
+)
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:22<00:00, 26.91it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:38<00:00, 15.64it/s]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 598/598 [00:29<00:00, 20.46it/s]
+Test accuracy 0.7166
 ```
 FCR Setting: dataset: ogbn-products, sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=3
 ```

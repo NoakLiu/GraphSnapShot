@@ -75,6 +75,7 @@ class NeighborSampler_OTF_struct(BlockSampler):
                 alpha=0.6, 
                 beta=2, 
                 gamma=0.4, 
+                T = 50,
                 prob=None, 
                 replace=False, 
                 output_device=None, 
@@ -100,6 +101,8 @@ class NeighborSampler_OTF_struct(BlockSampler):
         self.replace = replace
         self.output_device = output_device
         self.exclude_eids = exclude_eids
+        self.T = T
+        self.cycle = 0
 
         if mask is not None and prob is not None:
             raise ValueError(
@@ -111,7 +114,7 @@ class NeighborSampler_OTF_struct(BlockSampler):
         self.fused = fused
         self.mapping = {}
         self.cache_size = [fanout * alpha * beta for fanout in fanouts]
-        print(self.cache_size)
+        # print(self.cache_size)
 
         # Initialize cache with amplified fanouts
         self.cached_graph_structures = [self.initialize_cache(fanout * alpha * beta) for fanout in fanouts]
@@ -122,7 +125,7 @@ class NeighborSampler_OTF_struct(BlockSampler):
         set of neighbors. This pre-sampling helps in reducing the need for dynamic sampling 
         at every iteration, thereby improving efficiency.
         """
-        print("begin init")
+        # print("begin init")
         cached_graph = self.g.sample_neighbors(
             # torch.arange(0, self.g.number_of_nodes(), dtype=torch.int64),
             torch.arange(0, self.g.number_of_nodes()),
@@ -135,7 +138,7 @@ class NeighborSampler_OTF_struct(BlockSampler):
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
         )
-        print("end init")
+        # print("end init")
         return cached_graph
 
     def refresh_cache(self,layer_id, cached_graph_structure, seed_nodes, fanout_cache_retrieval, fanout_cache_refresh):
@@ -144,14 +147,15 @@ class NeighborSampler_OTF_struct(BlockSampler):
         cached edges with new samples from the graph. This method ensures the cache remains 
         relatively fresh and reflects changes in the dynamic graph structure or sampling needs.
         """
-        print("begin refresh")
-        print("begin remove")
+        # print("begin refresh")
+        # print("begin remove")
         fanout_cache_sample=[]
-        print(self.cache_size)
-        print(fanout_cache_refresh)
+        # print("layer_id",layer_id)
+        # print("self.cache.size",self.cache_size)
+        # print("fanout_cache_refresh",fanout_cache_refresh)
         # for i in range(len(self.cache_size)):
         fanout_cache_sample = self.cache_size[layer_id]-fanout_cache_refresh
-        print(fanout_cache_sample)
+        # print(fanout_cache_sample)
         # Sample edges to remove from cache
         removed = cached_graph_structure.sample_neighbors(
             seed_nodes,
@@ -163,14 +167,15 @@ class NeighborSampler_OTF_struct(BlockSampler):
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
         )
-        print("end remove")
+        # print("end remove")
         
-        # Compute the difference and update the cache
-        print("removed")
-        print("end removed")
+        # # Compute the difference and update the cache
+        # print("removed")
+        # # removed = graph_difference(cached_graph_structure, to_remove)
+        # print("end removed")
         
         # Add new edges from the disk to the cache
-        print("add graph")
+        # print("add graph")
         to_add = self.g.sample_neighbors(
             seed_nodes,
             fanout_cache_refresh,
@@ -180,10 +185,10 @@ class NeighborSampler_OTF_struct(BlockSampler):
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
         )
-        print("end add graph")
+        # print("end add graph")
         
-        # Merge the updated cache with new samples
-        print("begin refresh cache")
+        # # Merge the updated cache with new samples
+        # print("begin refresh cache")
         # refreshed_cache = dgl.graph((torch.cat([removed.edges()[0], to_add.edges()[0]]),
         #                              torch.cat([removed.edges()[1], to_add.edges()[1]])),
         #                             num_nodes=self.g.number_of_nodes())
@@ -201,14 +206,16 @@ class NeighborSampler_OTF_struct(BlockSampler):
         output_nodes = seed_nodes
         print("in sample blocks")
         for i, (fanout, cached_graph_structure) in enumerate(zip(reversed(self.fanouts), reversed(self.cached_graph_structures))):
-            fanout_cache_retrieval = int(fanout * self.alpha)
-            fanout_disk = fanout - fanout_cache_retrieval
-            fanout_cache_refresh = int(fanout_cache_retrieval * self.beta * self.gamma)
+            self.cycle+=1
+            if (self.cycle%self.T==0):
+                fanout_cache_retrieval = int(fanout * self.alpha)
+                fanout_disk = fanout - fanout_cache_retrieval
+                fanout_cache_refresh = int(fanout_cache_retrieval * self.beta * self.gamma)
 
-            print("fanout_size:",fanout)
+                print("fanout_size:",fanout)
 
-            # Refresh cache partially
-            self.cached_graph_structures[i] = self.refresh_cache(i, cached_graph_structure, seed_nodes, fanout_cache_retrieval, fanout_cache_refresh)
+                # Refresh cache partially
+                self.cached_graph_structures[i] = self.refresh_cache(i, cached_graph_structure, seed_nodes, fanout_cache_retrieval, fanout_cache_refresh)
             
             # Sample from cache
             frontier_cache = self.cached_graph_structures[i].sample_neighbors(
