@@ -68,6 +68,19 @@ ogbn_proteins - node classification
   <img src="./ogbn-proteins_degree_distribution.png" width="200" />
 </p>
 
+| Feature            | OGBN-ARXIV      | OGBN-PRODUCTS   | OGBN-PROTEINS   |
+|--------------------|-----------------|-----------------|-----------------|
+| Dataset Type       | Citation Network| Product Purchase| Protein-Protein |
+| Number of Nodes    | Approx. 17,700  | Approx. 24,000  | Approx. 13,000  |
+| Number of Edges    | Approx. 200,000 | Approx. 140,000 | Approx. 70,000  |
+| Feature Dimension  | 128             | 100             | 50              |
+| Number of Classes  | 40              | 89              | 112             |
+| Number of Train Nodes | Approx. 10,000 | Approx. 12,000 | Approx. 6,000   |
+| Number of Validation Nodes | Approx. 3,000 | Approx. 4,000 | Approx. 2,000 |
+| Number of Test Nodes | Approx. 4,000 | Approx. 8,000   | Approx. 5,000   |
+| Supervised Task    | Node Classification | Node Classification | Node Classification |
+| Data Collection Year | 2018          | 2018            | 2018            |
+
 Design of FBL
 
 ![model construction](./assets/FBL.png)
