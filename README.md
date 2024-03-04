@@ -259,7 +259,7 @@ Test accuracy 0.7178
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
 | Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 2     | Model: K-Hop sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=theoretical optimal |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 (theoretical optimal) |
 
 #### Results:
 | Metric        | Setting 1      | Setting 2      |
@@ -287,7 +287,7 @@ Test accuracy 0.7178
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
-| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
 | Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=797 (theoretical optimal) |
 
 #### Results:
@@ -302,7 +302,7 @@ Test accuracy 0.7178
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
 | Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 2     | Model: K-Hop sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=theoretical optimal |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 (theoretical optimal) |
 
 #### Results:
 | Metric        | Setting 1      | Setting 2      |
@@ -330,7 +330,7 @@ Test accuracy 0.7178
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
-| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
 | Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=797 (theoretical optimal) |
 
 #### Results:
@@ -345,7 +345,7 @@ Test accuracy 0.7178
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
 | Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 2     | Model: K-Hop sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=theoretical optimal |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 (theoretical optimal) |
 
 #### Results:
 | Metric        | Setting 1      | Setting 2      |
