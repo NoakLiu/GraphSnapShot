@@ -228,7 +228,13 @@ Test accuracy 0.7178
 ## OGBN-ARXIV
 
 ### FBL
-| Metric        |                |
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4] |
+
+#### Results:
+| Metric        |      Setting          |
 |---------------|----------------|
 | Accuracy      | 0.7178         | 
 | Training Time | 3.6946 s       |
@@ -268,7 +274,7 @@ Test accuracy 0.7178
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
-| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4]|
 
 #### Results:
 | Metric        |     Setting           |
@@ -311,7 +317,7 @@ Test accuracy 0.7178
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
-| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4] |
 
 #### Results:
 | Metric        | Setting        |
