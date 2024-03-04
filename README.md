@@ -224,74 +224,82 @@ ModuleList(
 Test accuracy 0.7178
 ```
 
+Settings:
+```
+|               |                |
+|---------------|----------------|
+| Setting 1     |  sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     |  sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=theoretical optimal |
+```
+
 ## OGBN-ARXIV
 
 ### FBL
-| Metric        | Setting 1      | Setting 2      |
-|---------------|----------------|----------------|
-| Accuracy      | 0.85           | 0.88           |
-| Training Time | 10 hours       | 12 hours       |
-| Memory Usage  | 8 GB           | 10 GB          |
+| Metric        | Setting 1      |
+|---------------|----------------|
+| Accuracy      | 0.7178         | 
+| Training Time | 3.6946 s       |
+| Memory Usage  | 0.3 GB         |
 
 ### FCR
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
-| Accuracy      | 0.75           | 0.78           |
-| Training Time | 8 hours        | 9 hours        |
-| Memory Usage  | 6 GB           | 7 GB           |
+| Accuracy      | 0.7145           | 0.7071           |
+| Training Time | 6.7892 s        | 3.4923 s        |
+| Memory Usage  | 0.4 GB           | 0.5 GB           |
 
 ### OTF
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
-| Accuracy      | 0.82           | 0.84           |
-| Training Time | 12 hours       | 14 hours       |
-| Memory Usage  | 9 GB           | 11 GB          |
+| Accuracy      | 0.7122         | 0.7178         |
+| Training Time | 3.9952 s       | 3.9875 s       |
+| Memory Usage  | 0.9 GB         | 0.4 GB         |
 
 ## OGBN-PRODUCTS
 
 ### FBL
-| Metric        | Setting 1      | Setting 2      |
-|---------------|----------------|----------------|
-| Accuracy      | 0.92           | 0.94           |
-| Training Time | 15 hours       | 18 hours       |
-| Memory Usage  | 12 GB          | 14 GB          |
+| Metric        | Setting 1      |
+|---------------|----------------|
+| Accuracy      | 0.7178         | 
+| Training Time | 3.6946 s       |
+| Memory Usage  | 0.3 GB         |
 
 ### FCR
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
-| Accuracy      | 0.87           | 0.89           |
-| Training Time | 10 hours       | 12 hours       |
-| Memory Usage  | 8 GB           | 9 GB           |
+| Accuracy      | 0.7145           | 0.7071           |
+| Training Time | 6.7892 s        | 3.4923 s        |
+| Memory Usage  | 0.4 GB           | 0.5 GB           |
 
 ### OTF
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
-| Accuracy      | 0.91           | 0.93           |
-| Training Time | 18 hours       | 20 hours       |
-| Memory Usage  | 13 GB          | 15 GB          |
+| Accuracy      | 0.7122         | 0.7178         |
+| Training Time | 3.9952 s       | 3.9875 s       |
+| Memory Usage  | 0.9 GB         | 0.4 GB         |
 
 ## OGBN-PROTEINS
 
 ### FBL
-| Metric        | Setting 1      | Setting 2      |
-|---------------|----------------|----------------|
-| Accuracy      | 0.78           | 0.80           |
-| Training Time | 5 hours        | 6 hours        |
-| Memory Usage  | 4 GB           | 5 GB           |
+| Metric        | Setting 1      |
+|---------------|----------------|
+| Accuracy      | 0.7178         | 
+| Training Time | 3.6946 s       |
+| Memory Usage  | 0.3 GB         |
 
 ### FCR
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
-| Accuracy      | 0.70           | 0.72           |
-| Training Time | 4 hours        | 5 hours        |
-| Memory Usage  | 3 GB           | 4 GB           |
+| Accuracy      | 0.7145           | 0.7071           |
+| Training Time | 6.7892 s        | 3.4923 s        |
+| Memory Usage  | 0.4 GB           | 0.5 GB           |
 
 ### OTF
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
-| Accuracy      | 0.75           | 0.77           |
-| Training Time | 6 hours        | 7 hours        |
-| Memory Usage  | 4 GB           | 5 GB           |
+| Accuracy      | 0.7122         | 0.7178         |
+| Training Time | 3.9952 s       | 3.9875 s       |
+| Memory Usage  | 0.9 GB         | 0.4 GB         |
 
 
 ```
