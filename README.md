@@ -231,10 +231,12 @@ Test accuracy 0.7178
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
-| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4] |
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4]|
+| Setting 2     | Model: K-Hop SGC sampler1: [2,2,2] sampler2: [4,4,4]|
+| Setting 3     | Model: K-Hop GraphSAGE sampler1: [2,2,2] sampler2: [4,4,4]|
 
 #### Results:
-| Metric        |      Setting          |
+| Metric        |     Setting           |
 |---------------|----------------|
 | Accuracy      | 0.7178         | 
 | Training Time | 3.6946 s       |
@@ -244,7 +246,25 @@ Test accuracy 0.7178
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
-| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=2391 (theoretical optimal) |
+| Setting 3     | Model: K-Hop SGC sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 4     | Model: K-Hop SGC sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=2391 (theoretical optimal) |
+| Setting 5     | Model: K-Hop GraphSAGE sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 6     | Model: K-Hop GraphSAGE sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=2391 (theoretical optimal) |
+
+#### Results:
+| Metric        | Setting 1      | Setting 2      |
+|---------------|----------------|----------------|
+| Accuracy      | 0.7145           | 0.7071           |
+| Training Time | 6.7892 s        | 3.4923 s        |
+| Memory Usage  | 0.4 GB           | 0.5 GB           |
+
+### FCR - Shared Cache
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
 | Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=797 (theoretical optimal) |
 
 #### Results:
@@ -260,6 +280,20 @@ Test accuracy 0.7178
 |---------------|-------------------------------------------------------------------------------|
 | Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
 | Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 (theoretical optimal) |
+
+#### Results:
+| Metric        | Setting 1      | Setting 2      |
+|---------------|----------------|----------------|
+| Accuracy      | 0.7122         | 0.7178         |
+| Training Time | 3.9952 s       | 3.9875 s       |
+| Memory Usage  | 0.9 GB         | 0.4 GB         |
+
+### OTF - Shared Cache
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=119 (theoretical optimal) |
 
 #### Results:
 | Metric        | Setting 1      | Setting 2      |
@@ -274,7 +308,9 @@ Test accuracy 0.7178
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
-| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4]|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4]|
+| Setting 2     | Model: K-Hop SGC sampler1: [2,2,2] sampler2: [4,4,4]|
+| Setting 3     | Model: K-Hop GraphSAGE sampler1: [2,2,2] sampler2: [4,4,4]|
 
 #### Results:
 | Metric        |     Setting           |
@@ -284,6 +320,24 @@ Test accuracy 0.7178
 | Memory Usage  | 0.3 GB         |
 
 ### FCR
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=2391 (theoretical optimal) |
+| Setting 3     | Model: K-Hop SGC sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 4     | Model: K-Hop SGC sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=2391 (theoretical optimal) |
+| Setting 5     | Model: K-Hop GraphSAGE sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 6     | Model: K-Hop GraphSAGE sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=2391 (theoretical optimal) |
+
+#### Results:
+| Metric        | Setting 1      | Setting 2      |
+|---------------|----------------|----------------|
+| Accuracy      | 0.7145           | 0.7071           |
+| Training Time | 6.7892 s        | 3.4923 s        |
+| Memory Usage  | 0.4 GB           | 0.5 GB           |
+
+### FCR - Shared Cache
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
@@ -311,22 +365,56 @@ Test accuracy 0.7178
 | Training Time | 3.9952 s       | 3.9875 s       |
 | Memory Usage  | 0.9 GB         | 0.4 GB         |
 
+### OTF - Shared Cache
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=119 (theoretical optimal) |
+
+#### Results:
+| Metric        | Setting 1      | Setting 2      |
+|---------------|----------------|----------------|
+| Accuracy      | 0.7122         | 0.7178         |
+| Training Time | 3.9952 s       | 3.9875 s       |
+| Memory Usage  | 0.9 GB         | 0.4 GB         |
+
 ## OGBN-PROTEINS
 
 ### FBL
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
-| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4] |
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4]|
+| Setting 2     | Model: K-Hop SGC sampler1: [2,2,2] sampler2: [4,4,4]|
+| Setting 3     | Model: K-Hop GraphSAGE sampler1: [2,2,2] sampler2: [4,4,4]|
 
 #### Results:
-| Metric        | Setting        |
+| Metric        |     Setting           |
 |---------------|----------------|
 | Accuracy      | 0.7178         | 
 | Training Time | 3.6946 s       |
 | Memory Usage  | 0.3 GB         |
 
 ### FCR
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=2391 (theoretical optimal) |
+| Setting 3     | Model: K-Hop SGC sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 4     | Model: K-Hop SGC sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=2391 (theoretical optimal) |
+| Setting 5     | Model: K-Hop GraphSAGE sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 6     | Model: K-Hop GraphSAGE sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=2391 (theoretical optimal) |
+
+#### Results:
+| Metric        | Setting 1      | Setting 2      |
+|---------------|----------------|----------------|
+| Accuracy      | 0.7145           | 0.7071           |
+| Training Time | 6.7892 s        | 3.4923 s        |
+| Memory Usage  | 0.4 GB           | 0.5 GB           |
+
+### FCR - Shared Cache
 #### Settings:
 |     IDs          |     Data Settings           |
 |---------------|-------------------------------------------------------------------------------|
@@ -346,6 +434,20 @@ Test accuracy 0.7178
 |---------------|-------------------------------------------------------------------------------|
 | Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
 | Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 (theoretical optimal) |
+
+#### Results:
+| Metric        | Setting 1      | Setting 2      |
+|---------------|----------------|----------------|
+| Accuracy      | 0.7122         | 0.7178         |
+| Training Time | 3.9952 s       | 3.9875 s       |
+| Memory Usage  | 0.9 GB         | 0.4 GB         |
+
+### OTF - Shared Cache
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=119 (theoretical optimal) |
 
 #### Results:
 | Metric        | Setting 1      | Setting 2      |
