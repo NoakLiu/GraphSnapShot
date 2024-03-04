@@ -40,6 +40,10 @@ OTF in execution
 
 https://github.com/NoakLiu/GraphSnapShot/assets/116571268/6fe1a566-d4e9-45ae-b654-676a2e4d6a58
 
+FCR-SC, OTF-SC, FBL comparison (Note: SC is short for shared cache)
+
+https://github.com/NoakLiu/GraphSnapShot/assets/116571268/baed1610-952c-4455-9ecf-015450b482dc
+
 
 Two types of samplers:
 ```
