@@ -224,23 +224,24 @@ ModuleList(
 Test accuracy 0.7178
 ```
 
-### Settings:
-|     IDs          |     Data Settings           |
-|---------------|-------------------------------------------------------------------------------|
-| Setting 1     |  sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 2     |  sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=theoretical optimal |
-
 
 ## OGBN-ARXIV
 
 ### FBL
-| Metric        | Setting 1      |
+| Metric        |                |
 |---------------|----------------|
 | Accuracy      | 0.7178         | 
 | Training Time | 3.6946 s       |
 | Memory Usage  | 0.3 GB         |
 
 ### FCR
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=797 (theoretical optimal) |
+
+#### Results:
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
 | Accuracy      | 0.7145           | 0.7071           |
@@ -248,6 +249,13 @@ Test accuracy 0.7178
 | Memory Usage  | 0.4 GB           | 0.5 GB           |
 
 ### OTF
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     | Model: K-Hop sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=theoretical optimal |
+
+#### Results:
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
 | Accuracy      | 0.7122         | 0.7178         |
@@ -257,13 +265,26 @@ Test accuracy 0.7178
 ## OGBN-PRODUCTS
 
 ### FBL
-| Metric        | Setting 1      |
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+
+#### Results:
+| Metric        |     Setting           |
 |---------------|----------------|
 | Accuracy      | 0.7178         | 
 | Training Time | 3.6946 s       |
 | Memory Usage  | 0.3 GB         |
 
 ### FCR
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=797 (theoretical optimal) |
+
+#### Results:
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
 | Accuracy      | 0.7145           | 0.7071           |
@@ -271,6 +292,13 @@ Test accuracy 0.7178
 | Memory Usage  | 0.4 GB           | 0.5 GB           |
 
 ### OTF
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     | Model: K-Hop sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=theoretical optimal |
+
+#### Results:
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
 | Accuracy      | 0.7122         | 0.7178         |
@@ -280,13 +308,26 @@ Test accuracy 0.7178
 ## OGBN-PROTEINS
 
 ### FBL
-| Metric        | Setting 1      |
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting      | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+
+#### Results:
+| Metric        | Setting        |
 |---------------|----------------|
 | Accuracy      | 0.7178         | 
 | Training Time | 3.6946 s       |
 | Memory Usage  | 0.3 GB         |
 
 ### FCR
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, T=797 (theoretical optimal) |
+
+#### Results:
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
 | Accuracy      | 0.7145           | 0.7071           |
@@ -294,6 +335,13 @@ Test accuracy 0.7178
 | Memory Usage  | 0.4 GB           | 0.5 GB           |
 
 ### OTF
+#### Settings:
+|     IDs          |     Data Settings           |
+|---------------|-------------------------------------------------------------------------------|
+| Setting 1     | Model: K-Hop GCN sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2     | Model: K-Hop sampler1: [2,2,2] sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=theoretical optimal |
+
+#### Results:
 | Metric        | Setting 1      | Setting 2      |
 |---------------|----------------|----------------|
 | Accuracy      | 0.7122         | 0.7178         |
