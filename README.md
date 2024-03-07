@@ -53,9 +53,12 @@ structure-level: reduce the inefficiency of resample whole k-hop structure for e
 
 Downsteam Task: 
 ```
-MultiLayer GCN
-MultiLayer SGC
-MultiLayer GraphSAGE
+MultiLayer GCN - ogbn_arxiv / ogbn_products
+MultiLayer SGC - ogbn_arxiv / ogbn_products
+MultiLayer GraphSAGE - ogbn_arxiv / ogbn_products
+MultiLayer MWE-GCN - ogbn_proteins
+MultiLayer MWE-DGCN - proteins
+MutlLayer GAT - proteins
 ```
 
 Datasets:
@@ -463,9 +466,9 @@ Note: T=119 is theoretical optimal
 
 | IDs       | Experimental Settings                                    |
 |-----------|----------------------------------------------------------|
-| Setting 1 | Model: K-Hop GCN, sampler1: [2,2,2], sampler2: [4,4,4]   |
-| Setting 2 | Model: K-Hop SGC, sampler1: [2,2,2], sampler2: [4,4,4]   |
-| Setting 3 | Model: K-Hop GraphSAGE, sampler1: [2,2,2], sampler2: [4,4,4] |
+| Setting 1 | Model: K-Hop MWE-GCN, sampler1: [2,2,2], sampler2: [4,4,4]   |
+| Setting 2 | Model: K-Hop MWE-DGCN, sampler1: [2,2,2], sampler2: [4,4,4]   |
+| Setting 3 | Model: K-Hop GAT, sampler1: [2,2,2], sampler2: [4,4,4] |
 
 #### FBL - Results
 
@@ -481,12 +484,12 @@ Note: T=119 is theoretical optimal
 
 | IDs       | Experimental Settings                                                           |
 |-----------|---------------------------------------------------------------------------------|
-| Setting 1 | Model: K-Hop GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50            |
-| Setting 2 | Model: K-Hop GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=2391          |
-| Setting 3 | Model: K-Hop SGC, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50            |
-| Setting 4 | Model: K-Hop SGC, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=2391          |
-| Setting 5 | Model: K-Hop GraphSAGE, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50      |
-| Setting 6 | Model: K-Hop GraphSAGE, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=2391    |
+| Setting 1 | Model: K-Hop MWE-GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50            |
+| Setting 2 | Model: K-Hop MWE-GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=2391          |
+| Setting 3 | Model: K-Hop MWE-DGCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50            |
+| Setting 4 | Model: K-Hop MWE-DGCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=2391          |
+| Setting 5 | Model: K-Hop GAT, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50      |
+| Setting 6 | Model: K-Hop GAT, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=2391    |
 
 Note: T = 2391 is theoretical optimal
 
@@ -503,12 +506,12 @@ Note: T = 2391 is theoretical optimal
 
 | IDs       | Experimental Settings                                                  |
 |-----------|------------------------------------------------------------------------|
-| Setting 1 | Model: K-Hop GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50  |
-| Setting 2 | Model: K-Hop GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=797 |
-| Setting 3 | Model: K-Hop SGC, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50  |
-| Setting 4 | Model: K-Hop SGC, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=797 |
-| Setting 5 | Model: K-Hop GraphSAGE, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50 |
-| Setting 6 | Model: K-Hop GraphSAGE, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=797 |
+| Setting 1 | Model: K-Hop MWE-GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50  |
+| Setting 2 | Model: K-Hop MWE-GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=797 |
+| Setting 3 | Model: K-Hop MWE-DGCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50  |
+| Setting 4 | Model: K-Hop MWE-DGCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=797 |
+| Setting 5 | Model: K-Hop GAT, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=50 |
+| Setting 6 | Model: K-Hop GAT, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, T=797 |
 
 Note: T = 797 is theoretical optimal
 
@@ -527,12 +530,12 @@ Note: T = 797 is theoretical optimal
 
 | IDs       | Experimental Settings                                                                 |
 |-----------|---------------------------------------------------------------------------------------|
-| Setting 1 | Model: K-Hop GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 2 | Model: K-Hop GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 |
-| Setting 3 | Model: K-Hop SGC, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 4 | Model: K-Hop SGC, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 |
-| Setting 5 | Model: K-Hop GraphSAGE, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 6 | Model: K-Hop GraphSAGE, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 |
+| Setting 1 | Model: K-Hop MWE-GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2 | Model: K-Hop MWE-GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 |
+| Setting 3 | Model: K-Hop MWE-DGCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 4 | Model: K-Hop MWE-DGCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 |
+| Setting 5 | Model: K-Hop GAT, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 6 | Model: K-Hop GAT, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=358 |
 
 Note: T = 358 is theoretical optimal
 
@@ -551,12 +554,12 @@ Note: T = 358 is theoretical optimal
 
 | IDs       | Experimental Settings                                                                 |
 |-----------|---------------------------------------------------------------------------------------|
-| Setting 1 | Model: K-Hop GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 2 | Model: K-Hop GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=119 |
-| Setting 3 | Model: K-Hop SGC, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 4 | Model: K-Hop SGC, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=119 |
-| Setting 5 | Model: K-Hop GraphSAGE, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
-| Setting 6 | Model: K-Hop GraphSAGE, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=119 |
+| Setting 1 | Model: K-Hop MWE-GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 2 | Model: K-Hop MWE-GCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=119 |
+| Setting 3 | Model: K-Hop MWE-DGCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 4 | Model: K-Hop MWE-DGCN, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=119 |
+| Setting 5 | Model: K-Hop GAT, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=50 |
+| Setting 6 | Model: K-Hop GAT, sampler1: [2,2,2], sampler2: [4,4,4], alpha=2, beta=2, gamma=0.15, T=119 |
 
 Note: T=119 is theoretical optimal
 
