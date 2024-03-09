@@ -19,6 +19,7 @@ from dgl.dataloading import (
     DataLoader,
     MultiLayerFullNeighborSampler,
     MultiLayerNeighborSampler,
+    NeighborSampler_FBL
 )
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
 from models import GAT
@@ -214,8 +215,11 @@ def run(
 
     train_batch_size = (len(train_idx) + 9) // 10
     # batch_size = len(train_idx)
-    train_sampler = MultiLayerNeighborSampler(
-        [32 for _ in range(args.n_layers)]
+    # train_sampler = MultiLayerNeighborSampler(
+    #     [32 for _ in range(args.n_layers)]
+    # )
+    train_sampler = NeighborSampler_FBL(
+        fanouts=[32 for _ in range(args.n_layers)]
     )
     # sampler = MultiLayerFullNeighborSampler(args.n_layers)
     train_dataloader = DataLoader(
@@ -226,8 +230,12 @@ def run(
         num_workers=10,
     )
 
-    eval_sampler = MultiLayerNeighborSampler(
-        [100 for _ in range(args.n_layers)]
+    # eval_sampler = MultiLayerNeighborSampler(
+    #     [100 for _ in range(args.n_layers)]
+    # )
+
+    eval_sampler = NeighborSampler_FBL(
+        fanouts=[100 for _ in range(args.n_layers)]
     )
     # sampler = MultiLayerFullNeighborSampler(args.n_layers)
     eval_dataloader = DataLoader(

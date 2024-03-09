@@ -482,3 +482,111 @@ class GAT(nn.Module):
         h = self.pred_linear(h)
 
         return h
+    
+
+class GraphConv(nn.Module):
+    def __init__(self, in_feats, out_feats, activation=F.relu, bias=True):
+        super(GraphConv, self).__init__()
+        self.in_feats = in_feats
+        self.out_feats = out_feats
+        self.activation = activation
+        self.weight = nn.Parameter(torch.Tensor(in_feats, out_feats))
+        if bias:
+            self.bias = nn.Parameter(torch.Tensor(out_feats))
+        else:
+            self.bias = None
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+        if self.bias is not None:
+            fan_in, _ = init._calculate_fan_in_and_fan_out(self.weight)
+            bound = 1 / math.sqrt(fan_in)
+            init.uniform_(self.bias, -bound, bound)
+
+    def forward(self, g, feat):
+        with g.local_scope():
+            g.ndata['h'] = torch.mm(feat, self.weight)
+            if self.bias is not None:
+                g.ndata['h'] += self.bias
+            g.update_all(fn.copy_u('h', 'm'), fn.sum('m', 'h'))
+            if self.activation is not None:
+                g.ndata['h'] = self.activation(g.ndata['h'])
+            return g.ndata['h']
+
+class GCN(nn.Module):
+    def __init__(self, in_feats, hidden_feats, out_feats, n_layers, activation=F.relu, dropout=0.5):
+        super(GCN, self).__init__()
+        self.layers = nn.ModuleList()
+        self.layers.append(GraphConv(in_feats, hidden_feats, activation))
+        for _ in range(n_layers - 2):
+            self.layers.append(GraphConv(hidden_feats, hidden_feats, activation))
+        self.layers.append(GraphConv(hidden_feats, out_feats, None))
+        self.dropout = dropout
+
+    def forward(self, g, inputs):
+        h = inputs
+        for i, layer in enumerate(self.layers):
+            if i != 0:
+                h = F.dropout(h, self.dropout, training=self.training)
+            h = layer(g, h)
+        return h
+
+class SGC(nn.Module):
+    def __init__(self, in_feats, out_feats, k=2):
+        super(SGC, self).__init__()
+        self.conv = GraphConv(in_feats, out_feats, activation=None, bias=True)
+        self.k = k  # here we should pre compute the hops that need for compute
+
+    def forward(self, g, features):
+        for _ in range(self.k):
+            features = self.conv(g, features)
+        return features
+
+
+class SAGEConv(nn.Module):
+    def __init__(self, in_feats, out_feats, activation=F.relu, aggregator_type='mean'):
+        super(SAGEConv, self).__init__()
+        self.in_feats = in_feats
+        self.out_feats = out_feats
+        self.activation = activation
+        self.aggregator_type = aggregator_type
+        self.weight = nn.Parameter(torch.Tensor(in_feats, out_feats))
+        if aggregator_type == 'mean':
+            self.reduce_func = fn.mean('m', 'neigh')
+        # here we can add more agg methods
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        init.xavier_uniform_(self.weight)
+
+    def forward(self, g, feat):
+        with g.local_scope():
+            g.ndata['h'] = feat
+            g.update_all(fn.copy_u('h', 'm'), self.reduce_func)
+            neigh = g.ndata['neigh']
+            if self.aggregator_type == 'mean':
+                h_self = feat
+            # here we can add more agg logic
+            h_total = torch.mm(h_self + neigh, self.weight)
+            if self.activation is not None:
+                h_total = self.activation(h_total)
+            return h_total
+
+class GraphSAGE(nn.Module):
+    def __init__(self, in_feats, hidden_feats, out_feats, n_layers, activation=F.relu, dropout=0.5):
+        super(GraphSAGE, self).__init__()
+        self.layers = nn.ModuleList()
+        self.layers.append(SAGEConv(in_feats, hidden_feats, activation))
+        for _ in range(n_layers - 2):
+            self.layers.append(SAGEConv(hidden_feats, hidden_feats, activation))
+        self.layers.append(SAGEConv(hidden_feats, out_feats, None))
+        self.dropout = dropout
+
+    def forward(self, g, inputs):
+        h = inputs
+        for i, layer in enumerate(self.layers):
+            if i != 0:
+                h = F.dropout(h, self.dropout, training=self.training)
+            h = layer(g, h)
+        return h
