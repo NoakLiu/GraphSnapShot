@@ -13,6 +13,7 @@ for dataset_name in dataset_names:
 
     # 获取节点的度
     deg = graph.in_degrees() + graph.out_degrees()
+    print(deg)
 
     # 统计度分布
     deg_hist = torch.bincount(deg)
@@ -28,3 +29,35 @@ for dataset_name in dataset_names:
 
     # 显示图形
     plt.show()
+
+# Load dataset
+dataset_name = 'ogbn-mag'
+dataset = DglNodePropPredDataset(name=dataset_name)
+graph, _ = dataset[0]
+
+# Inspect available edge types
+print("Available edge types:", graph.canonical_etypes)
+
+# Initialize degree tensor
+deg = torch.zeros(graph.number_of_nodes())
+
+# Calculate node degrees for each edge type and accumulate
+for etype in graph.canonical_etypes:
+    in_deg = graph.in_degrees(etype=etype)
+    out_deg = graph.out_degrees(etype=etype)
+    deg += in_deg + out_deg
+
+# Count degree distribution
+deg_hist = torch.bincount(deg.int())
+
+# Plot degree distribution
+plt.loglog(deg_hist.numpy(), 'bo-')
+plt.title('Degree Distribution for ' + dataset_name)
+plt.xlabel('Degree')
+plt.ylabel('Number of Nodes')
+
+# Save plot
+plt.savefig(dataset_name + '_degree_distribution.png')
+
+# Display plot
+plt.show()

@@ -122,6 +122,7 @@ def evaluate(model, graph, dataloader, num_classes):
     ys = []
     y_hats = []
     for it, (input_nodes, output_nodes, blocks) in enumerate(dataloader):
+        blocks = blocks[::-1]
         x = blocks[0].srcdata["feat"]
         ys.append(blocks[-1].dstdata["label"])
         y_hats.append(model(blocks, x))
@@ -164,8 +165,17 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     # during sampling. More details about `prefetch` can be found in the
     # `SAGE.inference` function.
     #####################################################################
-    sampler = NeighborSampler(
-        [10, 10, 10],  # fanout for [layer-0, layer-1, layer-2]
+    # sampler = NeighborSampler(
+    #     [10, 10, 10],  # fanout for [layer-0, layer-1, layer-2]
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )
+    
+    sampler = NeighborSampler_OTF_struct_shared_cache(
+        g=g,
+        fanouts=[10,10,10],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+        alpha=2, beta=2, gamma=0.15, T=100,
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
@@ -212,6 +222,7 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
         for it, (input_nodes, output_nodes, blocks) in enumerate(
             train_dataloader
         ):
+            blocks = blocks[::-1]
             # The input features from the source nodes in the first layer's
             # computation graph.
             x = blocks[0].srcdata["feat"]
