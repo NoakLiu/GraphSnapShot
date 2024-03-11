@@ -14,8 +14,7 @@ from dgl.dataloading import (
     MultiLayerFullNeighborSampler,
     NeighborSampler,
     MultiLayerNeighborSampler,
-    BlockSampler,
-    NeighborSampler_FCR_struct
+    BlockSampler
 )
 from ogb.nodeproppred import DglNodePropPredDataset
 
@@ -119,7 +118,27 @@ class GAT(nn.Module):
 
             feat = feat.to(device)
             for input_nodes, output_nodes, blocks in tqdm.tqdm(dataloader):
+                # # print(input_nodes, output_nodes, blocks)
+                # x = feat[input_nodes]
+                # # hidden_x = layer(blocks[0], x)  # len(blocks) = 1
+                # block = blocks[0].int().to(device)
 
+
+                # hidden_x = x
+
+                # h_dst = hidden_x[: block.num_dst_nodes()]
+
+                # for block in blocks:
+                #     # Perform message passing on the current block
+                #     hidden_x = layer(block, hidden_x)
+
+                # if layer_idx != len(self.layers) - 1:
+                #     hidden_x = F.relu(hidden_x)
+                #     hidden_x = self.dropout(hidden_x)
+                # # By design, our output nodes are contiguous.
+                # y[output_nodes[0] : output_nodes[-1] + 1] = hidden_x.to(
+                #     buffer_device
+                # )
                 block = blocks[0].int().to(device)
 
                 h = feat[input_nodes].to(device)
@@ -134,6 +153,111 @@ class GAT(nn.Module):
                 y[output_nodes] = h.cpu()
             feat = y
         return y
+        
+
+
+# class GCN(nn.Module):
+#     def __init__(self, in_feats, hidden_size, out_feats):
+#         super(GCN, self).__init__()
+#         self.layers = nn.ModuleList()
+#         self.layers.append(dglnn.GraphConv(in_feats, hidden_size))
+#         num_layers = 3
+#         for _ in range(num_layers - 2):
+#             self.layers.append(dglnn.GraphConv(hidden_size, hidden_size))
+#         self.layers.append(dglnn.GraphConv(hidden_size, out_feats))
+
+#         self.hidden_size = hidden_size
+#         self.out_size = out_feats
+#         self.dropout = nn.Dropout(0.5)
+
+#     def forward(self, blocks, x):
+#         for layer, block in zip(self.layers, blocks):
+#             x = layer(block, x)
+#             x = F.relu(x)
+#         return x
+
+#     def inference(self, g, device, batch_size, fused_sampling: bool = True):
+#         """Conduct layer-wise inference to get all the node embeddings."""
+#         feat = g.ndata["feat"]
+        
+#         sampler = MultiLayerFullNeighborSampler(
+#             1, prefetch_node_feats=["feat"], fused=fused_sampling
+#         )
+
+#         # sampler = NeighborSampler(
+#         # [1000, 500],  # fanout for [layer-0, layer-1, layer-2]
+#         # prefetch_node_feats=["feat"],
+#         # prefetch_labels=["label"],
+#         # fused=fused_sampling,
+#         # )
+
+#         dataloader = DataLoader(
+#             g,
+#             torch.arange(g.num_nodes()).to(g.device),
+#             sampler,
+#             device=device,
+#             batch_size=batch_size,
+#             shuffle=False,
+#             drop_last=False,
+#             num_workers=0,
+#         )
+#         buffer_device = torch.device("cpu")
+#         # Enable pin_memory for faster CPU to GPU data transfer if the
+#         # model is running on a GPU.
+#         pin_memory = buffer_device != device
+
+#         print(self.layers)
+
+#         """
+#         ModuleList(
+#         (0): GraphConv(in=100, out=256, normalization=both, activation=None)
+#         (1): GraphConv(in=256, out=256, normalization=both, activation=None)
+#         (2): GraphConv(in=256, out=47, normalization=both, activation=None)
+#         )
+#         """
+
+#         for layer_idx, layer in enumerate(self.layers):
+#             is_last_layer = layer_idx == len(self.layers) - 1
+#             y = torch.empty(
+#                 g.num_nodes(),
+#                 self.out_size if is_last_layer else self.hidden_size,
+#                 device=buffer_device,
+#                 pin_memory=pin_memory,
+#             )
+#             feat = feat.to(device)
+#             for input_nodes, output_nodes, blocks in tqdm.tqdm(dataloader):
+#                 # # print(input_nodes, output_nodes, blocks)
+#                 # x = feat[input_nodes]
+#                 # # hidden_x = layer(blocks[0], x)  # len(blocks) = 1
+
+#                 # hidden_x = x
+
+#                 # for block in blocks:
+#                 #     # Perform message passing on the current block
+#                 #     hidden_x = layer(block, hidden_x)
+
+#                 # if layer_idx != len(self.layers) - 1:
+#                 #     hidden_x = F.relu(hidden_x)
+#                 #     hidden_x = self.dropout(hidden_x)
+#                 # # By design, our output nodes are contiguous.
+#                 # y[output_nodes[0] : output_nodes[-1] + 1] = hidden_x.to(
+#                 #     buffer_device
+#                 # )
+#                 block = blocks[0].int().to(device)
+
+#                 h = feat[input_nodes].to(device)
+#                 h_dst = h[: block.num_dst_nodes()]
+#                 if layer_idx < self.n_layers - 1:
+#                     h = layer(block, (h, h_dst)).flatten(1)
+#                 else:
+#                     h = layer(block, (h, h_dst))
+#                     h = h.mean(1)
+#                     h = h.log_softmax(dim=-1)
+
+#                 y[output_nodes] = h.cpu()
+#             feat = y
+#         return y
+
 
 @torch.no_grad()
 def evaluate(model, graph, dataloader, num_classes):
@@ -169,20 +293,15 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     # Create sampler & dataloader.
     train_idx = dataset.train_idx.to(g.device if not use_uva else device)
     val_idx = dataset.val_idx.to(g.device if not use_uva else device)
-
-    sampler_cuda = NeighborSampler_FCR_struct(
-        g=g,
-        fanouts=[2,2,2],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-        alpha=2, T=2500,
+    sampler_cuda = NeighborSampler(
+        [2, 2, 2],  # fanout for [layer-0, layer-1, layer-2]
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
     )
 
-    sampler = NeighborSampler_FCR_struct(
-        g=g,
-        fanouts=[10,10,10],  # fanout for [layer-0, layer-1, layer-2] [10,10,10]
-        alpha=2, T=2500,
+    sampler = NeighborSampler(
+        [10, 10, 10],  # fanout for [layer-0, layer-1, layer-2]
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,

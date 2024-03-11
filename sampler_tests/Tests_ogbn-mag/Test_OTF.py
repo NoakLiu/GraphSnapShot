@@ -36,7 +36,7 @@ def prepare_data(args, device):
     print("Loaded graph: {}".format(g))
 
     logger = Logger(args.runs)
-
+    
     # train sampler
     sampler = MultiLayerNeighborSampler([25, 20])
     num_workers = args.num_workers

@@ -17,7 +17,8 @@ from tqdm import tqdm
 from dgl.dataloading import(
     MultiLayerNeighborSampler,
     DataLoader,
-    MultiLayerFullNeighborSampler
+    MultiLayerFullNeighborSampler,
+    NeighborSampler_FCR_struct_hete
 )
 
 v_t = dgl.__version__
@@ -37,8 +38,18 @@ def prepare_data(args, device):
 
     logger = Logger(args.runs)
 
-    # train sampler
-    sampler = MultiLayerNeighborSampler([25, 20])
+    # # train sampler
+    # sampler = MultiLayerNeighborSampler([25, 20])
+
+    sampler = NeighborSampler_FCR_struct_hete(
+        g=g,
+        fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+        alpha=2, T=1000,
+        prefetch_node_feats=["feat"],
+        prefetch_labels=["label"],
+        fused=True,
+    )
+
     num_workers = args.num_workers
     train_loader = DataLoader(
         g,

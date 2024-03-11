@@ -268,6 +268,7 @@ def train(
 
         for input_nodes, seeds, blocks in train_loader:
             blocks = [blk.to(device) for blk in blocks]
+            print("seeds",seeds)
             seeds = seeds[
                 category
             ]  # we only predict the nodes with type "category"
