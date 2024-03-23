@@ -14,6 +14,7 @@ from dgl.dataloading import (
     MultiLayerFullNeighborSampler,
     NeighborSampler,
     NeighborSampler_OTF_struct,
+    NeighborSampler_OTF_struct_rc,
     MultiLayerNeighborSampler,
     BlockSampler
 )
@@ -162,19 +163,37 @@ def train(device, g, dataset, model, num_classes, use_uva, fused_sampling):
     #     fused=fused_sampling,
     # )
 
-    sampler_cuda = NeighborSampler_OTF_struct(
+    # sampler_cuda = NeighborSampler_OTF_struct(
+    #     g=g,
+    #     fanouts=[2,2,2],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    #     alpha=2, beta=2, gamma=0.15, T=358,
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )
+
+    # sampler = NeighborSampler_OTF_struct(
+    #     g=g,
+    #     fanouts=[4,4,4],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+    #     alpha=2, beta=2, gamma=0.15, T=358, #3, 0.4
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )
+
+    sampler_cuda = NeighborSampler_OTF_struct_rc(
         g=g,
         fanouts=[2,2,2],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-        alpha=2, beta=2, gamma=0.15, T=358,
+        alpha=2, beta=0.75, gamma=0.2, T=358,
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
     )
 
-    sampler = NeighborSampler_OTF_struct(
+    sampler = NeighborSampler_OTF_struct_rc(
         g=g,
-        fanouts=[4,4,4],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
-        alpha=2, beta=2, gamma=0.15, T=358, #3, 0.4
+        fanouts=[10,10,10],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+        alpha=2, beta=0.75, gamma=0.2, T=358, #3, 0.4
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,

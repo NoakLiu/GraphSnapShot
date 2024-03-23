@@ -1,123 +1,5 @@
-from .. import backend as F
-from ..base import EID, NID
-from ..heterograph import DGLGraph
-from ..transforms import to_block
-from ..utils import get_num_threads
-from .base import BlockSampler
-import torch
-import dgl
-
-class double_shared_cache_hete(BlockSampler):
-
-    def __init__(
-        self,
-        fanouts,
-        edge_dir="in",
-        prob=None,
-        mask=None,
-        replace=False,
-        prefetch_node_feats=None,
-        prefetch_labels=None,
-        prefetch_edge_feats=None,
-        output_device=None,
-        fused=True,
-    ):
-        super().__init__(
-            prefetch_node_feats=prefetch_node_feats,
-            prefetch_labels=prefetch_labels,
-            prefetch_edge_feats=prefetch_edge_feats,
-            output_device=output_device,
-        )
-        self.fanouts = fanouts
-        self.edge_dir = edge_dir
-        if mask is not None and prob is not None:
-            raise ValueError(
-                "Mask and probability arguments are mutually exclusive. "
-                "Consider multiplying the probability with the mask "
-                "to achieve the same goal."
-            )
-        self.prob = prob or mask
-        self.replace = replace
-        self.fused = fused
-        self.mapping = {}
-        self.g = None
-        self.frontier1 = None
-        self.cycle = 0
-
-    def sample_blocks(self, g, seed_nodes, exclude_eids=None):
-        output_nodes = seed_nodes
-        blocks = []
-        # sample_neighbors_fused function requires multithreading to be more efficient
-        # than sample_neighbors
-        if self.fused and get_num_threads() > 1:
-            cpu = F.device_type(g.device) == "cpu"
-            if isinstance(seed_nodes, dict):
-                print("hiiiiiiii is dict")
-                for ntype in list(seed_nodes.keys()):
-                    print("seed dict",seed_nodes.keys)
-                    if not cpu:
-                        break
-                    cpu = (
-                        cpu and F.device_type(seed_nodes[ntype].device) == "cpu"
-                    )
-            else:
-                cpu = cpu and F.device_type(seed_nodes.device) == "cpu"
-            if cpu and isinstance(g, DGLGraph) and F.backend_name == "pytorch":
-                print("hiiiiiiii is dglgraphobject")
-                if self.g != g:
-                    self.mapping = {}
-                    self.g = g
-                for fanout in reversed(self.fanouts):
-                    block = g.sample_neighbors_fused(
-                        seed_nodes,
-                        fanout,
-                        edge_dir=self.edge_dir,
-                        prob=self.prob,
-                        replace=self.replace,
-                        exclude_edges=exclude_eids,
-                        mapping=self.mapping,
-                    )
-                    seed_nodes = block.srcdata[NID]
-                    blocks.insert(0, block)
-                return seed_nodes, output_nodes, blocks
-        
-        if self.cycle % 20 == 0:
-            self.frontier1 = g.sample_neighbors(
-                seed_nodes,
-                fanout*2,
-                edge_dir=self.edge_dir,
-                prob=self.prob,
-                replace=self.replace,
-                output_device=self.output_device,
-                exclude_edges=exclude_eids,
-            )
-
-        for fanout in reversed(self.fanouts):
-            print("seeds nodes:",seed_nodes)
-            print("org g:",g)
-            frontier = self.frontier1.sample_neighbors(
-                seed_nodes,
-                fanout,
-                edge_dir=self.edge_dir,
-                prob=self.prob,
-                replace=self.replace,
-                output_device=self.output_device,
-                exclude_edges=exclude_eids,
-            )
-            print("sampled frontier:",frontier)
-            block = to_block(frontier, seed_nodes)
-            # If sampled from graphbolt-backed DistGraph, `EID` may not be in
-            # the block.
-            if EID in frontier.edata.keys():
-                print("--------in this EID code---------")
-                block.edata[EID] = frontier.edata[EID]
-            seed_nodes = block.srcdata[NID]
-            blocks.insert(0, block)
-
-        return seed_nodes, output_nodes, blocks
-
 class NeighborSampler_OTF_struct_shared_cache_hete_mo(BlockSampler):
-    def __init__(self, g, 
+    def __init__(self, 
                 fanouts, 
                 edge_dir='in', 
                 alpha=0.6, 
@@ -140,7 +22,7 @@ class NeighborSampler_OTF_struct_shared_cache_hete_mo(BlockSampler):
             prefetch_edge_feats=prefetch_edge_feats,
             output_device=output_device,
         )
-        self.g = g
+        # self.g = g
         self.fanouts = fanouts
         self.edge_dir = edge_dir
         self.alpha = alpha
@@ -163,18 +45,18 @@ class NeighborSampler_OTF_struct_shared_cache_hete_mo(BlockSampler):
         # print(self.cache_size)
 
         # Initialize cache with amplified fanouts
-        self.cached_graph_structure = self.initialize_cache(self.cache_size) 
+        self.cached_graph_structure = None #self.initialize_cache(self.cache_size) 
         self.T = T
         self.cycle = 0
 
-    def initialize_cache(self, fanout_cache_storage):
+    def initialize_cache(self, g, fanout_cache_storage):
         """
         Initializes the cache for each layer with an amplified fanout to pre-sample a larger
         set of neighbors. This pre-sampling helps in reducing the need for dynamic sampling 
         at every iteration, thereby improving efficiency.
         """
         # print("begin init")
-        cached_graph = self.g.sample_neighbors(
+        cached_graph = g.sample_neighbors(
             # torch.arange(0, self.g.number_of_nodes(), dtype=torch.int64),
             # torch.arange(0, self.g.number_of_nodes()),
             {'paper':list(range(0, g.num_nodes("paper")))},
@@ -196,7 +78,7 @@ class NeighborSampler_OTF_struct_shared_cache_hete_mo(BlockSampler):
         cached edges with new samples from the graph. This method ensures the cache remains 
         relatively fresh and reflects changes in the dynamic graph structure or sampling needs.
         """
-        # print("begin refresh")
+        print("begin refresh")
         # print("begin remove")
         fanout_cache_sample=[]
         # print("layer_id",layer_id)
@@ -242,8 +124,8 @@ class NeighborSampler_OTF_struct_shared_cache_hete_mo(BlockSampler):
         #                              torch.cat([removed.edges()[1], to_add.edges()[1]])),
         #                             num_nodes=self.g.number_of_nodes())
         refreshed_cache = dgl.merge([removed, to_add])
-        refreshed_cache = dgl.add_self_loop(refreshed_cache)
-        # print("end refresh cache")
+        # refreshed_cache = dgl.add_self_loop(refreshed_cache)
+        print("end refresh cache")
         return refreshed_cache
 
     def sample_blocks(self, g, seed_nodes, exclude_eids=None):
@@ -254,6 +136,8 @@ class NeighborSampler_OTF_struct_shared_cache_hete_mo(BlockSampler):
         """
         blocks = []
         output_nodes = seed_nodes
+        if(self.cycle%self.T==0): #-->advanced T1-->refresh whole cache; T2-->refresh partial cache
+            self.cached_graph_structure = self.initialize_cache(g,self.cache_size)
         # print("in sample blocks")
         self.cycle+=1
         if(self.cycle%self.T==0):
