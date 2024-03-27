@@ -25,10 +25,14 @@ NeighborSampler_FCR_struct.py
 NeighborSampler_FCR_nodes.py
 ```
 
-Add samplers code in SSDReS_Sampler into the neighbor_sampler.py in dgl as in the path above and save the changes.
-
+The sampler code can be found at
 ```
-cd ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neighbor_sampler.py
+vim ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/sampling/neighbor.py
+```
+
+Add samplers code in SSDReS_Sampler into the neighbor_sampler.py in dgl as in the path above and save the changes.
+```
+vim ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neighbor_sampler.py
 ```
 Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers.
 
@@ -74,9 +78,9 @@ ogbn_proteins - node classification
   <img src="./ogbn-proteins_degree_distribution.png" width="200" />
 </p>
 
-| Feature           | OGBN-ARXIV   | OGBN-PRODUCTS | OGBN-PROTEINS |
+| Feature           | OGBN-ARXIV   | OGBN-PRODUCTS | OGBN-MAG      |
 |-------------------|--------------|---------------|---------------|
-| Dataset Type      | Citation Network | Product Purchase Network | Protein-Protein Interaction Network |
+| Dataset Type      | Citation Network | Product Purchase Network | Microsoft Academic Graph |
 | Number of Nodes   | 17,735       | 24,019        | 132,534       |
 | Number of Edges   | 116,624      | 123,006       | 1,116,428     |
 | Feature Dimension | 128          | 100           | 50            |
