@@ -36,6 +36,12 @@ vim ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neig
 ```
 Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers.
 
+FBL in execution
+```
+https://docs.dgl.ai/en/0.8.x/_modules/dgl/sampling/neighbor.html#sample_neighbors
+https://docs.dgl.ai/en/0.9.x/generated/dgl.dataloading.NeighborSampler.html
+```
+
 FCR in execution
 
 https://github.com/NoakLiu/GraphSnapShot/assets/116571268/ed701012-9267-4860-845b-baf1c39c317c
