@@ -26,22 +26,68 @@ from dgl.dataloading import (
     MultiLayerFullNeighborSampler,
     NeighborSampler,
     MultiLayerNeighborSampler,
-    BlockSampler
+    BlockSampler,
+    NeighborSampler_FCR_struct,
+    NeighborSampler_FCR_struct_shared_cache,
+    NeighborSampler_OTF_struct,
+    NeighborSampler_OTF_struct_shared_cache
+
 )
 from ogb.nodeproppred import DglNodePropPredDataset
 
-def train(device, g, dataset, num_classes, use_uva, fused_sampling):
+def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     # Create sampler & dataloader.
     train_idx = dataset.train_idx.to(g.device if not use_uva else device)
     val_idx = dataset.val_idx.to(g.device if not use_uva else device)
-    sampler = NeighborSampler(
-        [20, 20, 20],  # fanout for [layer-0, layer-1, layer-2]
+
+    # FBL
+    # sampler = NeighborSampler(
+    #     [20, 20, 20],  # fanout for [layer-0, layer-1, layer-2]
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )
+
+    # FCR
+    # sampler = NeighborSampler_FCR_struct(
+    #     g=g,
+    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    #     alpha=2, T=50,
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )
+
+    # FCR shared cache
+    # sampler = NeighborSampler_FCR_struct_shared_cache(
+    #     g=g,
+    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    #     alpha=2, T=50,
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )    
+
+    # OTF shared cache
+    # sampler = NeighborSampler_OTF_struct(
+    #     g=g,
+    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+    #     alpha=2, beta=1, gamma=0.15, T=358, #3, 0.4
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )
+
+    # OTF shared cache
+    sampler = NeighborSampler_OTF_struct_shared_cache(
+        g=g,
+        fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+        alpha=2, beta=1, gamma=0.15, T=119,
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
     )
 
-    # 调用示例
     seed_nodes1, output_nodes1, blocks1 = sampler.sample_blocks(g, 2)
     print("1sampler")
     print(seed_nodes1)
@@ -62,12 +108,14 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling):
         num_workers=0,
         use_uva=use_uva,
     )
+    lstime = []
+    lsmem = []
 
-    for epoch in range(1):
+    for epoch in range(3):
         t0 = time.time()
+        t20 = time.time()
         total_loss = 0
         # Before the operation
-        mem_before = psutil.virtual_memory().used
         for it, (input_nodes, output_nodes, blocks) in enumerate(
             train_dataloader
         ):
@@ -75,11 +123,16 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling):
             mem_after = psutil.virtual_memory().used
             memusage = mem_after - mem_before
             t2=time.time()
+            lsmem.append(memusage/(1024*1024))
+            lstime.append(t2-t20)
             print("memorage usage (Mb):",memusage/(1024*1024))
-            print("time needed (s):",t2-t0)
+            print("time needed (s):",t2-t20)
             # Before the operation
-            mem_before = psutil.virtual_memory().used
+            # mem_before = psutil.virtual_memory().used
+            t20=time.time()
         t1 = time.time()
+        print("lstime.mean:",sum(lstime)/len(lstime))
+        print("lsmem.mean",sum(lsmem)/len(lsmem))
         print(
             f"Epoch {epoch:05d} | Loss {total_loss / (it + 1):.4f} | Time {t1 - t0:.4f}"
         )
@@ -125,6 +178,8 @@ if __name__ == "__main__":
     device = torch.device("cpu" if args.mode == "cpu" else "cuda")
     fused_sampling = args.compare_to_graphbolt == "false"
 
+    mem_before = psutil.virtual_memory().used
+
     # Model training.
     print("Training...")
-    train(device, g, dataset, num_classes, use_uva, fused_sampling)
+    train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before)
