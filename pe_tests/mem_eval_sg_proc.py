@@ -2,13 +2,7 @@ import psutil
 import os
 
 # Before the operation
-mem_before = psutil.virtual_memory().used
-
-# Your code block here
-
-# After the operation
-mem_after = psutil.virtual_memory().used
-print(f"Memory used: {mem_after - mem_before} bytes")
+process = psutil.Process(os.getpid())
 
 
 import argparse
@@ -122,11 +116,11 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
         ):
             # After the operation
             mem_after = psutil.virtual_memory().used
-            memusage = mem_after - mem_before
+            memusage = process.memory_info().rss / (1024 ** 2) 
             t2=time.time()
-            lsmem.append(memusage/(1024*1024))
+            lsmem.append(memusage)
             lstime.append(t2-t20)
-            print("memorage usage (Mb):",memusage/(1024*1024))
+            print("memorage usage (Mb):",memusage)
             print("time needed (s):",t2-t20)
             # Before the operation
             # mem_before = psutil.virtual_memory().used

@@ -1,4 +1,4 @@
-# ogbn-products, ogbn-arxiv
+# ogbn-products
 ## FBL
 setting
 ```
@@ -98,12 +98,22 @@ lsmem.mean 3489.088622625216
 
 ## OTCR
 ```
+sampler = 
+```
 
+```
+result
 ```
 
 ## OTCR-SC
 ```
+sampler = 
+```
 
 ```
+result
+```
+
+# ogbn-arxiv
 
 # ogbn-mag
