@@ -1,7 +1,6 @@
-# at each time, when refresh the sampled seed node-related structure, and remain node struct keep the same
-# each time use a partial fetch strategy, while use a partial refresh strategy on seed nodes
+# each time partial refresh and partial fetch
 
-class NeighborSampler_OTF_struct_PCR(BlockSampler):
+class NeighborSampler_OTF_struct_PCFPSCR(BlockSampler):
     """
     Implements an on-the-fly (OTF) neighbor sampling strategy for Deep Graph Library (DGL) graphs. 
     This sampler dynamically samples neighbors while balancing efficiency through caching and 
@@ -20,7 +19,7 @@ class NeighborSampler_OTF_struct_PCR(BlockSampler):
                 edge_dir='in', 
                 amp_rate=1.5, # cache amplification rate (should be bigger than 1 --> to sample for multiple time)
                 refresh_rate=0.4, #propotion of cache to be refresh, should be a positive float smaller than 0.5
-                T=50, # refresh time
+                T=50, # refresh time, for example
                 prob=None, 
                 replace=False, 
                 output_device=None, 
@@ -78,13 +77,14 @@ class NeighborSampler_OTF_struct_PCR(BlockSampler):
         print("end init cache")
         return cached_graph
 
-    def OTF_refresh_cache(self,layer_id, cached_graph_structure, seed_nodes, fanout_cache_refresh):
+    def OTF_rf_cache(self,layer_id, cached_graph_structure, seed_nodes, fanout_cache_refresh, fanout):
         """
         Refreshes a portion of the cache based on the gamma parameter by replacing some of the 
         cached edges with new samples from the graph. This method ensures the cache remains 
         relatively fresh and reflects changes in the dynamic graph structure or sampling needs.
         """
-        fanout_cache_sample = self.cache_size[layer_id]-fanout_cache_refresh
+        fanout_cache_remain = self.cache_size[layer_id]-fanout_cache_refresh
+        fanout_cache_pr = fanout-fanout_cache_refresh
         unchanged_nodes = range(torch.arange(0, self.g.number_of_nodes()))-seed_nodes
         # the rest node structure remain the same
         unchanged_structure = cached_graph_structure.sample_neighbors(
@@ -99,7 +99,16 @@ class NeighborSampler_OTF_struct_PCR(BlockSampler):
         # the OTF node structure should 
         changed_cache_remain = cached_graph_structure.sample_neighbors(
             seed_nodes,
-            fanout_cache_sample,
+            fanout_cache_remain,
+            edge_dir=self.edge_dir,
+            prob=self.prob,
+            replace=self.replace,
+            output_device=self.output_device,
+            exclude_edges=self.exclude_eids,
+        )
+        cache_pr = cached_graph_structure.sample_neighbors(
+            seed_nodes,
+            fanout_cache_pr,
             edge_dir=self.edge_dir,
             prob=self.prob,
             replace=self.replace,
@@ -116,7 +125,8 @@ class NeighborSampler_OTF_struct_PCR(BlockSampler):
             exclude_edges=self.exclude_eids,
         )
         refreshed_cache = dgl.merge([unchanged_structure, changed_cache_remain, changed_disk_to_add])
-        return refreshed_cache
+        retrieval_cache = dgl.merge([cache_pr, changed_disk_to_add])
+        return refreshed_cache, retrieval_cache
 
     def sample_blocks(self, g, seed_nodes, exclude_eids=None):
         """
@@ -129,48 +139,15 @@ class NeighborSampler_OTF_struct_PCR(BlockSampler):
         for i, (fanout, cached_graph_structure) in enumerate(zip(reversed(self.fanouts), reversed(self.cached_graph_structures))):
             fanout_cache_refresh = int(fanout * self.refresh_rate)
 
-            # Refresh cache partially
-            self.cached_graph_structures[i] = self.OTF_refresh_cache(i, cached_graph_structure, seed_nodes, fanout_cache_refresh)
-            
-            # Sample from cache
-            frontier_cache = self.cached_graph_structures[i].sample_neighbors(
-                seed_nodes,
-                #fanout_cache_retrieval,
-                fanout,
-                edge_dir=self.edge_dir,
-                prob=self.prob,
-                replace=self.replace,
-                output_device=self.output_device,
-                exclude_edges=self.exclude_eids,
-            )
-            # print("merged_cache",frontier_cache)
-
-            merged_frontier = frontier_cache
-            
-            # # Sample remaining from disk
-            # frontier_disk = g.sample_neighbors(
-            #     seed_nodes,
-            #     fanout_disk,
-            #     edge_dir=self.edge_dir,
-            #     prob=self.prob,
-            #     replace=self.replace,
-            #     output_device=self.output_device,
-            #     exclude_edges=self.exclude_eids,
-            # )
-            # print("frontier_disk",frontier_disk)
-            
-            # # Merge frontiers
-            # merged_frontier = dgl.merge([frontier_cache, frontier_disk]) #merge batch
+            # Refresh cache&disk partially, while retrieval cache&disk partially
+            self.cached_graph_structures[i], frontier_comp = self.OTF_rf_cache(i, cached_graph_structure, seed_nodes, fanout_cache_refresh, fanout)
             
             # Convert the merged frontier to a block
-            block = to_block(merged_frontier, seed_nodes)
-            if EID in merged_frontier.edata.keys():
+            block = to_block(frontier_comp, seed_nodes)
+            if EID in frontier_comp.edata.keys():
                 print("--------in this EID code---------")
                 block.edata[EID] = merged_frontier.edata[EID]
             blocks.append(block)
             seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
-
-            # print(f"Layer {i}: Merged frontier edges:", merged_frontier.edges())
-        
 
         return seed_nodes,output_nodes, blocks
