@@ -23,9 +23,9 @@ from dgl.dataloading import (
     MultiLayerNeighborSampler,
     BlockSampler,
     NeighborSampler_FCR_struct,
-    NeighborSampler_FCR_struct_shared_cache,
-    NeighborSampler_OTF_struct,
-    NeighborSampler_OTF_struct_shared_cache
+    # NeighborSampler_FCR_struct_shared_cache,
+    # NeighborSampler_OTF_struct,
+    # NeighborSampler_OTF_struct_shared_cache
 
 )
 from ogb.nodeproppred import DglNodePropPredDataset
@@ -36,12 +36,12 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     val_idx = dataset.val_idx.to(g.device if not use_uva else device)
 
     # FBL
-    # sampler = NeighborSampler(
-    #     [20, 20, 20],  # fanout for [layer-0, layer-1, layer-2]
-    #     prefetch_node_feats=["feat"],
-    #     prefetch_labels=["label"],
-    #     fused=fused_sampling,
-    # )
+    sampler = NeighborSampler(
+        [20, 20, 20],  # fanout for [layer-0, layer-1, layer-2]
+        prefetch_node_feats=["feat"],
+        prefetch_labels=["label"],
+        fused=fused_sampling,
+    )
 
     # FCR
     # sampler = NeighborSampler_FCR_struct(
@@ -73,15 +73,15 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     fused=fused_sampling,
     # )
 
-    # OTF shared cache
-    sampler = NeighborSampler_OTF_struct_shared_cache(
-        g=g,
-        fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-        alpha=2, beta=1, gamma=0.15, T=119,
-        prefetch_node_feats=["feat"],
-        prefetch_labels=["label"],
-        fused=fused_sampling,
-    )
+    # # OTF shared cache
+    # sampler = NeighborSampler_OTF_struct_shared_cache(
+    #     g=g,
+    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    #     alpha=2, beta=1, gamma=0.15, T=119,
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )
 
     seed_nodes1, output_nodes1, blocks1 = sampler.sample_blocks(g, 2)
     print("1sampler")
@@ -126,8 +126,8 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
             # mem_before = psutil.virtual_memory().used
             t20=time.time()
         t1 = time.time()
-        print("lstime.mean(s):",sum(lstime)/len(lstime))
-        print("lsmem.mean(GB):",sum(lsmem)/(len(lsmem)))
+        print("lstime.mean:",sum(lstime)/len(lstime))
+        print("lsmem.mean",sum(lsmem)/len(lsmem))
         print(
             f"Epoch {epoch:05d} | Loss {total_loss / (it + 1):.4f} | Time {t1 - t0:.4f}"
         )

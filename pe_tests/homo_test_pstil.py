@@ -24,8 +24,9 @@ from dgl.dataloading import (
     BlockSampler,
     NeighborSampler_FCR_struct,
     NeighborSampler_FCR_struct_shared_cache,
-    NeighborSampler_OTF_struct,
-    NeighborSampler_OTF_struct_shared_cache
+    NeighborSampler_OTF_struct_FSCRFCF,
+    # NeighborSampler_OTF_struct,
+    # NeighborSampler_OTF_struct_shared_cache
 
 )
 from ogb.nodeproppred import DglNodePropPredDataset
@@ -35,7 +36,9 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     train_idx = dataset.train_idx.to(g.device if not use_uva else device)
     val_idx = dataset.val_idx.to(g.device if not use_uva else device)
 
-    # FBL
+    mem_pre_sample = psutil.virtual_memory().used
+
+    # # FBL
     # sampler = NeighborSampler(
     #     [20, 20, 20],  # fanout for [layer-0, layer-1, layer-2]
     #     prefetch_node_feats=["feat"],
@@ -43,7 +46,14 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     fused=fused_sampling,
     # )
 
-    # FCR
+    # # """
+    # # lstime.mean (s): 0.2765758597583145
+    # # lsmem.mean (MB): 6.338676597582038
+    # # sampler memory (MB): 0.0
+    # # sampler comp (MB): 3670.046875
+    # # """
+
+    # # FCR
     # sampler = NeighborSampler_FCR_struct(
     #     g=g,
     #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
@@ -53,7 +63,14 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     fused=fused_sampling,
     # )
 
-    # FCR shared cache
+    # # """
+    # # lstime.mean (s): 0.25917509965122465
+    # # lsmem.mean (MB): 2.0676273747841107
+    # # sampler memory (MB): 3688.75
+    # # sampler comp (MB): 4886.546875
+    # # """
+
+    # # FCR shared cache
     # sampler = NeighborSampler_FCR_struct_shared_cache(
     #     g=g,
     #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
@@ -63,33 +80,35 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     fused=fused_sampling,
     # )    
 
-    # OTF shared cache
-    # sampler = NeighborSampler_OTF_struct(
-    #     g=g,
-    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
-    #     alpha=2, beta=1, gamma=0.15, T=358, #3, 0.4
-    #     prefetch_node_feats=["feat"],
-    #     prefetch_labels=["label"],
-    #     fused=fused_sampling,
-    # )
+    # # """
+    # # lstime.mean (s): 0.25541082070899135
+    # # lsmem.mean (MB): 4.428675518134715
+    # # sampler memory (MB): 1386.828125
+    # # sampler comp (MB): 3951.53125
+    # # """
 
-    # OTF shared cache
-    sampler = NeighborSampler_OTF_struct_shared_cache(
+    # OTF
+    sampler = NeighborSampler_OTF_struct_FSCRFCF(
         g=g,
-        fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-        alpha=2, beta=1, gamma=0.15, T=119,
+        fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+        amp_rate=2, refresh_rate=0.15, T=358, #3, 0.4
         prefetch_node_feats=["feat"],
         prefetch_labels=["label"],
         fused=fused_sampling,
     )
 
-    seed_nodes1, output_nodes1, blocks1 = sampler.sample_blocks(g, 2)
-    print("1sampler")
-    print(seed_nodes1)
-    print(output_nodes1)
-    print(blocks1[0])
-    print(blocks1[0].edata)
-    print("---")
+    # # OTF shared cache
+    # sampler = NeighborSampler_OTF_struct_shared_cache(
+    #     g=g,
+    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    #     alpha=2, beta=1, gamma=0.15, T=119,
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )
+
+    mem_after_sample = psutil.virtual_memory().used
+
     train_dataloader = DataLoader(
         g,
         train_idx,
@@ -111,26 +130,37 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
         t20 = time.time()
         total_loss = 0
         # Before the operation
+        mem_before = psutil.virtual_memory().used
+        # Before the operation
         for it, (input_nodes, output_nodes, blocks) in enumerate(
             train_dataloader
         ):
             # After the operation
             mem_after = psutil.virtual_memory().used
-            memusage = process.memory_info().rss / (1024 ** 3) 
+            # memusage = process.memory_info().rss / (1024 ** 3) 
             t2=time.time()
-            lsmem.append(memusage)
+            # lsmem.append(memusage)
             lstime.append(t2-t20)
-            print("memorage usage (GB):",memusage)
+            # print("memorage usage (GB):",memusage)
+
+            memusage = mem_after-mem_before
+            lsmem.append(memusage/(1024**2))
             print("time needed (s):",t2-t20)
+            print("memorage usage (MB):",memusage)
             # Before the operation
-            # mem_before = psutil.virtual_memory().used
+            mem_before = psutil.virtual_memory().used
             t20=time.time()
         t1 = time.time()
-        print("lstime.mean(s):",sum(lstime)/len(lstime))
-        print("lsmem.mean(GB):",sum(lsmem)/(len(lsmem)))
+        print("lstime.mean (s):",sum(lstime)/len(lstime))
+        print("lsmem.mean (MB):",sum(lsmem)/len(lsmem))
         print(
             f"Epoch {epoch:05d} | Loss {total_loss / (it + 1):.4f} | Time {t1 - t0:.4f}"
         )
+    sampler_mem = (mem_after_sample- mem_pre_sample)/(1024 ** 2)
+    mem_after_compute = psutil.virtual_memory().used
+    sampler_comp = (mem_after_compute-mem_pre_sample)/(1024**2)
+    print("sampler memory (MB):", sampler_mem)
+    print("sampler comp (MB):", sampler_comp)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
