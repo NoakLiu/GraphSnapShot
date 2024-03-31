@@ -25,6 +25,7 @@ from dgl.dataloading import (
     NeighborSampler_FCR_struct,
     NeighborSampler_FCR_struct_shared_cache,
     NeighborSampler_OTF_struct_FSCRFCF,
+    NeighborSampler_OTF_struct_FSCRFCF_shared_cache,
     # NeighborSampler_OTF_struct,
     # NeighborSampler_OTF_struct_shared_cache
 
@@ -87,7 +88,7 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     # # sampler comp (MB): 3951.53125
     # # """
 
-    # OTF
+    # # OTF
     sampler = NeighborSampler_OTF_struct_FSCRFCF(
         g=g,
         fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
@@ -97,8 +98,16 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
         fused=fused_sampling,
     )
 
+    # """
+    # lstime.mean (s): 0.25199997363312876
+    # lsmem.mean (MB): 1.6715511658031088
+    # Epoch 00002 | Loss 0.0000 | Time 47.5013
+    # sampler memory (MB): 841.296875
+    # sampler comp (MB): 1812.578125
+    # """
+
     # # OTF shared cache
-    # sampler = NeighborSampler_OTF_struct_shared_cache(
+    # sampler = NeighborSampler_OTF_struct_FSCRFCF_shared_cache(
     #     g=g,
     #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
     #     alpha=2, beta=1, gamma=0.15, T=119,
@@ -106,6 +115,14 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     prefetch_labels=["label"],
     #     fused=fused_sampling,
     # )
+
+    # # """
+    # # lstime.mean (s): 0.25199997363312876
+    # # lsmem.mean (MB): 1.6715511658031088
+    # # Epoch 00002 | Loss 0.0000 | Time 47.5013
+    # # sampler memory (MB): 841.296875
+    # # sampler comp (MB): 1812.578125
+    # # """
 
     mem_after_sample = psutil.virtual_memory().used
 
