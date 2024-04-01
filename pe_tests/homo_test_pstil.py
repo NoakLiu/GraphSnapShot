@@ -26,6 +26,8 @@ from dgl.dataloading import (
     NeighborSampler_FCR_struct_shared_cache,
     NeighborSampler_OTF_struct_FSCRFCF,
     NeighborSampler_OTF_struct_FSCRFCF_shared_cache,
+    NeighborSampler_OTF_struct_PCFFSCR_shared_cache,
+    NeighborSampler_OTF_struct_PCFFSCR,
     # NeighborSampler_OTF_struct,
     # NeighborSampler_OTF_struct_shared_cache
 
@@ -89,22 +91,22 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     # # """
 
     # # OTF
-    sampler = NeighborSampler_OTF_struct_FSCRFCF(
-        g=g,
-        fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
-        amp_rate=2, refresh_rate=0.15, T=358, #3, 0.4
-        prefetch_node_feats=["feat"],
-        prefetch_labels=["label"],
-        fused=fused_sampling,
-    )
+    # sampler = NeighborSampler_OTF_struct_FSCRFCF(
+    #     g=g,
+    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+    #     amp_rate=2, refresh_rate=0.15, T=358, #3, 0.4
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=fused_sampling,
+    # )
 
-    # """
-    # lstime.mean (s): 0.25199997363312876
-    # lsmem.mean (MB): 1.6715511658031088
-    # Epoch 00002 | Loss 0.0000 | Time 47.5013
-    # sampler memory (MB): 841.296875
-    # sampler comp (MB): 1812.578125
-    # """
+    # # """
+    # # lstime.mean (s): 0.2459948853507561
+    # # lsmem.mean (MB): 4.13271804835924
+    # # Epoch 00002 | Loss 0.0000 | Time 47.2221
+    # # sampler memory (MB): 2657.890625
+    # # sampler comp (MB): 5052.359375
+    # # """
 
     # # OTF shared cache
     # sampler = NeighborSampler_OTF_struct_FSCRFCF_shared_cache(
@@ -123,6 +125,38 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     # # sampler memory (MB): 841.296875
     # # sampler comp (MB): 1812.578125
     # # """
+
+    # # OTF FSCR FCF shared cache
+    # sampler = NeighborSampler_OTF_struct_PCFFSCR_shared_cache(
+    #     g=g,
+    #     fanouts=[20,20,20],
+    #     amp_rate=1.5,fetch_rate=0.4,T_fetch=10
+    # )
+
+    # # """
+    # # lstime.mean (s): 0.3299847666257815
+    # # lsmem.mean (MB): 3.713811528497409
+    # # Epoch 00002 | Loss 0.0000 | Time 62.2927
+    # # sampler memory (MB): 444.21875
+    # # sampler comp (MB): 1006.125
+    # # """
+
+    # OTF FSCR FCF
+    sampler = NeighborSampler_OTF_struct_PCFFSCR(
+        g=g,
+        fanouts=[20,20,20],
+        amp_rate=1.5,fetch_rate=0.4,T_fetch=10
+    )
+
+    """
+    time needed (s): 0.006249189376831055
+    memorage usage (MB): 0
+    lstime.mean (s): 0.38904782651001923
+    lsmem.mean (MB): -8.920633635578584
+    Epoch 00002 | Loss 0.0000 | Time 76.9332
+    sampler memory (MB): 2604.015625
+    sampler comp (MB): -2566.578125
+    """
 
     mem_after_sample = psutil.virtual_memory().used
 
