@@ -30,6 +30,8 @@ from dgl.dataloading import (
     NeighborSampler_OTF_struct_PCFFSCR,
     NeighborSampler_OTF_struct_PCFPSCR_SC,
     NeighborSampler_OTF_struct_PCFPSCR,
+    NeighborSampler_OTF_struct_PSCRFCF_SC,
+    NeighborSampler_OTF_struct_PSCRFCF,
     # NeighborSampler_OTF_struct,
     # NeighborSampler_OTF_struct_shared_cache
 
@@ -174,6 +176,21 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
         amp_rate=1.5,refresh_rate=0.4,T=10
     )
 
+    # PSCR FCF SC
+    sampler = NeighborSampler_OTF_struct_PSCRFCF_SC(
+        g=g,
+        fanouts=[20,20,20],
+        amp_rate=1.5, refresh_rate=0.4, T=50
+    )
+
+    # PSCR FCF
+    sampler = NeighborSampler_OTF_struct_PSCRFCF(
+        g=g,
+        fanouts=[20,20,20],
+        amp_rate=1.5,
+        refresh_rate=0.4,
+        T=50,
+    )
 
 
     mem_after_sample = psutil.virtual_memory().used
