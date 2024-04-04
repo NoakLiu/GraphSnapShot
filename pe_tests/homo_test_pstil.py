@@ -28,6 +28,8 @@ from dgl.dataloading import (
     NeighborSampler_OTF_struct_FSCRFCF_shared_cache,
     NeighborSampler_OTF_struct_PCFFSCR_shared_cache,
     NeighborSampler_OTF_struct_PCFFSCR,
+    NeighborSampler_OTF_struct_PCFPSCR_SC,
+    NeighborSampler_OTF_struct_PCFPSCR,
     # NeighborSampler_OTF_struct,
     # NeighborSampler_OTF_struct_shared_cache
 
@@ -141,22 +143,38 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     # # sampler comp (MB): 1006.125
     # # """
 
-    # OTF FSCR FCF
-    sampler = NeighborSampler_OTF_struct_PCFFSCR(
+    # # OTF FSCR FCF
+    # sampler = NeighborSampler_OTF_struct_PCFFSCR(
+    #     g=g,
+    #     fanouts=[20,20,20],
+    #     amp_rate=1.5,fetch_rate=0.4,T_fetch=10
+    # )
+
+    # """
+    # time needed (s): 0.006249189376831055
+    # memorage usage (MB): 0
+    # lstime.mean (s): 0.38904782651001923
+    # lsmem.mean (MB): -8.920633635578584
+    # Epoch 00002 | Loss 0.0000 | Time 76.9332
+    # sampler memory (MB): 2604.015625
+    # sampler comp (MB): -2566.578125
+    # """
+
+    # PCF PSCR SC
+    # sampler = NeighborSampler_OTF_struct_PCFPSCR_SC(
+    #     g=g,
+    #     fanouts=[20,20,20],
+    #     amp_rate=1.5,refresh_rate=0.4,T=10
+    # )
+
+    # PCF PSCR
+    sampler = NeighborSampler_OTF_struct_PCFPSCR(
         g=g,
         fanouts=[20,20,20],
-        amp_rate=1.5,fetch_rate=0.4,T_fetch=10
+        amp_rate=1.5,refresh_rate=0.4,T=10
     )
 
-    """
-    time needed (s): 0.006249189376831055
-    memorage usage (MB): 0
-    lstime.mean (s): 0.38904782651001923
-    lsmem.mean (MB): -8.920633635578584
-    Epoch 00002 | Loss 0.0000 | Time 76.9332
-    sampler memory (MB): 2604.015625
-    sampler comp (MB): -2566.578125
-    """
+
 
     mem_after_sample = psutil.virtual_memory().used
 
