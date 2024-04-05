@@ -52,6 +52,7 @@ class NeighborSampler_FCR_struct_shared_cache(BlockSampler):
         is automatically called upon initialization and after every T sampling iterations to
         ensure that the cache is periodically updated with fresh samples.
         """
+        del self.shared_cache
         self.shared_cache=self.g.sample_neighbors(
             torch.arange(0, self.g.number_of_nodes()),  # Consider all nodes as seeds for pre-sampling
             self.shared_cache_size,
@@ -116,10 +117,9 @@ class NeighborSampler_FCR_struct_shared_cache(BlockSampler):
                     blocks.insert(0, block)
                 return seed_nodes, output_nodes, blocks
 
-        for k in range(len(self.cache_struct)-1,-1,-1):
-            cached_structure = self.cache_struct[k]
+        for k in range(len(self.fanouts)-1,-1,-1):
             fanout = self.fanouts[k]
-            frontier = cached_structure.sample_neighbors(
+            frontier = self.shared_cache.sample_neighbors(
                 seed_nodes,
                 fanout,
                 edge_dir=self.edge_dir,

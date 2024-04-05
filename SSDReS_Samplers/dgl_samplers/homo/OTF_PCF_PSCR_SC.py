@@ -1,6 +1,6 @@
 # each time partial refresh and partial fetch
 
-class NeighborSampler_OTF_struct_PCFPSCR(BlockSampler):
+class NeighborSampler_OTF_struct_PCFPSCR_SC(BlockSampler):
     """
     Implements an on-the-fly (OTF) neighbor sampling strategy for Deep Graph Library (DGL) graphs. 
     This sampler dynamically samples neighbors while balancing efficiency through caching and 
@@ -56,6 +56,7 @@ class NeighborSampler_OTF_struct_PCFPSCR(BlockSampler):
         self.mapping = {}
         self.amp_cache_size = [fanout * amp_rate for fanout in fanouts]
         self.T = T
+        self.cycle = 0
         # self.cached_graph_structures = [self.initialize_cache(cache_size) for cache_size in self.cache_size]
 
         self.shared_cache_size = max(self.amp_cache_size)
@@ -75,7 +76,6 @@ class NeighborSampler_OTF_struct_PCFPSCR(BlockSampler):
             replace=self.replace,
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
-            mappings=self.mapping
         )
         print("end init cache")
         return cached_graph
@@ -86,13 +86,20 @@ class NeighborSampler_OTF_struct_PCFPSCR(BlockSampler):
         cached edges with new samples from the graph. This method ensures the cache remains 
         relatively fresh and reflects changes in the dynamic graph structure or sampling needs.
         """
-        fanout_cache_remain = self.cache_size[layer_id]-fanout_cache_refresh
+        fanout_cache_remain = self.shared_cache_size-fanout_cache_refresh
         fanout_cache_pr = fanout-fanout_cache_refresh
-        unchanged_nodes = range(torch.arange(0, self.g.number_of_nodes()))-seed_nodes
+
+        all_nodes = torch.arange(0, self.g.number_of_nodes())
+        # mask = ~torch.isin(all_nodes, seed_nodes)
+        # # 使用布尔掩码来选择不在seed_nodes中的节点
+        # unchanged_nodes = all_nodes[mask]
+
+        # unchanged_nodes = torch.arange(0, self.g.number_of_nodes())-seed_nodes
         # the rest node structure remain the same
         unchanged_structure = self.shared_cache.sample_neighbors(
-            unchanged_nodes,
-            self.cache_size[layer_id],
+            all_nodes,
+            # unchanged_nodes,
+            self.shared_cache_size,
             edge_dir=self.edge_dir,
             prob=self.prob,
             replace=self.replace,
@@ -139,17 +146,29 @@ class NeighborSampler_OTF_struct_PCFPSCR(BlockSampler):
         """
         blocks = []
         output_nodes = seed_nodes
+        self.cycle += 1
         for i, (fanout) in enumerate(reversed(self.fanouts)):
             fanout_cache_refresh = int(fanout * self.refresh_rate)
 
             # Refresh cache&disk partially, while retrieval cache&disk partially
-            self.shared_cache, frontier_comp = self.OTF_rf_cache(i, seed_nodes, fanout_cache_refresh, fanout)
+            if(self.cycle%self.T==0):
+                self.shared_cache, frontier_comp = self.OTF_rf_cache(i, seed_nodes, fanout_cache_refresh, fanout)
+            else:
+                frontier_comp = self.shared_cache.sample_neighbors(
+                seed_nodes,
+                fanout,
+                edge_dir=self.edge_dir,
+                prob=self.prob,
+                replace=self.replace,
+                output_device=self.output_device,
+                exclude_edges=self.exclude_eids,
+            )
             
             # Convert the merged frontier to a block
             block = to_block(frontier_comp, seed_nodes)
             if EID in frontier_comp.edata.keys():
                 print("--------in this EID code---------")
-                block.edata[EID] = merged_frontier.edata[EID]
+                block.edata[EID] = frontier_comp.edata[EID]
             blocks.append(block)
             seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
 

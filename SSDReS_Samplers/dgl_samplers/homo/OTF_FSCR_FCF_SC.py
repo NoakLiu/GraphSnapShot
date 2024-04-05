@@ -1,6 +1,6 @@
 # after a period of time, refresh the graph structure partially
 
-class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
+class NeighborSampler_OTF_struct_FSCRFCF_shared_cache(BlockSampler):
     """
     Implements an on-the-fly (OTF) neighbor sampling strategy for Deep Graph Library (DGL) graphs. 
     This sampler dynamically samples neighbors while balancing efficiency through caching and 
@@ -56,6 +56,7 @@ class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
         self.fused = fused
         self.mapping = {}
         self.amp_cache_size = [fanout * amp_rate for fanout in fanouts]
+        self.Toptim = int(self.g.number_of_nodes() / (max(self.amp_cache_size))*self.amp_rate)
         self.T = T
         # self.cached_graph_structures = [self.initialize_cache(cache_size) for cache_size in self.cache_size]
 
@@ -76,7 +77,7 @@ class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
             replace=self.replace,
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
-            mappings=self.mapping
+            # mappings=self.mapping
         )
         print("end init cache")
         return cached_graph
@@ -108,9 +109,10 @@ class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
             exclude_edges=self.exclude_eids,
         )
 
-        refreshed_cache = dgl.merge([cache_remain, disk_to_add])
+        self.shared_cache = dgl.merge([cache_remain, disk_to_add])
+        del cache_remain
+        del disk_to_add
         print("end refresh cache")
-        return refreshed_cache
 
     def sample_blocks(self, g, seed_nodes, exclude_eids=None):
         """
@@ -118,12 +120,13 @@ class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
         neighbors. This method also partially refreshes the cache based on specified parameters 
         to balance between sampling efficiency and the freshness of the samples.
         """
+        self.cycle += 1
         blocks = []
         output_nodes = seed_nodes
-        if((self.cycle % self.T)==0):
+        if((self.cycle % self.Toptim)==0):
             # Refresh cache partially
             fanout_cache_refresh = int(self.shared_cache_size * self.refresh_rate)
-            self.shared_cache=self.refresh_cache(fanout_cache_refresh)
+            self.refresh_cache(fanout_cache_refresh)
             
         for i, (fanout) in enumerate(reversed(self.fanouts)):            
             # Sample from cache
@@ -145,7 +148,5 @@ class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
                 block.edata[EID] = frontier_from_cache.edata[EID]
             blocks.append(block)
             seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
-        
-        self.cycle += 1
         
         return seed_nodes,output_nodes, blocks

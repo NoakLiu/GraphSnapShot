@@ -57,6 +57,7 @@ class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
         self.mapping = {}
         self.cache_size = [fanout * amp_rate for fanout in fanouts]
         self.T = T
+        self.Toptim = int(self.g.number_of_nodes() / (max(self.cache_size))*self.amp_rate)
         self.cached_graph_structures = [self.initialize_cache(cache_size) for cache_size in self.cache_size]
 
     def initialize_cache(self, fanout_cache_storage):
@@ -73,7 +74,6 @@ class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
             replace=self.replace,
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
-            mappings=self.mapping
         )
         print("end init cache")
         return cached_graph
@@ -117,11 +117,12 @@ class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
         """
         blocks = []
         output_nodes = seed_nodes
-        if((self.cycle % self.T)==0):
+        self.cycle += 1
+        if((self.cycle % self.Toptim)==0):
             for i in range(0,len(self.cached_graph_structures)):
                 # Refresh cache partially
                 fanout_cache_refresh = int(self.cache_size[i] * self.refresh_rate)
-                self.cached_graph_structures[i]=self.refresh_cache(i, self.cached_graph_structure[i], fanout_cache_refresh)
+                self.cached_graph_structures[i]=self.refresh_cache(i, self.cached_graph_structures[i], fanout_cache_refresh)
             
         for i, (fanout, cached_graph_structure) in enumerate(zip(reversed(self.fanouts), reversed(self.cached_graph_structures))):            
             # Sample from cache
@@ -143,7 +144,5 @@ class NeighborSampler_OTF_struct_FSCRFCF(BlockSampler):
                 block.edata[EID] = frontier_from_cache.edata[EID]
             blocks.append(block)
             seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
-        
-        self.cycle += 1
         
         return seed_nodes,output_nodes, blocks

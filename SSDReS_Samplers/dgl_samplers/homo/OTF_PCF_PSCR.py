@@ -72,7 +72,6 @@ class NeighborSampler_OTF_struct_PCFPSCR(BlockSampler):
             replace=self.replace,
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
-            mappings=self.mapping
         )
         print("end init cache")
         return cached_graph
@@ -85,8 +84,12 @@ class NeighborSampler_OTF_struct_PCFPSCR(BlockSampler):
         """
         fanout_cache_remain = self.cache_size[layer_id]-fanout_cache_refresh
         fanout_cache_pr = fanout-fanout_cache_refresh
-        unchanged_nodes = range(torch.arange(0, self.g.number_of_nodes()))-seed_nodes
+        # unchanged_nodes = range(torch.arange(0, self.g.number_of_nodes()))-seed_nodes
         # the rest node structure remain the same
+        all_nodes = torch.arange(0, self.g.number_of_nodes())
+        mask = ~torch.isin(all_nodes, seed_nodes)
+        # 使用布尔掩码来选择不在seed_nodes中的节点
+        unchanged_nodes = all_nodes[mask]
         unchanged_structure = cached_graph_structure.sample_neighbors(
             unchanged_nodes,
             self.cache_size[layer_id],
@@ -146,7 +149,7 @@ class NeighborSampler_OTF_struct_PCFPSCR(BlockSampler):
             block = to_block(frontier_comp, seed_nodes)
             if EID in frontier_comp.edata.keys():
                 print("--------in this EID code---------")
-                block.edata[EID] = merged_frontier.edata[EID]
+                block.edata[EID] = frontier_comp.edata[EID]
             blocks.append(block)
             seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
 

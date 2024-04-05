@@ -1,7 +1,7 @@
 # at each time, when refresh the sampled seed node-related structure, and remain node struct keep the same
 # each time use a partial fetch strategy, while use a partial refresh strategy on seed nodes
 
-class NeighborSampler_OTF_struct_PSCRFCF(BlockSampler):
+class NeighborSampler_OTF_struct_PSCRFCF_SC(BlockSampler):
     """
     Implements an on-the-fly (OTF) neighbor sampling strategy for Deep Graph Library (DGL) graphs. 
     This sampler dynamically samples neighbors while balancing efficiency through caching and 
@@ -58,8 +58,9 @@ class NeighborSampler_OTF_struct_PSCRFCF(BlockSampler):
         # self.cache_size = [fanout * amp_rate for fanout in fanouts]
         self.T = T
         # self.cached_graph_structures = [self.initialize_cache(cache_size) for cache_size in self.cache_size]
+        self.cycle = 0
 
-        self.shared_cache_size = max(self.amplified_fanouts)
+        self.shared_cache_size = max(self.fanouts)*self.amp_rate
         self.shared_cache = self.initialize_cache(self.shared_cache_size)
 
     def initialize_cache(self, fanout_cache_storage):
@@ -76,7 +77,6 @@ class NeighborSampler_OTF_struct_PSCRFCF(BlockSampler):
             replace=self.replace,
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
-            mappings=self.mapping
         )
         print("end init cache")
         return cached_graph
@@ -87,8 +87,12 @@ class NeighborSampler_OTF_struct_PSCRFCF(BlockSampler):
         cached edges with new samples from the graph. This method ensures the cache remains 
         relatively fresh and reflects changes in the dynamic graph structure or sampling needs.
         """
+        all_nodes = torch.arange(0, self.g.number_of_nodes())
+        mask = ~torch.isin(all_nodes, seed_nodes)
+        # use bool mask to select those nodes in all nodes but not in seed_nodes
+        unchanged_nodes = all_nodes[mask]
         fanout_cache_sample = self.shared_cache_size-fanout_cache_refresh
-        unchanged_nodes = range(torch.arange(0, self.g.number_of_nodes()))-seed_nodes
+        # unchanged_nodes = range(torch.arange(0, self.g.number_of_nodes()))-seed_nodes
         # the rest node structure remain the same
         unchanged_structure = cached_graph_structure.sample_neighbors(
             unchanged_nodes,
@@ -129,11 +133,13 @@ class NeighborSampler_OTF_struct_PSCRFCF(BlockSampler):
         """
         blocks = []
         output_nodes = seed_nodes
+        self.cycle += 1
         for i, (fanout) in enumerate(reversed(self.fanouts)):
             fanout_cache_refresh = int(fanout * self.refresh_rate)
 
             # Refresh cache partially
-            self.shared_cache = self.OTF_refresh_cache(i, self.shared_cache, seed_nodes, fanout_cache_refresh)
+            if((self.cycle % self.T) ==0):
+                self.shared_cache = self.OTF_refresh_cache(i, self.shared_cache, seed_nodes, fanout_cache_refresh)
             
             # Sample from cache
             frontier_cache = self.shared_cache.sample_neighbors(

@@ -19,7 +19,7 @@ class NeighborSampler_OTF_struct_PCFFSCR(BlockSampler):
                 fanouts, 
                 edge_dir='in', 
                 amp_rate=1.5, # cache amplification rate (should be bigger than 1 --> to sample for multiple time)
-                refresh_rate=0.4, #propotion of cache to be refresh, should be a positive float smaller than 0.5
+                fetch_rate=0.4, #propotion of cache to be refresh, should be a positive float smaller than 0.5
                 T_fetch=3, # fetch period of time
                 T_refresh=None, # refresh time
                 prob=None, 
@@ -42,7 +42,7 @@ class NeighborSampler_OTF_struct_PCFFSCR(BlockSampler):
         self.fanouts = fanouts
         self.edge_dir = edge_dir
         self.amp_rate = amp_rate
-        self.refresh_rate = refresh_rate
+        self.fetch_rate = fetch_rate
         self.replace = replace
         self.output_device = output_device
         self.exclude_eids = exclude_eids
@@ -60,9 +60,9 @@ class NeighborSampler_OTF_struct_PCFFSCR(BlockSampler):
         if T_refresh!=None:
             self.T_refresh = T_refresh
         else:
-            self.T_refresh = int(max([self.cache_size[i]/self.fanouts[i] for i in len(self.fanouts)]))
+            self.T_refresh = int(self.g.number_of_nodes()/max(self.fanouts) *self.amp_rate)
         self.T_fetch = T_fetch
-        self.cached_graph_structures = None
+        self.cached_graph_structures = [self.full_cache_refresh(cache_size) for cache_size in self.cache_size]
         self.cycle = 0
 
     def full_cache_refresh(self, fanout_cache_storage):
@@ -79,7 +79,6 @@ class NeighborSampler_OTF_struct_PCFFSCR(BlockSampler):
             replace=self.replace,
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
-            mappings=self.mapping
         )
         print("cache refresh")
         return cached_graph
@@ -123,19 +122,29 @@ class NeighborSampler_OTF_struct_PCFFSCR(BlockSampler):
         """
         blocks = []
         output_nodes = seed_nodes
+        self.cycle += 1
 
         # refresh full cache after a period of time
         if((self.cycle%self.T_refresh)==0):
             self.cached_graph_structures = [self.full_cache_refresh(cache_size) for cache_size in self.cache_size]
         
         for i, (fanout, cached_graph_structure) in enumerate(zip(reversed(self.fanouts), reversed(self.cached_graph_structures))):
-            fanout_cache_refresh = int(fanout * self.refresh_rate)
+            fanout_cache_refresh = int(fanout * self.fetch_rate)
 
             # fetch cache partially
             if((self.cycle%self.T_fetch)==0):
                 frontier_OTF = self.OTF_fetch(i, cached_graph_structure, seed_nodes, fanout_cache_refresh)
             else:
-                frontier_OTF = self.OTF_fetch(i, cached_graph_structure, seed_nodes, self.fanouts[i])
+                # frontier_OTF = self.OTF_fetch(i, cached_graph_structure, seed_nodes, self.fanouts[i])
+                frontier_OTF = cached_graph_structure.sample_neighbors(
+                    seed_nodes,
+                    fanout,
+                    edge_dir=self.edge_dir,
+                    prob=self.prob,
+                    replace=self.replace,
+                    output_device=self.output_device,
+                    exclude_edges=self.exclude_eids,
+                )
             
             # Convert the merged frontier to a block
             block = to_block(frontier_OTF, seed_nodes)
@@ -144,7 +153,5 @@ class NeighborSampler_OTF_struct_PCFFSCR(BlockSampler):
                 block.edata[EID] = frontier_OTF.edata[EID]
             blocks.append(block)
             seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
-        
-        self.cycle += 1
 
         return seed_nodes,output_nodes, blocks

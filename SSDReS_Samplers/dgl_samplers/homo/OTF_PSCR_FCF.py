@@ -58,6 +58,7 @@ class NeighborSampler_OTF_struct_PSCRFCF(BlockSampler):
         self.cache_size = [fanout * amp_rate for fanout in fanouts]
         self.T = T
         self.cached_graph_structures = [self.initialize_cache(cache_size) for cache_size in self.cache_size]
+        self.cycle = 0
 
     def initialize_cache(self, fanout_cache_storage):
         """
@@ -73,7 +74,6 @@ class NeighborSampler_OTF_struct_PSCRFCF(BlockSampler):
             replace=self.replace,
             output_device=self.output_device,
             exclude_edges=self.exclude_eids,
-            mappings=self.mapping
         )
         print("end init cache")
         return cached_graph
@@ -85,7 +85,11 @@ class NeighborSampler_OTF_struct_PSCRFCF(BlockSampler):
         relatively fresh and reflects changes in the dynamic graph structure or sampling needs.
         """
         fanout_cache_sample = self.cache_size[layer_id]-fanout_cache_refresh
-        unchanged_nodes = range(torch.arange(0, self.g.number_of_nodes()))-seed_nodes
+        # unchanged_nodes = range(torch.arange(0, self.g.number_of_nodes()))-seed_nodes
+        all_nodes = torch.arange(0, self.g.number_of_nodes())
+        mask = ~torch.isin(all_nodes, seed_nodes)
+        # 使用布尔掩码来选择不在seed_nodes中的节点
+        unchanged_nodes = all_nodes[mask]
         # the rest node structure remain the same
         unchanged_structure = cached_graph_structure.sample_neighbors(
             unchanged_nodes,
@@ -126,11 +130,13 @@ class NeighborSampler_OTF_struct_PSCRFCF(BlockSampler):
         """
         blocks = []
         output_nodes = seed_nodes
+        self.cycle += 1
         for i, (fanout, cached_graph_structure) in enumerate(zip(reversed(self.fanouts), reversed(self.cached_graph_structures))):
             fanout_cache_refresh = int(fanout * self.refresh_rate)
 
             # Refresh cache partially
-            self.cached_graph_structures[i] = self.OTF_refresh_cache(i, cached_graph_structure, seed_nodes, fanout_cache_refresh)
+            if(self.cycle%self.T==0):
+                self.cached_graph_structures[i] = self.OTF_refresh_cache(i, cached_graph_structure, seed_nodes, fanout_cache_refresh)
             
             # Sample from cache
             frontier_cache = self.cached_graph_structures[i].sample_neighbors(

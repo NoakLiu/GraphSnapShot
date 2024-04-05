@@ -169,19 +169,19 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     amp_rate=1.5,refresh_rate=0.4,T=10
     # )
 
-    # PCF PSCR
-    sampler = NeighborSampler_OTF_struct_PCFPSCR(
-        g=g,
-        fanouts=[20,20,20],
-        amp_rate=1.5,refresh_rate=0.4,T=10
-    )
+    # # PCF PSCR
+    # sampler = NeighborSampler_OTF_struct_PCFPSCR(
+    #     g=g,
+    #     fanouts=[20,20,20],
+    #     amp_rate=1.5,refresh_rate=0.4,T=10
+    # )
 
-    # PSCR FCF SC
-    sampler = NeighborSampler_OTF_struct_PSCRFCF_SC(
-        g=g,
-        fanouts=[20,20,20],
-        amp_rate=1.5, refresh_rate=0.4, T=50
-    )
+    # # PSCR FCF SC
+    # sampler = NeighborSampler_OTF_struct_PSCRFCF_SC(
+    #     g=g,
+    #     fanouts=[20,20,20],
+    #     amp_rate=1.5, refresh_rate=0.4, T=50
+    # )
 
     # PSCR FCF
     sampler = NeighborSampler_OTF_struct_PSCRFCF(
@@ -191,6 +191,14 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
         refresh_rate=0.4,
         T=50,
     )
+    """
+    memorage usage (MB): 0
+    lstime.mean (s): 0.31931374645397864
+    lsmem.mean (MB): 16.19705310880829
+    Epoch 00002 | Loss 0.0000 | Time 62.6516
+    sampler memory (MB): 4558.78125
+    sampler comp (MB): 13939.65625
+    """
 
 
     mem_after_sample = psutil.virtual_memory().used
