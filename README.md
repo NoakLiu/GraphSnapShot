@@ -73,15 +73,15 @@ MutlLayer GAT - proteins
 
 Datasets:
 ```
-ogbn_arxiv - node classification
-ogbn_products - node classification
-ogbn_proteins - node classification
+ogbn_arxiv - node classification (homo)
+ogbn_products - node classification (homo)
+ogbn_mag - node classification (hete)
 ```
 
 <p align="center">
   <img src="./ogbn-arxiv_degree_distribution.png" width="200" />
   <img src="./ogbn-products_degree_distribution.png" width="200" />
-  <img src="./ogbn-proteins_degree_distribution.png" width="200" />
+  <img src="./ogbn-mag_degree_distribution.png" width="200" />
 </p>
 
 | Feature           | OGBN-ARXIV   | OGBN-PRODUCTS | OGBN-MAG      |
