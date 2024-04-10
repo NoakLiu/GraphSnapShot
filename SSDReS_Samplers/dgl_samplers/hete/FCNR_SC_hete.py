@@ -1,10 +1,12 @@
-class NeighborSampler_FCR_struct_shared_cache(BlockSampler):
+class NeighborSampler_FCR_struct_shared_cache_hete(BlockSampler):    
     def __init__(
             self, 
+            g,
             fanouts, 
             edge_dir='in', 
             alpha=2, 
             T=20,
+            hete_label=None,
             prob=None,
             mask=None,
             replace=False,
@@ -29,6 +31,7 @@ class NeighborSampler_FCR_struct_shared_cache(BlockSampler):
                 "Consider multiplying the probability with the mask "
                 "to achieve the same goal."
             )
+        self.g = g
         self.prob = prob or mask
         self.replace = replace
         self.fused = fused
@@ -36,23 +39,23 @@ class NeighborSampler_FCR_struct_shared_cache(BlockSampler):
 
         self.alpha = alpha
         self.cycle = 0  # Initialize sampling cycle counter
-        self.amplified_fanouts = [f * alpha for f in fanouts]  # Amplified fanouts for pre-sampling
+        self.sc_size = max([f * alpha for f in fanouts])  # shared cache_storage size
         self.T = T
-        self.Toptim = None#int(self.g.number_of_nodes() / max(self.amplified_fanouts))
-        # self.cache_struct = []  # Initialize cache structure
-        self.shared_cache_size = max(self.amplified_fanouts)
-        self.shared_cache = None
+        self.Toptim = None # int(self.g.number_of_nodes() / max(self.amplified_fanouts))
+        self.shared_cache = None  # Initialize cache structure
+        self.hete_label = hete_label
         self.cache_refresh()  # Pre-sample and populate the cache
+        self.Toptim = int(self.g.num_nodes(self.hete_label)/ self.sc_size )
 
-    def cache_refresh(self,g, exclude_eids=None):
+    def cache_refresh(self,exclude_eids=None):
         """
-        Pre-samples neighborhoods to refresh the shared cache. This method
+        Pre-samples neighborhoods with amplified fanouts and refreshes the cache. This method
         is automatically called upon initialization and after every T sampling iterations to
         ensure that the cache is periodically updated with fresh samples.
         """
-        self.shared_cache=g.sample_neighbors(
-            torch.arange(0, g.number_of_nodes()),  # Consider all nodes as seeds for pre-sampling
-            self.shared_cache_size,
+        self.shared_cache = self.g.sample_neighbors(
+            {self.hete_label:list(range(0, self.g.num_nodes(self.hete_label)))},
+            self.sc_size,
             edge_dir=self.edge_dir,
             prob=self.prob,
             replace=self.replace,
@@ -77,11 +80,11 @@ class NeighborSampler_FCR_struct_shared_cache(BlockSampler):
         """
         output_nodes = seed_nodes
 
-        # refresh full cache after every T cycles to learn graph structure
-        self.cycle += 1
-        self.Toptim = int(g.number_of_nodes() / max(self.amplified_fanouts))
+        # refresh cache after a period of time for generalization
         if self.cycle % self.Toptim == 0:
-            self.cache_refresh()
+            self.cache_refresh()  # Refresh cache every T cycles
+        
+        self.cycle += 1
 
         blocks = []
 
@@ -102,7 +105,7 @@ class NeighborSampler_FCR_struct_shared_cache(BlockSampler):
                     self.mapping = {}
                     self.g = g
                 for fanout in reversed(self.fanouts):
-                    block = g.sample_neighbors_fused(
+                    block = self.g.sample_neighbors_fused(
                         seed_nodes,
                         fanout,
                         edge_dir=self.edge_dir,
@@ -115,12 +118,10 @@ class NeighborSampler_FCR_struct_shared_cache(BlockSampler):
                     blocks.insert(0, block)
                 return seed_nodes, output_nodes, blocks
 
-        for k in range(len(self.cache_struct)-1,-1,-1):
-            cached_structure = self.cache_struct[k]
-            fanout = self.fanouts[k]
-            frontier = cached_structure.sample_neighbors(
+        for k in range(len(self.fanouts)-1,-1,-1):
+            frontier = self.shared_cache.sample_neighbors(
                 seed_nodes,
-                fanout,
+                self.fanouts[k],
                 edge_dir=self.edge_dir,
                 prob=self.prob,
                 replace=self.replace,

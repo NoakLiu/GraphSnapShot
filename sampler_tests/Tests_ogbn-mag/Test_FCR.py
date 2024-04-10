@@ -51,6 +51,7 @@ def prepare_data(args, device):
     )
 
     num_workers = args.num_workers
+    print("------------- pre loader -------------")
     train_loader = DataLoader(
         g,
         split_idx["train"],
@@ -60,6 +61,7 @@ def prepare_data(args, device):
         num_workers=num_workers,
         device=device,
     )
+    print("------------- after loader -------------")
 
     return g, labels, dataset.num_classes, split_idx, logger, train_loader
 
@@ -277,11 +279,16 @@ def train(
 
         total_loss = 0
 
+        print("here is trainloader",train_loader)
+        
+
         for input_nodes, seeds, blocks in train_loader:
             blocks = [blk.to(device) for blk in blocks]
+            print("seed pre",seeds)
             seeds = seeds[
                 category
             ]  # we only predict the nodes with type "category"
+            print("seed after",seeds)
             batch_size = seeds.shape[0]
             input_nodes_indexes = input_nodes["paper"].to(g.device)
             seeds = seeds.to(labels.device)

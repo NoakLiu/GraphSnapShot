@@ -17,7 +17,13 @@ from tqdm import tqdm
 from dgl.dataloading import(
     MultiLayerNeighborSampler,
     DataLoader,
-    MultiLayerFullNeighborSampler
+    MultiLayerFullNeighborSampler,
+    NeighborSampler_FCR_struct_hete,
+    double_hete,
+    pre_hete,
+    pre_khop_hete,
+    pre_khop_partial_hete,
+    pre_khop_full_hete
 )
 
 v_t = dgl.__version__
@@ -33,12 +39,34 @@ def prepare_data(args, device):
     transform = Compose([ToSimple(), AddReverse()])
     g = transform(g)
 
+    print(g)
+    """
+    Graph(num_nodes={'author': 1134649, 'field_of_study': 59965, 'institution': 8740, 'paper': 736389},
+      num_edges={('author', 'affiliated_with', 'institution'): 1043998, ('author', 'writes', 'paper'): 7145660, ('field_of_study', 'rev_has_topic', 'paper'): 7505078, ('institution', 'rev_affiliated_with', 'author'): 1043998, ('paper', 'cites', 'paper'): 10832542, ('paper', 'has_topic', 'field_of_study'): 7505078, ('paper', 'rev_writes', 'author'): 7145660},
+      metagraph=[('author', 'institution', 'affiliated_with'), ('author', 'paper', 'writes'), ('institution', 'author', 'rev_affiliated_with'), ('paper', 'paper', 'cites'), ('paper', 'field_of_study', 'has_topic'), ('paper', 'author', 'rev_writes'), ('field_of_study', 'paper', 'rev_has_topic')])
+    """
+
     print("Loaded graph: {}".format(g))
 
     logger = Logger(args.runs)
 
     # train sampler
-    sampler = MultiLayerNeighborSampler([25, 20])
+    # sampler = MultiLayerNeighborSampler([25, 20])
+
+    # sampler = NeighborSampler_FCR_struct_hete(
+    #     g=g,
+    #     fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+    #     alpha=2, T=1000,
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=True,
+    # )
+
+    #sampler=pre_hete([25,20])
+    #sampler=pre_khop_hete([25,20])
+    #sampler=pre_khop_partial_hete([25,20])
+    sampler=pre_khop_full_hete([25,20])
+
     num_workers = args.num_workers
     train_loader = DataLoader(
         g,
@@ -464,7 +492,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="RGCN")
-    parser.add_argument("--runs", type=int, default=10)
+    parser.add_argument("--runs", type=int, default=1)
     parser.add_argument("--num_workers", type=int, default=0)
 
     args = parser.parse_args()

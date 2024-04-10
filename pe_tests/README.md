@@ -117,3 +117,19 @@ result
 # ogbn-arxiv
 
 # ogbn-mag
+
+FCR
+```
+Run: 10, Epoch: 03, Loss: 1.0480, Train: 87.53%, Valid: 47.12%, Test: 45.85%
+Run 10:
+Highest Train: 87.53
+Highest Valid: 49.35
+  Final Train: 78.47
+   Final Test: 48.23
+Final performance: 
+All runs:
+Highest Train: 87.57 ± 0.22
+Highest Valid: 48.31 ± 0.61
+  Final Train: 75.66 ± 6.39
+   Final Test: 47.30 ± 0.61
+```

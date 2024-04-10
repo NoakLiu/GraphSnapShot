@@ -18,7 +18,7 @@ from dgl.dataloading import(
     MultiLayerNeighborSampler,
     DataLoader,
     MultiLayerFullNeighborSampler,
-    NeighborSampler_FCR_struct_shared_cache
+    NeighborSampler_FCR_struct_shared_cache_hete
 )
 
 v_t = dgl.__version__
@@ -40,7 +40,7 @@ def prepare_data(args, device):
 
     # train sampler
     # sampler = MultiLayerNeighborSampler([25, 20])
-    sampler = NeighborSampler_FCR_struct_shared_cache(
+    sampler = NeighborSampler_FCR_struct_shared_cache_hete(
         g=g,
         fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
         alpha=2, T=100, # 800

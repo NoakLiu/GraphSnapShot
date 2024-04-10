@@ -1,6 +1,7 @@
 class NeighborSampler_FCR_struct_hete(BlockSampler):    
     def __init__(
             self, 
+            g,
             fanouts, 
             edge_dir='in', 
             alpha=2, 
@@ -30,6 +31,7 @@ class NeighborSampler_FCR_struct_hete(BlockSampler):
                 "Consider multiplying the probability with the mask "
                 "to achieve the same goal."
             )
+        self.g = g
         self.prob = prob or mask
         self.replace = replace
         self.fused = fused
@@ -42,7 +44,7 @@ class NeighborSampler_FCR_struct_hete(BlockSampler):
         self.Toptim = None # int(self.g.number_of_nodes() / max(self.amplified_fanouts))
         self.cache_struct = []  # Initialize cache structure
         self.hete_label = hete_label
-        self.cache_refresh()  # Pre-sample and populate the cache
+        # self.cache_refresh(self.g)  # Pre-sample and populate the cache
 
     def cache_refresh(self,g,exclude_eids=None):
         """
@@ -62,7 +64,7 @@ class NeighborSampler_FCR_struct_hete(BlockSampler):
                 output_device=self.output_device,
                 exclude_edges=exclude_eids
             )
-            frontier = dgl.add_self_loop(frontier)
+            # frontier = dgl.add_self_loop(frontier)
             self.cache_struct.append(frontier)  # Update cache with new samples
 
     def sample_blocks(self, g,seed_nodes, exclude_eids=None):
@@ -83,10 +85,11 @@ class NeighborSampler_FCR_struct_hete(BlockSampler):
         output_nodes = seed_nodes
 
         # refresh cache after a period of time for generalization
-        self.cycle += 1
         self.Toptim = int(g.number_of_nodes() / max(self.amplified_fanouts))
         if self.cycle % self.Toptim == 0:
             self.cache_refresh(g)  # Refresh cache every T cycles
+        
+        self.cycle += 1
 
         blocks = []
 
