@@ -22,6 +22,8 @@ from dgl.dataloading import(
     NeighborSampler_FCR_struct_shared_cache_hete,
     NeighborSampler_OTF_refresh_struct_hete,
     NeighborSampler_OTF_refresh_struct_shared_cache_hete,
+    NeighborSampler_OTF_fetch_struct_shared_cache_hete,
+    modify_NeighborSampler_OTF_refresh_struct_shared_cache_hete
     # FCR_hete,
 )
 
@@ -62,24 +64,6 @@ def prepare_data(args, device):
     #     hete_label="paper",
     # )
 
-    # sampler = NeighborSampler_OTF_struct_FSCRFCF_hete(
-    #     g=g,
-    #     fanouts=[25,20],
-    #     amp_rate=1.5,
-    #     refresh_rate=0.4,
-    #     T=100,
-    #     hete_label="paper"
-    # )
-
-    # sampler = NeighborSampler_OTF_struct_FSCRFCF_shared_cache_hete(
-    #     g=g,
-    #     fanouts=[25,20],
-    #     amp_rate=1.5,
-    #     refresh_rate=0.4,
-    #     T=100,
-    #     hete_label="paper"
-    # )
-
     # sampler = NeighborSampler_OTF_refresh_struct_hete(
     #     g=g,
     #     fanouts=[25,20],
@@ -89,13 +73,31 @@ def prepare_data(args, device):
     #     hete_label="paper"
     # )
 
-    sampler = NeighborSampler_OTF_refresh_struct_shared_cache_hete(
+    # sampler = NeighborSampler_OTF_refresh_struct_shared_cache_hete(
+    #     g=g,
+    #     fanouts=[25,20],
+    #     alpha=2,
+    #     T=20,
+    #     refresh_rate=0.4,
+    #     hete_label="paper"
+    # )
+
+    # sampler = NeighborSampler_OTF_fetch_struct_shared_cache_hete(
+    #     g=g,
+    #     fanouts=[25,20],
+    #     amp_rate=1.5,
+    #     fetch_rate=0.4,
+    #     T_fetch=3,
+    #     T_refresh=20,
+    # )
+
+    sampler = modify_NeighborSampler_OTF_refresh_struct_shared_cache_hete(
         g=g,
         fanouts=[25,20],
-        alpha=2,
-        T=20,
-        refresh_rate=0.4,
-        hete_label="paper"
+        amp_rate=1.5,
+        fetch_rate=0.4,
+        T_fetch=3,
+        T_refresh=20,
     )
 
     num_workers = args.num_workers
