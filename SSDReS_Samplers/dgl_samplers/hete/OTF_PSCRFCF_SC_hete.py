@@ -1,13 +1,12 @@
-class NeighborSampler_OTF_fetch_struct_shared_cache_hete(BlockSampler):    
+class NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete(BlockSampler):    
     def __init__(
             self, 
             g,
             fanouts, 
             edge_dir='in', 
             amp_rate=2, 
-            fetch_rate = 0.4,
-            T_refresh=None,
-            T_fetch=3, # fetch period of time
+            T=20,
+            refresh_rate=0.4,
             hete_label=None,
             prob=None,
             mask=None,
@@ -40,22 +39,22 @@ class NeighborSampler_OTF_fetch_struct_shared_cache_hete(BlockSampler):
         self.mapping = {}
         self.exclude_eids = None
 
-        self.alpha = amp_rate
-        self.cycle = 0  # Initialize sampling cycle counter
-        self.sc_size = max([f * amp_rate for f in fanouts])  # Amplified fanouts for pre-sampling
-        if T_refresh!=None:
-            self.T_refresh = T_refresh
-        else:
-            self.T_refresh = int(self.g.number_of_nodes()/max(self.fanouts) *self.amp_rate)
-        self.T_fetch = T_fetch
-        self.Toptim = None # int(self.g.number_of_nodes() / max(self.amplified_fanouts))
-        self.fetch_rate = fetch_rate
-        # self.cache_struct = []  # Initialize cache structure
+        self.amp_rate = amp_rate
         self.hete_label = hete_label
+        self.cycle = 0  # Initialize sampling cycle counter
+        self.sc_size = max([f * self.amp_rate for f in fanouts])  # Amplified fanouts for pre-sampling
+        self.T = T
+        self.refresh_rate = refresh_rate
+        self.Toptim = None # int(self.g.number_of_nodes() / max(self.amplified_fanouts))
+        self.shared_cache = self.initialize_cache(fanout_cache_storage=self.sc_size)  # Initialize cache structure
         # self.cache_refresh(self.g)  # Pre-sample and populate the cache
-        self.shared_cache = self.full_cache_refresh(self.sc_size)
-    
-    def full_cache_refresh(self, fanout_cache_storage, exclude_eids = None):
+
+    def initialize_cache(self, fanout_cache_storage):
+        """
+        Initializes the cache for each layer with an amplified fanout to pre-sample a larger
+        set of neighbors. This pre-sampling helps in reducing the need for dynamic sampling 
+        at every iteration, thereby improving efficiency.
+        """
         cached_graph = self.g.sample_neighbors(
             # torch.arange(0, self.g.number_of_nodes()),
             {self.hete_label:list(range(0, self.g.num_nodes(self.hete_label)))},
@@ -64,48 +63,55 @@ class NeighborSampler_OTF_fetch_struct_shared_cache_hete(BlockSampler):
             prob=self.prob,
             replace=self.replace,
             output_device=self.output_device,
-            exclude_edges=exclude_eids,
+            exclude_edges=self.exclude_eids,
         )
-        print("cache refresh")
+        print("end init cache")
         return cached_graph
 
-    def OTF_fetch(self,layer_id,  seed_nodes, fanout_cache_fetch, exclude_eids = None):
-        print("OTF fetch cache")
-        if(fanout_cache_fetch==self.fanouts[layer_id]):
-            cache_fetch = self.shared_cache.sample_neighbors(
-            seed_nodes,
-            fanout_cache_fetch,
+    def OTF_refresh_cache(self, seed_nodes, fanout_cache_refresh):
+        """
+        Refreshes a portion of the cache based on the gamma parameter by replacing some of the 
+        cached edges with new samples from the graph. This method ensures the cache remains 
+        relatively fresh and reflects changes in the dynamic graph structure or sampling needs.
+        """
+        fanout_cache_sample = self.sc_size-fanout_cache_refresh
+        all_nodes = torch.arange(0,  self.g.num_nodes(self.hete_label))
+        print("seed nodes:",seed_nodes)
+        print("all nodes",all_nodes)
+        mask = ~torch.isin(all_nodes, seed_nodes[self.hete_label])
+        # bool mask to select those nodes do not in seed_nodes
+        unchanged_nodes = {self.hete_label: all_nodes[mask]}
+        # the rest node structure remain the same
+        unchanged_structure = self.shared_cache.sample_neighbors(
+            unchanged_nodes,
+            self.sc_size,
             edge_dir=self.edge_dir,
             prob=self.prob,
             replace=self.replace,
             output_device=self.output_device,
-            exclude_edges=exclude_eids,
-            )
-            return cache_fetch
-        else:
-            fanout_disk_fetch = self.fanouts[layer_id]-fanout_cache_fetch
-            cache_fetch = self.shared_cache.sample_neighbors(
-                seed_nodes,
-                fanout_cache_fetch,
-                edge_dir=self.edge_dir,
-                prob=self.prob,
-                replace=self.replace,
-                output_device=self.output_device,
-                exclude_edges=self.exclude_eids,
-            )
-
-            disk_fetch = self.g.sample_neighbors(
-                seed_nodes,
-                fanout_disk_fetch,
-                edge_dir=self.edge_dir,
-                prob=self.prob,
-                replace=self.replace,
-                output_device=self.output_device,
-                exclude_edges=self.exclude_eids,
-            )
-
-            OTF_fetch_res = dgl.merge([cache_fetch, disk_fetch])
-            return OTF_fetch_res
+            exclude_edges=self.exclude_eids,
+        )
+        # the OTF node structure should 
+        changed_cache_remain = self.shared_cache.sample_neighbors(
+            seed_nodes,
+            fanout_cache_sample,
+            edge_dir=self.edge_dir,
+            prob=self.prob,
+            replace=self.replace,
+            output_device=self.output_device,
+            exclude_edges=self.exclude_eids,
+        )
+        changed_disk_to_add = self.g.sample_neighbors(
+            seed_nodes,
+            fanout_cache_refresh,
+            edge_dir=self.edge_dir,
+            prob=self.prob,
+            replace=self.replace,
+            output_device=self.output_device,
+            exclude_edges=self.exclude_eids,
+        )
+        refreshed_cache = dgl.merge([unchanged_structure, changed_cache_remain, changed_disk_to_add])
+        return refreshed_cache
 
     def sample_blocks(self, g,seed_nodes, exclude_eids=None):
         """
@@ -125,10 +131,6 @@ class NeighborSampler_OTF_fetch_struct_shared_cache_hete(BlockSampler):
         output_nodes = seed_nodes
         
         self.cycle += 1
-        print("self.T_refresh=",self.T_refresh)
-        # refresh full cache after a period of time
-        if((self.cycle%self.T_refresh)==0):
-            self.shared_cache = self.full_cache_refresh(self.sc_size)
 
         blocks = []
 
@@ -149,7 +151,7 @@ class NeighborSampler_OTF_fetch_struct_shared_cache_hete(BlockSampler):
                     self.mapping = {}
                     self.g = g
                 for fanout in reversed(self.fanouts):
-                    block = self.g.sample_neighbors_fused(
+                    block = g.sample_neighbors_fused(
                         seed_nodes,
                         fanout,
                         edge_dir=self.edge_dir,
@@ -163,30 +165,27 @@ class NeighborSampler_OTF_fetch_struct_shared_cache_hete(BlockSampler):
                 return seed_nodes, output_nodes, blocks
 
         for k in range(len(self.fanouts)-1,-1,-1):
-            fanout = self.fanouts[k]
+            fanout_cache_refresh = int(self.fanouts[k] * self.refresh_rate)
 
-            fanout_cache_fetch = int(fanout * self.fetch_rate)
+            # Refresh cache&disk partially, while retrieval cache&disk partially
+            self.shared_cache = self.OTF_refresh_cache(seed_nodes, fanout_cache_refresh)
 
-            # fetch cache partially
-            if((self.cycle%self.T_fetch)==0):
-                frontier_OTF = self.OTF_fetch(k, seed_nodes, fanout_cache_fetch)
-            else:
-                #frontier_OTF = self.OTF_fetch(i, seed_nodes, self.fanouts[i])
-                frontier_OTF = self.shared_cache.sample_neighbors(
-                    seed_nodes,
-                    fanout,
-                    edge_dir=self.edge_dir,
-                    prob=self.prob,
-                    replace=self.replace,
-                    output_device=self.output_device,
-                    exclude_edges=self.exclude_eids,
-                )
+            # Sample from cache
+            frontier_cache = self.shared_cache.sample_neighbors(
+                seed_nodes,
+                self.fanouts[k],
+                edge_dir=self.edge_dir,
+                prob=self.prob,
+                replace=self.replace,
+                output_device=self.output_device,
+                exclude_edges=self.exclude_eids,
+            )
 
             # Sample frontier from the cache for acceleration
-            block = to_block(frontier_OTF, seed_nodes)
-            if EID in frontier_OTF.edata.keys():
+            block = to_block(frontier_cache, seed_nodes)
+            if EID in frontier_cache.edata.keys():
                 print("--------in this EID code---------")
-                block.edata[EID] = frontier_OTF.edata[EID]
+                block.edata[EID] = frontier_cache.edata[EID]
             blocks.insert(0, block)
             seed_nodes = block.srcdata[NID]  # Update seed nodes for the next layer
 

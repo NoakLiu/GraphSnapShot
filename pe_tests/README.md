@@ -117,6 +117,11 @@ result
 # ogbn-arxiv
 
 # ogbn-mag
+FBL
+```
+Run: 01, Epoch: 01, Loss: 2.3219, Train: 62.44%, Valid: 49.37%, Test: 48.71%
+Run: 01, Epoch: 02, Loss: 1.5387, Train: 75.45%, Valid: 49.61%, Test: 48.75%
+```
 
 FCR
 ```
