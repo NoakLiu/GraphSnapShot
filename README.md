@@ -1,6 +1,6 @@
 ### GraphSnapShot
 
-3x training acceleration and 5x memory reduction for lossless graph ML training with GraphSnapShot!
+Up to **3x** training acceleration and **5x** memory reduction for lossless graph ML training with GraphSnapShot!
 
 GraphSnapShot is a framework for fast storage, retrieval and computation for graph learning, developed by Shawn Dong Liu. It can quickly store and update the local topology of graph structure, just like take `snapshots` of the graph.
 
