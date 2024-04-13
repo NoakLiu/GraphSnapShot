@@ -47,80 +47,292 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
 
     # # FBL
     # sampler = NeighborSampler(
-    #     [20, 20, 20],  # fanout for [layer-0, layer-1, layer-2]
+    #     [5, 5, 5],  # fanout for [layer-0, layer-1, layer-2]
     #     prefetch_node_feats=["feat"],
     #     prefetch_labels=["label"],
     #     fused=fused_sampling,
     # )
 
     # # """
+    # # [20, 20, 20]
     # # lstime.mean (s): 0.2765758597583145
     # # lsmem.mean (MB): 6.338676597582038
     # # sampler memory (MB): 0.0
     # # sampler comp (MB): 3670.046875
     # # """
+    
+    # # """
+    # # [10, 10, 10]
+    # # lstime.mean (s): 0.07474744958169308
+    # # lsmem.mean (MB): 4.704123488773748
+    # # Epoch 00002 | Loss 0.0000 | Time 14.0586
+    # # sampler memory (MB): -0.015625
+    # # sampler comp (MB): 2725.03125
+    # # """
+
+    # # """
+    # # [5, 5, 5]
+    # # lstime.mean (s): 0.01887392256544044
+    # # lsmem.mean (MB): 4.596313687392056
+    # # Epoch 00002 | Loss 0.0000 | Time 3.2730
+    # # sampler memory (MB): 0.0
+    # # sampler comp (MB): 2661.296875
+    # # """
 
     # # FCR
     # sampler = NeighborSampler_FCR_struct(
     #     g=g,
-    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-    #     alpha=2, T=50,
+    #     fanouts=[5,5,5],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    #     alpha=1.5, T=50,
     #     prefetch_node_feats=["feat"],
     #     prefetch_labels=["label"],
     #     fused=fused_sampling,
     # )
 
     # # """
-    # # lstime.mean (s): 0.25917509965122465
-    # # lsmem.mean (MB): 2.0676273747841107
-    # # sampler memory (MB): 3688.75
-    # # sampler comp (MB): 4886.546875
+    # # [20, 20, 20], alpha=2, T=50
+    # # time needed (s): 0.012237787246704102
+    # # memorage usage (MB): 0
+    # # lstime.mean (s): 0.25709364945406743
+    # # lsmem.mean (MB): 2.696216537132988
+    # # Epoch 00002 | Loss 0.0000 | Time 49.3013
+    # # sampler memory (MB): 5747.703125
+    # # sampler comp (MB): 7309.40625
+    # # """
+
+    # # """
+    # # [10, 10, 10], alpha=2, T=50
+    # # lstime.mean (s): 0.06386809027874409
+    # # lsmem.mean (MB): 2.11488018134715
+    # # Epoch 00002 | Loss 0.0000 | Time 12.0869
+    # # sampler memory (MB): 4754.109375
+    # # sampler comp (MB): 5980.1875
+    # # """
+
+    # # """
+    # # lstime.mean (s): 0.016260120741032155
+    # # lsmem.mean (MB): 1.2920984455958548
+    # # Epoch 00002 | Loss 0.0000 | Time 2.9867
+    # # sampler memory (MB): 3828.8125
+    # # sampler comp (MB): 4578.0
+    # # """
+
+    # # """
+    # # [20, 20, 20], alpha=1.5, T=50
+    # # time needed (s): 0.009011030197143555
+    # # memorage usage (MB): 0
+    # # lstime.mean (s): 0.2479564447682962
+    # # lsmem.mean (MB): 6.598904360967185
+    # # Epoch 00002 | Loss 0.0000 | Time 47.7072
+    # # sampler memory (MB): 5278.15625
+    # # sampler comp (MB): 9100.46875
+    # # """
+
+    # # """
+    # # [10, 10, 10], alpha=1.5, T=50
+    # # time needed (s): 0.0061130523681640625
+    # # memorage usage (MB): 0
+    # # lstime.mean (s): 0.0602550984252508
+    # # lsmem.mean (MB): 2.025340025906736
+    # # Epoch 00002 | Loss 0.0000 | Time 11.5165
+    # # sampler memory (MB): 4837.3125
+    # # sampler comp (MB): 6010.515625
+    # # """
+
+    # # """
+    # # [5, 5, 5], alpha=1.5, T=50
+    # # lstime.mean (s): 0.01521589801307375
+    # # lsmem.mean (MB): 1.8717076856649395
+    # # Epoch 00002 | Loss 0.0000 | Time 2.8404
+    # # sampler memory (MB): 3618.921875
+    # # sampler comp (MB): 4704.21875
     # # """
 
     # # FCR shared cache
     # sampler = NeighborSampler_FCR_struct_shared_cache(
     #     g=g,
-    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-    #     alpha=2, T=50,
+    #     fanouts=[5,5,5],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    #     alpha=1.5, T=50,
     #     prefetch_node_feats=["feat"],
     #     prefetch_labels=["label"],
     #     fused=fused_sampling,
     # )    
 
     # # """
+    # # [20, 20, 20], alpha=2, T=50
     # # lstime.mean (s): 0.25541082070899135
     # # lsmem.mean (MB): 4.428675518134715
     # # sampler memory (MB): 1386.828125
     # # sampler comp (MB): 3951.53125
     # # """
 
+    # # """
+    # # [10, 10, 10], alpha=2, T=50
+    # # lstime.mean (s): 0.06397193989399595
+    # # lsmem.mean (MB): 4.627239853195164
+    # # Epoch 00002 | Loss 0.0000 | Time 12.3945
+    # # sampler memory (MB): 2744.125
+    # # sampler comp (MB): 5424.8125
+    # # """
+
+    # # """
+    # # [5, 5, 5], alpha=2, T=50
+    # # lstime.mean (s): 0.01607649931635881
+    # # lsmem.mean (MB): 1.6645077720207253
+    # # Epoch 00002 | Loss 0.0000 | Time 3.0865
+    # # sampler memory (MB): 2455.90625
+    # # sampler comp (MB): 3419.75
+    # # """
+
+    # # """
+    # # lstime.mean (s): 0.24052175586087715
+    # # lsmem.mean (MB): 6.71362262521589
+    # # Epoch 00002 | Loss 0.0000 | Time 46.2107
+    # # sampler memory (MB): 527.3125
+    # # sampler comp (MB): 4414.84375
+    # # """
+
+    # # """
+    # # [10, 10, 10], alpha=1.5, T=50
+    # # lstime.mean (s): 0.059165482282226775
+    # # lsmem.mean (MB): 4.275340025906735
+    # # Epoch 00002 | Loss 0.0000 | Time 11.3112
+    # # sampler memory (MB): 362.125
+    # # sampler comp (MB): 2837.28125
+    # # """
+
+    # # """
+    # # [5, 5, 5], alpha=1.5, T=50
+    # # lstime.mean (s): 0.01488172328533904
+    # # lsmem.mean (MB): 0.10646049222797928
+    # # Epoch 00002 | Loss 0.0000 | Time 2.8331
+    # # sampler memory (MB): 1721.359375
+    # # sampler comp (MB): 1784.28125
+    # # """
+
     # # OTF
     # sampler = NeighborSampler_OTF_struct_FSCRFCF(
     #     g=g,
-    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
-    #     amp_rate=2, refresh_rate=0.15, T=358, #3, 0.4
+    #     fanouts=[5,5,5],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+    #     amp_rate=2, refresh_rate=0.3, T=50, #3, 0.4
     #     prefetch_node_feats=["feat"],
     #     prefetch_labels=["label"],
     #     fused=fused_sampling,
     # )
 
+    # # # """
+    # # # [20, 20, 20], amp_rate=2, refresh_rate=0.15, T=358
+    # # # lstime.mean (s): 0.2459948853507561
+    # # # lsmem.mean (MB): 4.13271804835924
+    # # # Epoch 00002 | Loss 0.0000 | Time 47.2221
+    # # # sampler memory (MB): 2657.890625
+    # # # sampler comp (MB): 5052.359375
+    # # # """
+
     # # """
-    # # lstime.mean (s): 0.2459948853507561
-    # # lsmem.mean (MB): 4.13271804835924
-    # # Epoch 00002 | Loss 0.0000 | Time 47.2221
-    # # sampler memory (MB): 2657.890625
-    # # sampler comp (MB): 5052.359375
+    # # [20, 20, 20], amp_rate=2, refresh_rate=0.15, T=50
+    # # time needed (s): 0.005285024642944336
+    # # memorage usage (MB): 114688
+    # # lstime.mean (s): 0.2528338296425775
+    # # lsmem.mean (MB): 4.192357512953368
+    # # Epoch 00002 | Loss 0.0000 | Time 48.0913
+    # # sampler memory (MB): 2924.234375
+    # # sampler comp (MB): 5350.921875
     # # """
 
-    # # OTF shared cache
-    # sampler = NeighborSampler_OTF_struct_FSCRFCF_shared_cache(
-    #     g=g,
-    #     fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-    #     alpha=2, beta=1, gamma=0.15, T=119,
-    #     prefetch_node_feats=["feat"],
-    #     prefetch_labels=["label"],
-    #     fused=fused_sampling,
-    # )
+    # # """
+    # # [10, 10, 10], amp_rate=2, refresh_rate=0.15, T=50
+    # # time needed (s): 0.0026259422302246094
+    # # memorage usage (MB): 0
+    # # lstime.mean (s): 0.056848634298189524
+    # # lsmem.mean (MB): 1.8781573834196892
+    # # Epoch 00002 | Loss 0.0000 | Time 10.7541
+    # # sampler memory (MB): 1020.25
+    # # sampler comp (MB): 2108.046875
+    # # """
+
+    # # """
+    # # [5, 5, 5], amp_rate=2, refresh_rate=0.15, T=50
+    # # time needed (s): 0.0018260478973388672
+    # # memorage usage (MB): 0
+    # # lstime.mean (s): 0.014533051966797297
+    # # lsmem.mean (MB): 0.32070379965457685
+    # # Epoch 00002 | Loss 0.0000 | Time 2.6287
+    # # sampler memory (MB): 1240.4375
+    # # sampler comp (MB): 1427.65625
+    # # """
+
+    # # """
+    # # [20, 20, 20], amp_rate=1.5, refresh_rate=0.15, T=50
+    # # time needed (s): 0.005866050720214844
+    # # memorage usage (MB): 0
+    # # lstime.mean (s): 0.2424830072696139
+    # # lsmem.mean (MB): 2.588784542314335
+    # # Epoch 00002 | Loss 0.0000 | Time 44.9782
+    # # sampler memory (MB): 2510.609375
+    # # sampler comp (MB): 4016.390625
+    # # """
+
+    # # """
+    # # [10, 10, 10], amp_rate=1.5, refresh_rate=0.15, T=50
+    # # time needed (s): 0.0029630661010742188
+    # # memorage usage (MB): 0
+    # # lstime.mean (s): 0.055565218027803356
+    # # lsmem.mean (MB): 2.7754209844559585
+    # # Epoch 00002 | Loss 0.0000 | Time 10.6695
+    # # sampler memory (MB): 1660.0625
+    # # sampler comp (MB): 3265.4375
+    # # """
+
+    # # """
+    # # [5, 5, 5], amp_rate=1.5, refresh_rate=0.15, T=50
+    # # time needed (s): 0.0015718936920166016
+    # # memorage usage (MB): 0
+    # # lstime.mean (s): 0.014085919951733736
+    # # lsmem.mean (MB): -0.6624028497409327
+    # # Epoch 00002 | Loss 0.0000 | Time 2.6370
+    # # sampler memory (MB): 794.359375
+    # # sampler comp (MB): 412.40625
+    # # """
+
+    # # """
+    # # [20, 20, 20], amp_rate=1.5, refresh_rate=0.3, T=50
+    # # time needed (s): 0.0057260990142822266
+    # # memorage usage (MB): 196608
+    # # lstime.mean (s): 0.24946731771623945
+    # # lsmem.mean (MB): 3.8385956390328153
+    # # Epoch 00002 | Loss 0.0000 | Time 49.0388
+    # # sampler memory (MB): 2818.84375
+    # # sampler comp (MB): 5042.765625
+    # # """
+
+    # # """
+    # # [10, 10, 10], amp_rate=1.5, refresh_rate=0.3, T=50
+    # # lstime.mean (s): 0.05582910498189185
+    # # lsmem.mean (MB): 1.56452396373057
+    # # Epoch 00002 | Loss 0.0000 | Time 10.4803
+    # # sampler memory (MB): 1655.46875
+    # # sampler comp (MB): 2562.9375
+    # # """
+
+    # # """
+    # # [5, 5, 5], amp_rate=1.5, refresh_rate=0.3, T=50
+    # # lstime.mean (s): 0.01460982686703275
+    # # lsmem.mean (MB): -0.3279360967184801
+    # # Epoch 00002 | Loss 0.0000 | Time 2.6154
+    # # sampler memory (MB): 1102.09375
+    # # sampler comp (MB): 922.140625
+    # # """
+
+    # OTF shared cache
+    sampler = NeighborSampler_OTF_struct_FSCRFCF_shared_cache(
+        g=g,
+        fanouts=[20,20,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+        alpha=2, beta=1, gamma=0.15, T=119,
+        prefetch_node_feats=["feat"],
+        prefetch_labels=["label"],
+        fused=fused_sampling,
+    )
 
     # # """
     # # lstime.mean (s): 0.25199997363312876
@@ -183,22 +395,22 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     amp_rate=1.5, refresh_rate=0.4, T=50
     # )
 
-    # PSCR FCF
-    sampler = NeighborSampler_OTF_struct_PSCRFCF(
-        g=g,
-        fanouts=[20,20,20],
-        amp_rate=1.5,
-        refresh_rate=0.4,
-        T=50,
-    )
-    """
-    memorage usage (MB): 0
-    lstime.mean (s): 0.31931374645397864
-    lsmem.mean (MB): 16.19705310880829
-    Epoch 00002 | Loss 0.0000 | Time 62.6516
-    sampler memory (MB): 4558.78125
-    sampler comp (MB): 13939.65625
-    """
+    # # PSCR FCF
+    # sampler = NeighborSampler_OTF_struct_PSCRFCF(
+    #     g=g,
+    #     fanouts=[20,20,20],
+    #     amp_rate=1.5,
+    #     refresh_rate=0.4,
+    #     T=50,
+    # )
+    # """
+    # memorage usage (MB): 0
+    # lstime.mean (s): 0.31931374645397864
+    # lsmem.mean (MB): 16.19705310880829
+    # Epoch 00002 | Loss 0.0000 | Time 62.6516
+    # sampler memory (MB): 4558.78125
+    # sampler comp (MB): 13939.65625
+    # """
 
 
     mem_after_sample = psutil.virtual_memory().used
