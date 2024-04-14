@@ -125,16 +125,7 @@ def prepare_data(args, device):
     #     hete_label="paper",
     # )
     
-    # sampler = NeighborSampler_OTF_struct_PCFPSCR_shared_cache_hete(
-    #     g=g,
-    #     fanouts=[25,20],
-    #     amp_rate=1.5,
-    #     refresh_rate=0.4,
-    #     T=50,
-    #     hete_label="paper",
-    # )
-
-    sampler = NeighborSampler_OTF_struct_PSCRFCF_hete(
+    sampler = NeighborSampler_OTF_struct_PCFPSCR_shared_cache_hete(
         g=g,
         fanouts=[25,20],
         amp_rate=1.5,
@@ -142,6 +133,15 @@ def prepare_data(args, device):
         T=50,
         hete_label="paper",
     )
+
+    # sampler = NeighborSampler_OTF_struct_PSCRFCF_hete(
+    #     g=g,
+    #     fanouts=[25,20],
+    #     amp_rate=1.5,
+    #     refresh_rate=0.4,
+    #     T=50,
+    #     hete_label="paper",
+    # )
 
     # sampler = NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete(
     #     g=g,
