@@ -117,6 +117,22 @@ result
 # ogbn-arxiv
 
 # ogbn-mag
+
+
+MultiLayerFullNeighborSampler,
+NeighborSampler_FCR_struct_hete,
+NeighborSampler_FCR_struct_shared_cache_hete,
+NeighborSampler_OTF_refresh_struct_hete,
+NeighborSampler_OTF_refresh_struct_shared_cache_hete,
+NeighborSampler_OTF_fetch_struct_hete,
+NeighborSampler_OTF_fetch_struct_shared_cache_hete,
+NeighborSampler_OTF_struct_PCFPSCR_hete,
+NeighborSampler_OTF_struct_PCFPSCR_shared_cache_hete,
+NeighborSampler_OTF_struct_PSCRFCF_hete,
+NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete,
+
+
+
 FBL
 ```
 Run: 01, Epoch: 01, Loss: 2.3219, Train: 62.44%, Valid: 49.37%, Test: 48.71%
@@ -137,4 +153,53 @@ Highest Train: 87.57 ± 0.22
 Highest Valid: 48.31 ± 0.61
   Final Train: 75.66 ± 6.39
    Final Test: 47.30 ± 0.61
+```
+
+FCR - shared cache
+```
+
+```
+
+OTF-refresh
+```
+
+```
+
+OTF-refresh shared cache
+```
+
+```
+
+OTF-fetch
+```
+
+```
+
+OTF-fetch shared cache
+```
+
+```
+
+OTF-PCFPSCR
+```
+
+```
+
+OTF-PCFPSCR shared cache
+```
+
+```
+
+OTF-PSCRFCF
+```
+Epoch 00: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 629571/629571 [28:00<00:00, 374.67it/s]
+Inference: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 736389/736389 [01:45<00:00, 6953.87it/s]
+Run: 01, Epoch: 01, Loss: 2.3508, Train: 62.14%, Valid: 48.79%, Test: 48.00%
+```
+
+OTF-PSCRFCF-shared_cache
+```
+Epoch 00: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 629571/629571 [34:58<00:00, 300.01it/s]
+Inference: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 736389/736389 [01:47<00:00, 6834.24it/s]
+Run: 01, Epoch: 01, Loss: 2.3863, Train: 61.20%, Valid: 47.85%, Test: 47.12%
 ```
