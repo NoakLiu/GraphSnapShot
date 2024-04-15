@@ -806,6 +806,80 @@ sampler memory (MB): 867.4375
 sampler comp (MB): 5200.734375
 ```
 
+OTF PSCR FCF
+Setting
+```
+[20, 20, 20], amp_rate=2, refresh_rate=0.3, T=50
+```
+Performance
+```
+lstime.mean (s): 0.3558487307428284
+lsmem.mean (MB): 21.278308506044905
+Epoch 00002 | Loss 0.0000 | Time 70.2805
+sampler memory (MB): 2323.9375
+sampler comp (MB): 14644.671875
+```
+Setting
+```
+[10, 10, 10], amp_rate=2, refresh_rate=0.3, T=50
+```
+Performance
+```
+lstime.mean (s): 0.13441514268852062
+lsmem.mean (MB): 17.331633203799655
+Epoch 00002 | Loss 0.0000 | Time 27.1706
+sampler memory (MB): 1471.875
+sampler comp (MB): 11508.421875
+```
+Setting
+```
+[5, 5, 5], amp_rate=2, refresh_rate=0.3, T=50
+```
+Performance
+```
+lstime.mean (s): 0.06801044426227892
+lsmem.mean (MB): 8.788752158894646
+Epoch 00002 | Loss 0.0000 | Time 14.0671
+sampler memory (MB): 2431.359375
+sampler comp (MB): 7521.640625
+```
+Setting
+```
+[20, 20, 20], amp_rate=1.5, refresh_rate=0.4, T=50
+```
+Performance
+```
+lstime.mean (s): 0.35511266094003524
+lsmem.mean (MB): 20.667746113989637
+Epoch 00002 | Loss 0.0000 | Time 69.8808
+sampler memory (MB): 3233.5
+sampler comp (MB): 15201.65625
+```
+Setting
+```
+[10, 10, 10], amp_rate=1.5, refresh_rate=0.4, T=50
+```
+Performance
+```
+lstime.mean (s): 0.13539677374515302
+lsmem.mean (MB): 16.850091753022454
+Epoch 00002 | Loss 0.0000 | Time 27.2500
+sampler memory (MB): 2216.90625
+sampler comp (MB): 11974.625
+```
+Setting
+```
+[5, 5, 5], amp_rate=1.5, refresh_rate=0.4, T=50
+```
+Performance
+```
+lstime.mean (s): 0.06892447973985952
+lsmem.mean (MB): 10.312041234887737
+Epoch 00002 | Loss 0.0000 | Time 14.1827
+sampler memory (MB): 1340.59375
+sampler comp (MB): 7311.25
+```
+
 # ogbn-arixv
 ## FBL
 setting
