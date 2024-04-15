@@ -1,6 +1,6 @@
 # after a period of time, refresh the graph structure partially
 
-class NeighborSampler_OTF_refresh_struct_hete(BlockSampler):    
+class NeighborSampler_OTF_refresh_struct_hete(BlockSampler):
     def __init__(
             self, 
             g,
