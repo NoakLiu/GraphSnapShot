@@ -53,31 +53,31 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     fused=fused_sampling,
     # )
 
-    # # """
-    # # [20, 20, 20]
-    # # lstime.mean (s): 0.2765758597583145
-    # # lsmem.mean (MB): 6.338676597582038
-    # # sampler memory (MB): 0.0
-    # # sampler comp (MB): 3670.046875
-    # # """
+    # """
+    # [20, 20, 20]
+    # lstime.mean (s): 0.2765758597583145
+    # lsmem.mean (MB): 6.338676597582038
+    # sampler memory (MB): 0.0
+    # sampler comp (MB): 3670.046875
+    # """
     
-    # # """
-    # # [10, 10, 10]
-    # # lstime.mean (s): 0.07474744958169308
-    # # lsmem.mean (MB): 4.704123488773748
-    # # Epoch 00002 | Loss 0.0000 | Time 14.0586
-    # # sampler memory (MB): -0.015625
-    # # sampler comp (MB): 2725.03125
-    # # """
+    # """
+    # [10, 10, 10]
+    # lstime.mean (s): 0.07474744958169308
+    # lsmem.mean (MB): 4.704123488773748
+    # Epoch 00002 | Loss 0.0000 | Time 14.0586
+    # sampler memory (MB): -0.015625
+    # sampler comp (MB): 2725.03125
+    # """
 
-    # # """
-    # # [5, 5, 5]
-    # # lstime.mean (s): 0.01887392256544044
-    # # lsmem.mean (MB): 4.596313687392056
-    # # Epoch 00002 | Loss 0.0000 | Time 3.2730
-    # # sampler memory (MB): 0.0
-    # # sampler comp (MB): 2661.296875
-    # # """
+    # """
+    # [5, 5, 5]
+    # lstime.mean (s): 0.01887392256544044
+    # lsmem.mean (MB): 4.596313687392056
+    # Epoch 00002 | Loss 0.0000 | Time 3.2730
+    # sampler memory (MB): 0.0
+    # sampler comp (MB): 2661.296875
+    # """
 
     # # FCR
     # sampler = NeighborSampler_FCR_struct(

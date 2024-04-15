@@ -1,4 +1,125 @@
 # ogbn-products
+
+## FBL
+Setting
+```
+[20, 20, 20]
+```
+Peformance
+```
+lstime.mean (s): 0.2765758597583145
+lsmem.mean (MB): 6.338676597582038
+sampler memory (MB): 0.0
+sampler comp (MB): 3670.046875
+```
+Setting
+```
+[10, 10, 10]
+```
+Performance
+```
+lstime.mean (s): 0.07474744958169308
+lsmem.mean (MB): 4.704123488773748
+Epoch 00002 | Loss 0.0000 | Time 14.0586
+sampler memory (MB): -0.015625
+sampler comp (MB): 2725.03125
+```
+Setting
+```
+[5, 5, 5]
+```
+Performance
+```
+lstime.mean (s): 0.01887392256544044
+lsmem.mean (MB): 4.596313687392056
+Epoch 00002 | Loss 0.0000 | Time 3.2730
+sampler memory (MB): 0.0
+sampler comp (MB): 2661.296875
+```
+
+
+## FCR
+
+Setting
+```
+[20, 20, 20], alpha=2, T=50
+```
+Performance
+```
+time needed (s): 0.012237787246704102
+memorage usage (MB): 0
+lstime.mean (s): 0.25709364945406743
+lsmem.mean (MB): 2.696216537132988
+Epoch 00002 | Loss 0.0000 | Time 49.3013
+sampler memory (MB): 5747.703125
+sampler comp (MB): 7309.40625
+```
+Setting
+```
+[10, 10, 10], alpha=2, T=50
+```
+Performance
+```
+lstime.mean (s): 0.06386809027874409
+lsmem.mean (MB): 2.11488018134715
+Epoch 00002 | Loss 0.0000 | Time 12.0869
+sampler memory (MB): 4754.109375
+sampler comp (MB): 5980.1875
+```
+Setting
+```
+[5, 5, 5], alpha=2, T=50
+```
+Peformance
+```
+lstime.mean (s): 0.016260120741032155
+lsmem.mean (MB): 1.2920984455958548
+Epoch 00002 | Loss 0.0000 | Time 2.9867
+sampler memory (MB): 3828.8125
+sampler comp (MB): 4578.0
+```
+Setting
+```
+[20, 20, 20], alpha=1.5, T=50
+```
+Performance
+```
+time needed (s): 0.009011030197143555
+memorage usage (MB): 0
+lstime.mean (s): 0.2479564447682962
+lsmem.mean (MB): 6.598904360967185
+Epoch 00002 | Loss 0.0000 | Time 47.7072
+sampler memory (MB): 5278.15625
+sampler comp (MB): 9100.46875
+```
+Setting
+```
+[10, 10, 10], alpha=1.5, T=50
+```
+Performance
+```
+time needed (s): 0.0061130523681640625
+memorage usage (MB): 0
+lstime.mean (s): 0.0602550984252508
+lsmem.mean (MB): 2.025340025906736
+Epoch 00002 | Loss 0.0000 | Time 11.5165
+sampler memory (MB): 4837.3125
+sampler comp (MB): 6010.515625
+```
+Setting
+```
+[5, 5, 5], alpha=1.5, T=50
+```
+Performance
+```
+lstime.mean (s): 0.01521589801307375
+lsmem.mean (MB): 1.8717076856649395
+Epoch 00002 | Loss 0.0000 | Time 2.8404
+sampler memory (MB): 3618.921875
+sampler comp (MB): 4704.21875
+```
+
+# ogbn-arixv
 ## FBL
 setting
 ```
@@ -95,26 +216,6 @@ sampler = NeighborSampler_OTF_struct_shared_cache(
 lstime.mean: 0.05370364535040188
 lsmem.mean 3489.088622625216
 ```
-
-## OTCR
-```
-sampler = 
-```
-
-```
-result
-```
-
-## OTCR-SC
-```
-sampler = 
-```
-
-```
-result
-```
-
-# ogbn-arxiv
 
 # ogbn-mag
 
