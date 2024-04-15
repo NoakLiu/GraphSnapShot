@@ -111,6 +111,242 @@ Design of FCR
 ![model construction](./assets/FCR.png)
 
 
+Deployment on homo-graphs
+Import
+```
+from dgl.dataloading import (
+    DataLoader,
+    MultiLayerFullNeighborSampler,
+    NeighborSampler,
+    MultiLayerNeighborSampler,
+    BlockSampler,
+    NeighborSampler_FCR_struct,
+    NeighborSampler_FCR_struct_shared_cache,
+    NeighborSampler_OTF_struct_FSCRFCF,
+    NeighborSampler_OTF_struct_FSCRFCF_shared_cache,
+    NeighborSampler_OTF_struct_PCFFSCR_shared_cache,
+    NeighborSampler_OTF_struct_PCFFSCR,
+    NeighborSampler_OTF_struct_PCFPSCR_SC,
+    NeighborSampler_OTF_struct_PCFPSCR,
+    NeighborSampler_OTF_struct_PSCRFCF_SC,
+    NeighborSampler_OTF_struct_PSCRFCF,
+    # NeighborSampler_OTF_struct,
+    # NeighborSampler_OTF_struct_shared_cache
+
+)
+```
+Deployment
+```
+# FBL
+sampler = NeighborSampler(
+    [5, 5, 5],  # fanout for [layer-0, layer-1, layer-2]
+    prefetch_node_feats=["feat"],
+    prefetch_labels=["label"],
+    fused=fused_sampling,
+)
+
+# FCR
+sampler = NeighborSampler_FCR_struct(
+    g=g,
+    fanouts=[5,5,5],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    alpha=1.5, T=50,
+    prefetch_node_feats=["feat"],
+    prefetch_labels=["label"],
+    fused=fused_sampling,
+)
+
+
+# FCR shared cache
+sampler = NeighborSampler_FCR_struct_shared_cache(
+    g=g,
+    fanouts=[5,5,5],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    alpha=1.5, T=50,
+    prefetch_node_feats=["feat"],
+    prefetch_labels=["label"],
+    fused=fused_sampling,
+)    
+
+# OTF
+sampler = NeighborSampler_OTF_struct_FSCRFCF(
+    g=g,
+    fanouts=[5,5,5],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+    amp_rate=2, refresh_rate=0.3, T=50, #3, 0.4
+    prefetch_node_feats=["feat"],
+    prefetch_labels=["label"],
+    fused=fused_sampling,
+)
+
+# OTF shared cache
+sampler = NeighborSampler_OTF_struct_FSCRFCF_shared_cache(
+    g=g,
+    fanouts=[5,5,5],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    # alpha=2, beta=1, gamma=0.15, T=119,
+    amp_rate=2, refresh_rate=0.3, T=50,
+    prefetch_node_feats=["feat"],
+    prefetch_labels=["label"],
+    fused=fused_sampling,
+)
+
+# OTF FSCR FCF shared cache
+sampler = NeighborSampler_OTF_struct_PCFFSCR_shared_cache(
+    g=g,
+    fanouts=[5,5,5],
+    amp_rate=2,fetch_rate=0.3,T_fetch=10
+)
+
+# OTF FSCR FCF
+sampler = NeighborSampler_OTF_struct_PCFFSCR(
+    g=g,
+    fanouts=[5,5,5],
+    amp_rate=2,fetch_rate=0.3,T_fetch=10
+)
+
+# PCF PSCR SC
+sampler = NeighborSampler_OTF_struct_PCFPSCR_SC(
+    g=g,
+    fanouts=[5,5,5],
+    amp_rate=2,refresh_rate=0.3,T=10
+)
+
+# PCF PSCR
+sampler = NeighborSampler_OTF_struct_PCFPSCR(
+    g=g,
+    fanouts=[5,5,5],
+    amp_rate=2,refresh_rate=0.3,T=50
+)
+
+# PSCR FCF SC
+sampler = NeighborSampler_OTF_struct_PSCRFCF_SC(
+    g=g,
+    fanouts=[5,5,5],
+    amp_rate=2, refresh_rate=0.3, T=50
+)
+```
+
+Deployment on hete-graphs
+Import
+```
+from dgl.dataloading import(
+    MultiLayerNeighborSampler,
+    DataLoader,
+    MultiLayerFullNeighborSampler,
+    NeighborSampler_FCR_struct_hete,
+    NeighborSampler_FCR_struct_shared_cache_hete,
+    NeighborSampler_OTF_refresh_struct_hete,
+    NeighborSampler_OTF_refresh_struct_shared_cache_hete,
+    NeighborSampler_OTF_fetch_struct_hete,
+    NeighborSampler_OTF_fetch_struct_shared_cache_hete,
+    NeighborSampler_OTF_struct_PCFPSCR_hete,
+    NeighborSampler_OTF_struct_PCFPSCR_shared_cache_hete,
+    NeighborSampler_OTF_struct_PSCRFCF_hete,
+    NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete,
+
+    # modify_NeighborSampler_OTF_refresh_struct_shared_cache_hete
+    # FCR_hete,
+)
+```
+Deployment
+```
+sampler = NeighborSampler_FCR_struct_hete(
+    g=g,
+    fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+    alpha=2, T=10, # 800
+    hete_label="paper",
+    # prefetch_node_feats=["feat"],
+    # prefetch_labels=["label"],
+    # fused=True,
+)
+
+sampler = NeighborSampler_FCR_struct_shared_cache_hete(
+    g=g,
+    fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+    alpha=2, T=10, # 800
+    hete_label="paper",
+)
+
+sampler = NeighborSampler_OTF_refresh_struct_hete(
+    g=g,
+    fanouts=[25,20],
+    alpha=2,
+    T=20,
+    refresh_rate=0.4,
+    hete_label="paper"
+)
+
+sampler = NeighborSampler_OTF_refresh_struct_shared_cache_hete(
+    g=g,
+    fanouts=[25,20],
+    alpha=2,
+    T=20,
+    refresh_rate=0.4,
+    hete_label="paper"
+)
+
+sampler = NeighborSampler_OTF_fetch_struct_hete(
+    g=g,
+    fanouts=[25,20],
+    amp_rate=1.5,
+    T_refresh=20,
+    T_fetch=3,
+    hete_label="paper"
+)
+
+sampler = NeighborSampler_OTF_fetch_struct_shared_cache_hete(
+    g=g,
+    fanouts=[25,20],
+    amp_rate=1.5,
+    fetch_rate=0.4,
+    T_fetch=3,
+    T_refresh=20,
+    hete_label="paper"
+)
+
+sampler = modify_NeighborSampler_OTF_refresh_struct_shared_cache_hete(
+    g=g,
+    fanouts=[25,20],
+    amp_rate=1.5,
+    fetch_rate=0.4,
+    T_fetch=3,
+    T_refresh=20,
+)
+
+sampler = NeighborSampler_OTF_struct_PCFPSCR_hete(
+    g=g,
+    fanouts=[25,20],
+    amp_rate=1.5,
+    refresh_rate=0.4,
+    T=50,
+    hete_label="paper",
+)
+
+sampler = NeighborSampler_OTF_struct_PCFPSCR_shared_cache_hete(
+    g=g,
+    fanouts=[25,20],
+    amp_rate=1.5,
+    refresh_rate=0.4,
+    T=50,
+    hete_label="paper",
+)
+
+sampler = NeighborSampler_OTF_struct_PSCRFCF_hete(
+    g=g,
+    fanouts=[25,20],
+    amp_rate=1.5,
+    refresh_rate=0.4,
+    T=50,
+    hete_label="paper",
+)
+
+sampler = NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete(
+    g=g,
+    fanouts=[25,20],
+    amp_rate=1.5,
+    refresh_rate=0.4,
+    T=50,
+    hete_label="paper",
+)
+```
+
 
 Results
 
