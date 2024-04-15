@@ -220,110 +220,110 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     fused=fused_sampling,
     # )
 
-    """
-    [20, 20, 20], amp_rate=2, refresh_rate=0.15, T=358
-    lstime.mean (s): 0.2459948853507561
-    lsmem.mean (MB): 4.13271804835924
-    Epoch 00002 | Loss 0.0000 | Time 47.2221
-    sampler memory (MB): 2657.890625
-    sampler comp (MB): 5052.359375
-    """
+    # """
+    # [20, 20, 20], amp_rate=2, refresh_rate=0.15, T=358
+    # lstime.mean (s): 0.2459948853507561
+    # lsmem.mean (MB): 4.13271804835924
+    # Epoch 00002 | Loss 0.0000 | Time 47.2221
+    # sampler memory (MB): 2657.890625
+    # sampler comp (MB): 5052.359375
+    # """
 
-    """
-    [20, 20, 20], amp_rate=2, refresh_rate=0.15, T=50
-    time needed (s): 0.005285024642944336
-    memorage usage (MB): 114688
-    lstime.mean (s): 0.2528338296425775
-    lsmem.mean (MB): 4.192357512953368
-    Epoch 00002 | Loss 0.0000 | Time 48.0913
-    sampler memory (MB): 2924.234375
-    sampler comp (MB): 5350.921875
-    """
+    # """
+    # [20, 20, 20], amp_rate=2, refresh_rate=0.15, T=50
+    # time needed (s): 0.005285024642944336
+    # memorage usage (MB): 114688
+    # lstime.mean (s): 0.2528338296425775
+    # lsmem.mean (MB): 4.192357512953368
+    # Epoch 00002 | Loss 0.0000 | Time 48.0913
+    # sampler memory (MB): 2924.234375
+    # sampler comp (MB): 5350.921875
+    # """
 
-    """
-    [10, 10, 10], amp_rate=2, refresh_rate=0.15, T=50
-    time needed (s): 0.0026259422302246094
-    memorage usage (MB): 0
-    lstime.mean (s): 0.056848634298189524
-    lsmem.mean (MB): 1.8781573834196892
-    Epoch 00002 | Loss 0.0000 | Time 10.7541
-    sampler memory (MB): 1020.25
-    sampler comp (MB): 2108.046875
-    """
+    # """
+    # [10, 10, 10], amp_rate=2, refresh_rate=0.15, T=50
+    # time needed (s): 0.0026259422302246094
+    # memorage usage (MB): 0
+    # lstime.mean (s): 0.056848634298189524
+    # lsmem.mean (MB): 1.8781573834196892
+    # Epoch 00002 | Loss 0.0000 | Time 10.7541
+    # sampler memory (MB): 1020.25
+    # sampler comp (MB): 2108.046875
+    # """
 
-    """
-    [5, 5, 5], amp_rate=2, refresh_rate=0.15, T=50
-    time needed (s): 0.0018260478973388672
-    memorage usage (MB): 0
-    lstime.mean (s): 0.014533051966797297
-    lsmem.mean (MB): 0.32070379965457685
-    Epoch 00002 | Loss 0.0000 | Time 2.6287
-    sampler memory (MB): 1240.4375
-    sampler comp (MB): 1427.65625
-    """
+    # """
+    # [5, 5, 5], amp_rate=2, refresh_rate=0.15, T=50
+    # time needed (s): 0.0018260478973388672
+    # memorage usage (MB): 0
+    # lstime.mean (s): 0.014533051966797297
+    # lsmem.mean (MB): 0.32070379965457685
+    # Epoch 00002 | Loss 0.0000 | Time 2.6287
+    # sampler memory (MB): 1240.4375
+    # sampler comp (MB): 1427.65625
+    # """
 
-    """
-    [20, 20, 20], amp_rate=1.5, refresh_rate=0.15, T=50
-    time needed (s): 0.005866050720214844
-    memorage usage (MB): 0
-    lstime.mean (s): 0.2424830072696139
-    lsmem.mean (MB): 2.588784542314335
-    Epoch 00002 | Loss 0.0000 | Time 44.9782
-    sampler memory (MB): 2510.609375
-    sampler comp (MB): 4016.390625
-    """
+    # """
+    # [20, 20, 20], amp_rate=1.5, refresh_rate=0.15, T=50
+    # time needed (s): 0.005866050720214844
+    # memorage usage (MB): 0
+    # lstime.mean (s): 0.2424830072696139
+    # lsmem.mean (MB): 2.588784542314335
+    # Epoch 00002 | Loss 0.0000 | Time 44.9782
+    # sampler memory (MB): 2510.609375
+    # sampler comp (MB): 4016.390625
+    # """
 
-    """
-    [10, 10, 10], amp_rate=1.5, refresh_rate=0.15, T=50
-    time needed (s): 0.0029630661010742188
-    memorage usage (MB): 0
-    lstime.mean (s): 0.055565218027803356
-    lsmem.mean (MB): 2.7754209844559585
-    Epoch 00002 | Loss 0.0000 | Time 10.6695
-    sampler memory (MB): 1660.0625
-    sampler comp (MB): 3265.4375
-    """
+    # """
+    # [10, 10, 10], amp_rate=1.5, refresh_rate=0.15, T=50
+    # time needed (s): 0.0029630661010742188
+    # memorage usage (MB): 0
+    # lstime.mean (s): 0.055565218027803356
+    # lsmem.mean (MB): 2.7754209844559585
+    # Epoch 00002 | Loss 0.0000 | Time 10.6695
+    # sampler memory (MB): 1660.0625
+    # sampler comp (MB): 3265.4375
+    # """
 
-    """
-    [5, 5, 5], amp_rate=1.5, refresh_rate=0.15, T=50
-    time needed (s): 0.0015718936920166016
-    memorage usage (MB): 0
-    lstime.mean (s): 0.014085919951733736
-    lsmem.mean (MB): -0.6624028497409327
-    Epoch 00002 | Loss 0.0000 | Time 2.6370
-    sampler memory (MB): 794.359375
-    sampler comp (MB): 412.40625
-    """
+    # """
+    # [5, 5, 5], amp_rate=1.5, refresh_rate=0.15, T=50
+    # time needed (s): 0.0015718936920166016
+    # memorage usage (MB): 0
+    # lstime.mean (s): 0.014085919951733736
+    # lsmem.mean (MB): -0.6624028497409327
+    # Epoch 00002 | Loss 0.0000 | Time 2.6370
+    # sampler memory (MB): 794.359375
+    # sampler comp (MB): 412.40625
+    # """
 
-    """
-    [20, 20, 20], amp_rate=1.5, refresh_rate=0.3, T=50
-    time needed (s): 0.0057260990142822266
-    memorage usage (MB): 196608
-    lstime.mean (s): 0.24946731771623945
-    lsmem.mean (MB): 3.8385956390328153
-    Epoch 00002 | Loss 0.0000 | Time 49.0388
-    sampler memory (MB): 2818.84375
-    sampler comp (MB): 5042.765625
-    """
+    # """
+    # [20, 20, 20], amp_rate=1.5, refresh_rate=0.3, T=50
+    # time needed (s): 0.0057260990142822266
+    # memorage usage (MB): 196608
+    # lstime.mean (s): 0.24946731771623945
+    # lsmem.mean (MB): 3.8385956390328153
+    # Epoch 00002 | Loss 0.0000 | Time 49.0388
+    # sampler memory (MB): 2818.84375
+    # sampler comp (MB): 5042.765625
+    # """
 
-    """
-    [10, 10, 10], amp_rate=1.5, refresh_rate=0.3, T=50
-    lstime.mean (s): 0.05582910498189185
-    lsmem.mean (MB): 1.56452396373057
-    Epoch 00002 | Loss 0.0000 | Time 10.4803
-    sampler memory (MB): 1655.46875
-    sampler comp (MB): 2562.9375
-    """
+    # """
+    # [10, 10, 10], amp_rate=1.5, refresh_rate=0.3, T=50
+    # lstime.mean (s): 0.05582910498189185
+    # lsmem.mean (MB): 1.56452396373057
+    # Epoch 00002 | Loss 0.0000 | Time 10.4803
+    # sampler memory (MB): 1655.46875
+    # sampler comp (MB): 2562.9375
+    # """
 
-    """
-    [5, 5, 5], amp_rate=1.5, refresh_rate=0.3, T=50
-    lstime.mean (s): 0.01460982686703275
-    lsmem.mean (MB): -0.3279360967184801
-    Epoch 00002 | Loss 0.0000 | Time 2.6154
-    sampler memory (MB): 1102.09375
-    sampler comp (MB): 922.140625
-    """
-
+    # """
+    # [5, 5, 5], amp_rate=1.5, refresh_rate=0.3, T=50
+    # lstime.mean (s): 0.01460982686703275
+    # lsmem.mean (MB): -0.3279360967184801
+    # Epoch 00002 | Loss 0.0000 | Time 2.6154
+    # sampler memory (MB): 1102.09375
+    # sampler comp (MB): 922.140625
+    # """
+    
     # # OTF shared cache
     # sampler = NeighborSampler_OTF_struct_FSCRFCF_shared_cache(
     #     g=g,
