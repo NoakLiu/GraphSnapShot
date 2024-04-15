@@ -28,12 +28,12 @@ NeighborSampler_FCR_nodes.py
 ```
 
 The sampler code can be found at
-```
+```shell
 vim ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/sampling/neighbor.py
 ```
 
 Add samplers code in SSDReS_Sampler into the neighbor_sampler.py in dgl as in the path above and save the changes.
-```
+```shell
 vim ~/anaconda3/envs/dglsampler/lib/python3.9/site-packages/dgl/dataloading/neighbor_sampler.py
 ```
 Then you can deploy OTF and FCR samplers at node-level and struct-level from neighbor_sampler and create objects of those samplers.
@@ -113,7 +113,7 @@ Design of FCR
 
 Deployment on homo-graphs
 Import
-```
+```python
 from dgl.dataloading import (
     DataLoader,
     MultiLayerFullNeighborSampler,
@@ -136,7 +136,7 @@ from dgl.dataloading import (
 )
 ```
 Deployment
-```
+```python
 # FBL
 sampler = NeighborSampler(
     [5, 5, 5],  # fanout for [layer-0, layer-1, layer-2]
@@ -225,7 +225,7 @@ sampler = NeighborSampler_OTF_struct_PSCRFCF_SC(
 
 Deployment on hete-graphs
 Import
-```
+```python
 from dgl.dataloading import(
     MultiLayerNeighborSampler,
     DataLoader,
@@ -246,7 +246,7 @@ from dgl.dataloading import(
 )
 ```
 Deployment
-```
+```python
 sampler = NeighborSampler_FCR_struct_hete(
     g=g,
     fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
