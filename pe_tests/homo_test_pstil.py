@@ -485,61 +485,61 @@ def train(device, g, dataset, num_classes, use_uva, fused_sampling, mem_before):
     #     amp_rate=2,fetch_rate=0.3,T_fetch=10
     # )
 
-    """
-    [20, 20, 20], amp_rate=1.5, fetch_rate=0.4, T_fetch=10
-    time needed (s): 0.006249189376831055
-    memorage usage (MB): 0
-    lstime.mean (s): 0.38904782651001923
-    lsmem.mean (MB): -8.920633635578584
-    Epoch 00002 | Loss 0.0000 | Time 76.9332
-    sampler memory (MB): 2604.015625
-    sampler comp (MB): -2566.578125
-    """
+    # """
+    # [20, 20, 20], amp_rate=1.5, fetch_rate=0.4, T_fetch=10
+    # time needed (s): 0.006249189376831055
+    # memorage usage (MB): 0
+    # lstime.mean (s): 0.38904782651001923
+    # lsmem.mean (MB): -8.920633635578584
+    # Epoch 00002 | Loss 0.0000 | Time 76.9332
+    # sampler memory (MB): 2604.015625
+    # sampler comp (MB): -2566.578125
+    # """
 
-    """
-    [10, 10, 10], amp_rate=1.5, fetch_rate=0.4, T_fetch=10
-    lstime.mean (s): 0.10557236119667278
-    lsmem.mean (MB): 2.5692465457685665
-    Epoch 00002 | Loss 0.0000 | Time 20.1938
-    sampler memory (MB): 1727.59375
-    sampler comp (MB): 3216.875
-    """
+    # """
+    # [10, 10, 10], amp_rate=1.5, fetch_rate=0.4, T_fetch=10
+    # lstime.mean (s): 0.10557236119667278
+    # lsmem.mean (MB): 2.5692465457685665
+    # Epoch 00002 | Loss 0.0000 | Time 20.1938
+    # sampler memory (MB): 1727.59375
+    # sampler comp (MB): 3216.875
+    # """
 
-    """
-    [5, 5, 5], amp_rate=1.5, fetch_rate=0.4, T_fetch=10
-    lstime.mean (s): 0.06438153889512768
-    lsmem.mean (MB): 0.8608322538860104
-    Epoch 00002 | Loss 0.0000 | Time 12.3647
-    sampler memory (MB): 1090.953125
-    sampler comp (MB): 1589.96875
-    """
+    # """
+    # [5, 5, 5], amp_rate=1.5, fetch_rate=0.4, T_fetch=10
+    # lstime.mean (s): 0.06438153889512768
+    # lsmem.mean (MB): 0.8608322538860104
+    # Epoch 00002 | Loss 0.0000 | Time 12.3647
+    # sampler memory (MB): 1090.953125
+    # sampler comp (MB): 1589.96875
+    # """
 
-    """
-    [20, 20, 20], amp_rate=2, fetch_rate=0.3, T_fetch=10
-    lstime.mean (s): 0.2892284520961254
-    lsmem.mean (MB): 1.3424816493955094
-    Epoch 00002 | Loss 0.0000 | Time 55.4870
-    sampler memory (MB): 4554.4375
-    sampler comp (MB): 5333.25
-    """
+    # """
+    # [20, 20, 20], amp_rate=2, fetch_rate=0.3, T_fetch=10
+    # lstime.mean (s): 0.2892284520961254
+    # lsmem.mean (MB): 1.3424816493955094
+    # Epoch 00002 | Loss 0.0000 | Time 55.4870
+    # sampler memory (MB): 4554.4375
+    # sampler comp (MB): 5333.25
+    # """
 
-    """
-    [10, 10, 10], amp_rate=2, fetch_rate=0.3, T_fetch=10
-    lstime.mean (s): 0.11041197957976083
-    lsmem.mean (MB): 2.9305375647668392
-    Epoch 00002 | Loss 0.0000 | Time 21.0894
-    sampler memory (MB): 3284.25
-    sampler comp (MB): 4981.578125
-    """
+    # """
+    # [10, 10, 10], amp_rate=2, fetch_rate=0.3, T_fetch=10
+    # lstime.mean (s): 0.11041197957976083
+    # lsmem.mean (MB): 2.9305375647668392
+    # Epoch 00002 | Loss 0.0000 | Time 21.0894
+    # sampler memory (MB): 3284.25
+    # sampler comp (MB): 4981.578125
+    # """
 
-    """
-    [5, 5, 5], amp_rate=2, fetch_rate=0.3, T_fetch=10
-    lstime.mean (s): 0.064887913603445
-    lsmem.mean (MB): 1.180510578583765
-    Epoch 00002 | Loss 0.0000 | Time 12.5179
-    sampler memory (MB): 1313.5625
-    sampler comp (MB): 1998.59375
-    """
+    # """
+    # [5, 5, 5], amp_rate=2, fetch_rate=0.3, T_fetch=10
+    # lstime.mean (s): 0.064887913603445
+    # lsmem.mean (MB): 1.180510578583765
+    # Epoch 00002 | Loss 0.0000 | Time 12.5179
+    # sampler memory (MB): 1313.5625
+    # sampler comp (MB): 1998.59375
+    # """
 
     # # PCF PSCR SC
     # sampler = NeighborSampler_OTF_struct_PCFPSCR_SC(

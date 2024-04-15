@@ -379,6 +379,7 @@ Setting
 [10, 10, 10], amp_rate=1.5, refresh_rate=0.15, T=50
 ```
 Performance
+```
 lstime.mean (s): 0.05265655418751771
 lsmem.mean (MB): 2.6571135578583767
 Epoch 00002 | Loss 0.0000 | Time 10.1088
