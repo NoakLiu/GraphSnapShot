@@ -19,11 +19,11 @@ from dgl.dataloading import(
     DataLoader,
     MultiLayerFullNeighborSampler,
     NeighborSampler_FCR_struct_hete,
-    double_hete,
-    pre_hete,
-    pre_khop_hete,
-    pre_khop_partial_hete,
-    pre_khop_full_hete
+    # double_hete,
+    # pre_hete,
+    # pre_khop_hete,
+    # pre_khop_partial_hete,
+    # pre_khop_full_hete
 )
 
 v_t = dgl.__version__
@@ -53,19 +53,16 @@ def prepare_data(args, device):
     # train sampler
     # sampler = MultiLayerNeighborSampler([25, 20])
 
-    # sampler = NeighborSampler_FCR_struct_hete(
-    #     g=g,
-    #     fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
-    #     alpha=2, T=1000,
-    #     prefetch_node_feats=["feat"],
-    #     prefetch_labels=["label"],
-    #     fused=True,
-    # )
+    sampler = NeighborSampler_FCR_struct_hete(
+        g=g,
+        fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [4,4,4]
+        alpha=2, T=1000,
+    )
 
     #sampler=pre_hete([25,20])
     #sampler=pre_khop_hete([25,20])
     #sampler=pre_khop_partial_hete([25,20])
-    sampler=pre_khop_full_hete([25,20])
+    # sampler=pre_khop_full_hete([25,20])
 
     num_workers = args.num_workers
     train_loader = DataLoader(
