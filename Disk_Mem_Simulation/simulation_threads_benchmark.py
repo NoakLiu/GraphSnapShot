@@ -8,7 +8,7 @@ class DiskMemoryBenchmark:
         self.disk_write_time = disk_write_time
         self.memory_access_time = memory_access_time
         self.cache = {}  # Simple cache for demonstration
-
+        
     def simulate_disk_read(self, file_size=1):
         """ Simulate reading from disk with varying file size """
         start_time = time.time()

@@ -81,9 +81,9 @@ ogbn_mag - node classification (hete)
 ```
 
 <p align="center">
-  <img src="./ogbn-arxiv_degree_distribution.png" width="200" />
-  <img src="./ogbn-products_degree_distribution.png" width="200" />
-  <img src="./ogbn-mag_degree_distribution.png" width="200" />
+  <img src="./results/stats/ogbn-arxiv_degree_distribution.png" width="200" />
+  <img src="./results/stats/ogbn-products_degree_distribution.png" width="200" />
+  <img src="./results/stats/ogbn-mag_degree_distribution.png" width="200" />
 </p>
 
 | Feature           | OGBN-ARXIV   | OGBN-PRODUCTS | OGBN-MAG      |

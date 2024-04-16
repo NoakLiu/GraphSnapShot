@@ -1,6 +1,6 @@
 # ogbn-mag
 
-
+```python
 MultiLayerFullNeighborSampler,
 NeighborSampler_FCR_struct_hete,
 NeighborSampler_FCR_struct_shared_cache_hete,
@@ -12,7 +12,7 @@ NeighborSampler_OTF_struct_PCFPSCR_hete,
 NeighborSampler_OTF_struct_PCFPSCR_shared_cache_hete,
 NeighborSampler_OTF_struct_PSCRFCF_hete,
 NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete,
-
+```
 
 
 FBL
@@ -560,6 +560,7 @@ Epoch 00002 | Loss 0.0000 | Time 57.7882
 sampler memory (MB): 869.71875
 sampler comp (MB): 3057.296875
 ```
+
 Setting
 ```
 [10, 10, 10], amp_rate=2, fetch_rate=0.3, T_fetch=10
@@ -572,6 +573,7 @@ Epoch 00002 | Loss 0.0000 | Time 20.5457
 sampler memory (MB): 2072.890625
 sampler comp (MB): 2129.0625
 ```
+
 Setting
 ```
 [5, 5, 5], amp_rate=2, fetch_rate=0.3, T_fetch=10
@@ -584,6 +586,7 @@ Epoch 00002 | Loss 0.0000 | Time 12.0080
 sampler memory (MB): 629.8125
 sampler comp (MB): 1208.21875
 ```
+
 Setting
 ```
 [20, 20, 20], amp_rate=1.5, fetch_rate=0.4, T_fetch=10
@@ -596,6 +599,7 @@ Epoch 00002 | Loss 0.0000 | Time 62.2927
 sampler memory (MB): 444.21875
 sampler comp (MB): 1006.125
 ```
+
 Setting
 ```
 [10, 10, 10], amp_rate=1.5, fetch_rate=0.4, T_fetch=10
@@ -608,6 +612,7 @@ Epoch 00002 | Loss 0.0000 | Time 19.8745
 sampler memory (MB): 472.0
 sampler comp (MB): 1851.890625
 ```
+
 Setting
 ```
 [5, 5, 5], amp_rate=1.5, fetch_rate=0.4, T_fetch=10
@@ -930,6 +935,7 @@ Epoch 00002 | Loss 0.0000 | Time 70.2805
 sampler memory (MB): 2323.9375
 sampler comp (MB): 14644.671875
 ```
+
 Setting
 ```
 [10, 10, 10], amp_rate=2, refresh_rate=0.3, T=50
@@ -942,6 +948,7 @@ Epoch 00002 | Loss 0.0000 | Time 27.1706
 sampler memory (MB): 1471.875
 sampler comp (MB): 11508.421875
 ```
+
 Setting
 ```
 [5, 5, 5], amp_rate=2, refresh_rate=0.3, T=50
@@ -954,6 +961,7 @@ Epoch 00002 | Loss 0.0000 | Time 14.0671
 sampler memory (MB): 2431.359375
 sampler comp (MB): 7521.640625
 ```
+
 Setting
 ```
 [20, 20, 20], amp_rate=1.5, refresh_rate=0.4, T=50
@@ -966,6 +974,7 @@ Epoch 00002 | Loss 0.0000 | Time 69.8808
 sampler memory (MB): 3233.5
 sampler comp (MB): 15201.65625
 ```
+
 Setting
 ```
 [10, 10, 10], amp_rate=1.5, refresh_rate=0.4, T=50
@@ -978,6 +987,7 @@ Epoch 00002 | Loss 0.0000 | Time 27.2500
 sampler memory (MB): 2216.90625
 sampler comp (MB): 11974.625
 ```
+
 Setting
 ```
 [5, 5, 5], amp_rate=1.5, refresh_rate=0.4, T=50
