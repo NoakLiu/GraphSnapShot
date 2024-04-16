@@ -1,3 +1,8 @@
+Experiment
+```
+hetegraph training by RelGraphConv
+```
+
 Experimental Methods
 ```python
 MultiLayerFullNeighborSampler,

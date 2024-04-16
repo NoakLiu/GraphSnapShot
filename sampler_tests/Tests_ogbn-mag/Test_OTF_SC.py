@@ -18,8 +18,8 @@ from dgl.dataloading import(
     #MultiLayerNeighborSampler,
     DataLoader,
     MultiLayerFullNeighborSampler,
-    NeighborSampler_OTF_struct_hete,
-    NeighborSampler_OTF_struct_shared_cache_hete_mo
+    # NeighborSampler_OTF_struct_hete,
+    # NeighborSampler_OTF_struct_shared_cache_hete_mo
 )
 
 v_t = dgl.__version__
