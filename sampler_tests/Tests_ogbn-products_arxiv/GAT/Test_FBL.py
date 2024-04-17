@@ -14,7 +14,17 @@ from ogb.nodeproppred import DglNodePropPredDataset
 from dgl.dataloading import (
     MultiLayerNeighborSampler,
     DataLoader,
-    MultiLayerFullNeighborSampler
+    MultiLayerFullNeighborSampler,
+    NeighborSampler_FCR_struct,
+    NeighborSampler_FCR_struct_shared_cache,
+    NeighborSampler_OTF_struct_PCFPSCR,
+    NeighborSampler_OTF_struct_PCFPSCR_SC,
+    NeighborSampler_OTF_struct_PSCRFCF,
+    NeighborSampler_OTF_struct_PSCRFCF_SC,
+    NeighborSampler_OTF_struct_FSCRFCF,
+    NeighborSampler_OTF_struct_FSCRFCF_shared_cache,
+    NeighborSampler_OTF_struct_PCFFSCR,
+    NeighborSampler_OTF_struct_PCFFSCR_shared_cache
 
 )
 
@@ -180,11 +190,32 @@ def run(args, device, data):
         g,
         num_heads,
     ) = data
-
+    modeltype = "OTF" #FCR
     # Create PyTorch DataLoader for constructing blocks
-    sampler = MultiLayerNeighborSampler(
-        [int(fanout) for fanout in args.fan_out.split(",")]
+    # sampler = MultiLayerNeighborSampler(
+    #     [int(fanout) for fanout in args.fan_out.split(",")]
+    # )
+
+    # sampler = NeighborSampler_FCR_struct(
+    #     g=g,
+    #     fanouts=[int(fanout) for fanout in args.fan_out.split(",")],  # fanout for [layer-0, layer-1, layer-2] [10,10,10]
+    #     alpha=2, T=2500,
+    # )
+
+    # sampler = NeighborSampler_FCR_struct_shared_cache(
+    #     g=g,
+    #     fanouts=[int(fanout) for fanout in args.fan_out.split(",")],  # fanout for [layer-0, layer-1, layer-2] [10,10,10]
+    #     alpha=2, T=2500,
+    # )
+
+    sampler = NeighborSampler_OTF_struct_PCFPSCR(
+        g=g,
+        fanouts=[int(fanout) for fanout in args.fan_out.split(",")],  # fanout for [layer-0, layer-1, layer-2] [10,10,10]
+        amp_rate=1.5,
+        refresh_rate=0.4,
+        T=2500
     )
+
     dataloader = DataLoader(
         g,
         train_nid,
@@ -214,7 +245,8 @@ def run(args, device, data):
         # blocks.
         for step, (input_nodes, seeds, blocks) in enumerate(dataloader):
             tic_step = time.time()
-
+            if modeltype == "OTF":
+                blocks = blocks[::-1]
             # copy block to gpu
             blocks = [blk.to(device) for blk in blocks]
 

@@ -1,3 +1,35 @@
+GAT
+
+FBL
+```
+Epoch 00000 | Step 00000 | Loss 5.0155 | Train Acc 0.0156 | Time 1.1543 | Speed (samples/sec) nan | GPU 0.0 MB
+Epoch 00000 | Step 00020 | Loss 1.9194 | Train Acc 0.5801 | Time 0.9820 | Speed (samples/sec) 519.3363 | GPU 0.0 MB
+Epoch 00000 | Step 00040 | Loss 1.2241 | Train Acc 0.7402 | Time 0.9753 | Speed (samples/sec) 519.1643 | GPU 0.0 MB
+Epoch 00000 | Step 00060 | Loss 0.8692 | Train Acc 0.7949 | Time 0.9879 | Speed (samples/sec) 519.9833 | GPU 0.0 MB
+```
+
+FCR
+```
+Epoch 00000 | Step 00000 | Loss 4.2421 | Train Acc 0.0059 | Time 1.0922 | Speed (samples/sec) nan | GPU 0.0 MB
+Epoch 00000 | Step 00020 | Loss 1.6064 | Train Acc 0.6641 | Time 0.9713 | Speed (samples/sec) 559.1945 | GPU 0.0 MB
+Epoch 00000 | Step 00040 | Loss 1.1080 | Train Acc 0.7363 | Time 0.9253 | Speed (samples/sec) 566.1933 | GPU 0.0 MB
+Epoch 00000 | Step 00060 | Loss 0.8605 | Train Acc 0.8066 | Time 0.8924 | Speed (samples/sec) 570.1873 | GPU 0.0 MB
+Epoch 00000 | Step 00080 | Loss 0.7004 | Train Acc 0.8301 | Time 0.8848 | Speed (samples/sec) 571.4933 | GPU 0.0 MB
+```
+
+FCR - shared cache
+```
+Epoch 00000 | Step 00000 | Loss 5.5809 | Train Acc 0.0117 | Time 1.0977 | Speed (samples/sec) nan | GPU 0.0 MB
+Epoch 00000 | Step 00020 | Loss 1.7260 | Train Acc 0.5996 | Time 0.9294 | Speed (samples/sec) 548.0917 | GPU 0.0 MB
+Epoch 00000 | Step 00040 | Loss 1.2600 | Train Acc 0.6934 | Time 0.9228 | Speed (samples/sec) 550.7310 | GPU 0.0 MB
+Epoch 00000 | Step 00060 | Loss 0.9143 | Train Acc 0.7930 | Time 0.9078 | Speed (samples/sec) 552.2257 | GPU 0.0 MB
+Epoch 00000 | Step 00080 | Loss 0.7528 | Train Acc 0.8281 | Time 0.9155 | Speed (samples/sec) 553.6696 | GPU 0.0 MB
+Epoch 00000 | Step 00100 | Loss 0.6076 | Train Acc 0.8613 | Time 0.9385 | Speed (samples/sec) 552.4347 | GPU 0.0 MB
+Epoch 00000 | Step 00120 | Loss 0.6829 | Train Acc 0.8398 | Time 0.9157 | Speed (samples/sec) 551.8440 | GPU 0.0 MB
+Epoch 00000 | Step 00140 | Loss 0.5512 | Train Acc 0.8535 | Time 0.9061 | Speed (samples/sec) 551.4936 | GPU 0.0 MB
+```
+
+GCN
 FBL
 setting
 ```

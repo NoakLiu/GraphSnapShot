@@ -40,7 +40,7 @@ class NeighborSampler_OTF_fetch_struct_hete(BlockSampler):
         self.mapping = {}
         self.exclude_eids = None
 
-        self.alpha = amp_rate
+        self.amp_rate = amp_rate
         self.cycle = 0  # Initialize sampling cycle counter
         self.cache_size = [f * amp_rate for f in fanouts]  # Amplified fanouts for pre-sampling
         if T_refresh!=None:

@@ -18,7 +18,7 @@ from dgl.dataloading import(
     MultiLayerNeighborSampler,
     DataLoader,
     MultiLayerFullNeighborSampler,
-    NeighborSampler_OTF_struct_hete,
+    # NeighborSampler_OTF_struct_hete,
     NeighborSampler_FCR_struct_hete,
     NeighborSampler_FCR_struct_shared_cache_hete,
     NeighborSampler_OTF_struct_PSCRFCF_hete,
@@ -47,13 +47,21 @@ def prepare_data(args, device):
     # train sampler
     # sampler = MultiLayerNeighborSampler([25, 20])
 
-    sampler = NeighborSampler_OTF_struct_hete(
+    # sampler = NeighborSampler_OTF_struct_hete(
+    #     g=g,
+    #     fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    #     alpha=2, beta=2, gamma=0.15, T=358,
+    #     prefetch_node_feats=["feat"],
+    #     prefetch_labels=["label"],
+    #     fused=True,
+    # )
+
+    sampler = NeighborSampler_OTF_struct_PSCRFCF_hete(
         g=g,
-        fanouts=[25,20],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
-        alpha=2, beta=2, gamma=0.15, T=358,
-        prefetch_node_feats=["feat"],
-        prefetch_labels=["label"],
-        fused=True,
+        fanouts=[25,20],
+        amp_rate=2,
+        T=2000,
+        refresh_rate=0.4
     )
 
     num_workers = args.num_workers
