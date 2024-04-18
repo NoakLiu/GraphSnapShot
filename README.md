@@ -135,6 +135,19 @@ from dgl.dataloading import (
 
 )
 ```
+Method Explanation - homo
+```
+NeighborSampler_FCR_struct: Fully Cache Refresh, with each hop has unique cached frontier
+NeighborSampler_FCR_struct_shared_cache: Fully Cache Refresh with Shared Cache, with all hop has shared cached frontier
+NeighborSampler_OTF_struct_FSCRFCF: 
+NeighborSampler_OTF_struct_FSCRFCF_shared_cache: 
+NeighborSampler_OTF_struct_PCFFSCR: 
+NeighborSampler_OTF_struct_PCFFSCR_shared_cache: 
+NeighborSampler_OTF_struct_PCFPSCR: 
+NeighborSampler_OTF_struct_PCFPSCR_SC: 
+NeighborSampler_OTF_struct_PSCRFCF: 
+NeighborSampler_OTF_struct_PSCRFCF_SC: 
+```
 Deployment
 ```python
 # FBL
@@ -244,6 +257,19 @@ from dgl.dataloading import(
     # modify_NeighborSampler_OTF_refresh_struct_shared_cache_hete
     # FCR_hete,
 )
+```
+Method Explanation
+```
+NeighborSampler_FCR_struct_hete: 
+NeighborSampler_FCR_struct_shared_cache_hete
+NeighborSampler_OTF_refresh_struct_hete
+NeighborSampler_OTF_refresh_struct_shared_cache_hete
+NeighborSampler_OTF_fetch_struct_hete
+NeighborSampler_OTF_fetch_struct_shared_cache_hete
+NeighborSampler_OTF_struct_PCFPSCR_hete
+NeighborSampler_OTF_struct_PCFPSCR_shared_cache_hete
+NeighborSampler_OTF_struct_PSCRFCF_hete
+NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete
 ```
 Deployment
 ```python
