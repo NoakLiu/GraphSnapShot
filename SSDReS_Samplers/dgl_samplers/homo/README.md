@@ -32,6 +32,11 @@ NeighborSampler_OTF_struct_PSCRFCF_SC: Partially cache refresh + Fully cache fet
 | Memory Usage (MB)| 6.34      | 4.70      | 4.60      |
 | GPU Usage        | graph size| graph size| graph size|
 
+graph size:
+
+products = 1871.046875 MB
+arxiv
+
 ### Impact on Accuracy
 
 | Accuracy   | GCN    | GAT    | GraphSAGE |
