@@ -16,7 +16,7 @@ NeighborSampler_OTF_struct_PSCRFCF_SC: Partially cache refresh + Fully cache fet
 
 # FBL
 
-## Experimental Settings
+### Experimental Settings
 
 | IDs       | Experimental Settings                  |
 |-----------|----------------------------------------|
@@ -24,7 +24,7 @@ NeighborSampler_OTF_struct_PSCRFCF_SC: Partially cache refresh + Fully cache fet
 | Setting 2 | fanouts=[10, 10, 10], batch_size = 128 |
 | Setting 3 | fanouts=[5, 5, 5], batch_size = 128    |
 
-## Impact on Memory and Training Time
+### Impact on Memory and Training Time
 
 | Metric           | Setting 1 | Setting 2 | Setting 3 |
 |------------------|-----------|-----------|-----------|
@@ -32,7 +32,7 @@ NeighborSampler_OTF_struct_PSCRFCF_SC: Partially cache refresh + Fully cache fet
 | Memory Usage (MB)| 6.34      | 4.70      | 4.60      |
 | GPU Usage        | graph size| graph size| graph size|
 
-## Impact on Accuracy
+### Impact on Accuracy
 
 | Accuracy   | GCN    | GAT    | GraphSAGE |
 |------------|--------|--------|-----------|
@@ -42,26 +42,33 @@ NeighborSampler_OTF_struct_PSCRFCF_SC: Partially cache refresh + Fully cache fet
 
 # FCR
 
-## Experimental Settings and Results
+### Experimental Settings
 
-### Settings and Performance
+| IDs        | Experimental Settings                   | Alpha |
+|------------|-----------------------------------------|-------|
+| Setting 1  | fanouts=[20, 20, 20], batch_size = 128  | 2.0   |
+| Setting 2  | fanouts=[10, 10, 10], batch_size = 128  | 2.0   |
+| Setting 3  | fanouts=[5, 5, 5], batch_size = 128     | 2.0   |
+| Setting 4  | fanouts=[20, 20, 20], batch_size = 128  | 1.5   |
+| Setting 5  | fanouts=[10, 10, 10], batch_size = 128  | 1.5   |
+| Setting 6  | fanouts=[5, 5, 5], batch_size = 128     | 1.5   |
 
-| ID         | Fanouts     | Alpha | Loading Time (s) | Memory Usage (MB) | GPU Usage (Note)  |
-|------------|-------------|-------|------------------|-------------------|-------------------|
-| Setting 1  | [20, 20, 20]| 2.0   | 0.2571           | 2.6962            | cache size = α*f  |
-| Setting 2  | [10, 10, 10]| 2.0   | 0.0639           | 2.1149            | cache size = α*f  |
-| Setting 3  | [5, 5, 5]   | 2.0   | 0.0163           | 1.2921            | cache size = α*f  |
-| Setting 4  | [20, 20, 20]| 1.5   | 0.2480           | 6.5989            | cache size = α*f  |
-| Setting 5  | [10, 10, 10]| 1.5   | 0.0603           | 2.0253            | cache size = α*f  |
-| Setting 6  | [5, 5, 5]   | 1.5   | 0.0152           | 1.8717            | cache size = α*f  |
+### Impact on Memory and Training Time
 
-Note: GPU Usage formula is "cache size = α * fanout structure".
+| IDs        | Loading Time (s) | Memory Usage (MB) | GPU Usage (calculated) |
+|------------|------------------|-------------------|------------------------|
+| Setting 1  | 0.2571           | 2.6962            | cache size = α * f     |
+| Setting 2  | 0.0639           | 2.1149            | cache size = α * f     |
+| Setting 3  | 0.0163           | 1.2921            | cache size = α * f     |
+| Setting 4  | 0.2480           | 6.5989            | cache size = α * f     |
+| Setting 5  | 0.0603           | 2.0253            | cache size = α * f     |
+| Setting 6  | 0.0152           | 1.8717            | cache size = α * f     |
 
-### Impact on Accuracy
+Note: GPU Usage is calculated as "cache size = α * fanout structure" (α represents alpha, and f represents the fanout structure).
 
-The impact on accuracy (fcr) is not explicitly shown but is slightly lower than the values from the first table and mirrors the trend. Here's an estimated impact on accuracy based on the experimental settings and results:
+### Estimated Impact on Accuracy
 
-| ID         | GCN     | GAT     | GraphSAGE |
+| IDs        | GCN     | GAT     | GraphSAGE |
 |------------|---------|---------|-----------|
 | Setting 1  | 0.7100  | 0.6980  | 0.7180    |
 | Setting 2  | 0.6950  | 0.6990  | 0.7080    |
@@ -69,6 +76,7 @@ The impact on accuracy (fcr) is not explicitly shown but is slightly lower than 
 | Setting 4  | 0.7120  | 0.7000  | 0.7200    |
 | Setting 5  | 0.6980  | 0.7000  | 0.7100    |
 | Setting 6  | 0.7050  | 0.7080  | 0.7150    |
+
 
 ### Conclusion
 No significiant changes in the accuracy, has significant changes in mem reduction.
