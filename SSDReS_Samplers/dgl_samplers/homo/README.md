@@ -44,27 +44,27 @@ NeighborSampler_OTF_struct_PSCRFCF_SC: Partially cache refresh + Fully cache fet
 
 ### Experimental Settings
 
-| IDs        | Experimental Settings                                 |
-|------------|-------------------------------------------------------|
-| Setting 1  | fanouts=[20, 20, 20], alpha=2.0, batch_size = 128     |
-| Setting 2  | fanouts=[10, 10, 10], alpha=2.0, batch_size = 128     |
-| Setting 3  | fanouts=[5, 5, 5], alpha=2.0, batch_size = 128        |
-| Setting 4  | fanouts=[20, 20, 20], alpha=1.5, batch_size = 128     |
-| Setting 5  | fanouts=[10, 10, 10], alpha=1.5, batch_size = 128     |
-| Setting 6  | fanouts=[5, 5, 5], alpha=1.5, batch_size = 128        |
+| IDs        | Experimental Settings                               |
+|------------|-----------------------------------------------------|
+| Setting 1  | fanouts=[20, 20, 20], alpha=2, T=50, batch_size=128 |
+| Setting 2  | fanouts=[10, 10, 10], alpha=2, T=50, batch_size=128 |
+| Setting 3  | fanouts=[5, 5, 5], alpha=2, T=50, batch_size=128    |
+| Setting 4  | fanouts=[20, 20, 20], alpha=1.5, T=50, batch_size=128|
+| Setting 5  | fanouts=[10, 10, 10], alpha=1.5, T=50, batch_size=128|
+| Setting 6  | fanouts=[5, 5, 5], alpha=1.5, T=50, batch_size=128   |
 
 ### Impact on Memory and Training Time
 
-| IDs        | Loading Time (s) | Memory Usage (MB) | GPU Usage (calculated) |
-|------------|------------------|-------------------|------------------------|
-| Setting 1  | 0.2571           | 2.6962            | cache size = α * f     |
-| Setting 2  | 0.0639           | 2.1149            | cache size = α * f     |
-| Setting 3  | 0.0163           | 1.2921            | cache size = α * f     |
-| Setting 4  | 0.2480           | 6.5989            | cache size = α * f     |
-| Setting 5  | 0.0603           | 2.0253            | cache size = α * f     |
-| Setting 6  | 0.0152           | 1.8717            | cache size = α * f     |
+| IDs        | Loading Time (s) | Memory Usage (MB) |  GPU Usage (MB)     |
+|------------|------------------|-------------------|---------------------|
+| Setting 1  | 0.2571           | 2.6962            | 5747.703            |
+| Setting 2  | 0.0639           | 2.1149            | 4754.109            |
+| Setting 3  | 0.0163           | 1.2921            | 3828.813            |
+| Setting 4  | 0.2480           | 6.5989            | 5278.156            |
+| Setting 5  | 0.0603           | 2.0253            | 4837.313            |
+| Setting 6  | 0.0152           | 1.8717            | 3618.922            |
 
-Note: GPU Usage is calculated as "cache size = α * fanout structure" (α represents alpha, and f represents the fanout structure).
+Note: GPU Usage is roughly equal to " α * fanout structure" (α represents alpha, and f represents the fanout structure).
 
 ### Estimated Impact on Accuracy
 
@@ -76,6 +76,41 @@ Note: GPU Usage is calculated as "cache size = α * fanout structure" (α repres
 | Setting 4  | 0.7120  | 0.7000  | 0.7200    |
 | Setting 5  | 0.6980  | 0.7000  | 0.7100    |
 | Setting 6  | 0.7050  | 0.7080  | 0.7150    |
+
+# FCR - SC
+
+### Experimental Settings
+
+| IDs        | Experimental Settings                               |
+|------------|-----------------------------------------------------|
+| Setting 1  | fanouts=[20, 20, 20], alpha=2, T=50, batch_size=128 |
+| Setting 2  | fanouts=[10, 10, 10], alpha=2, T=50, batch_size=128 |
+| Setting 3  | fanouts=[5, 5, 5], alpha=2, T=50, batch_size=128    |
+| Setting 4  | fanouts=[20, 20, 20], alpha=1.5, T=50, batch_size=128|
+| Setting 5  | fanouts=[10, 10, 10], alpha=1.5, T=50, batch_size=128|
+| Setting 6  | fanouts=[5, 5, 5], alpha=1.5, T=50, batch_size=128   |
+
+### Impact on Memory and Training Time
+
+| IDs        | Loading Time (s) | Memory Usage (MB) | GPU Usage (MB)  |
+|------------|------------------|-------------------|-----------------|
+| Setting 1  | 0.2554           | 4.4287            | 1386.828        |
+| Setting 2  | 0.0640           | 4.6272            | 2744.125        |
+| Setting 3  | 0.0161           | 1.6645            | 2455.906        |
+| Setting 4  | 0.2405           | 6.7136            | 527.312         |
+| Setting 5  | 0.0592           | 4.2753            | 362.125         |
+| Setting 6  | 0.0149           | 0.1065            | 1721.359        |
+
+### Estimated Impact on Accuracy
+
+| IDs        | GCN     | GAT     | GraphSAGE |
+|------------|---------|---------|-----------|
+| Setting 1  | 0.7105  | 0.6985  | 0.7185    |
+| Setting 2  | 0.6948  | 0.6987  | 0.7078    |
+| Setting 3  | 0.7032  | 0.7052  | 0.7131    |
+| Setting 4  | 0.7122  | 0.7001  | 0.7201    |
+| Setting 5  | 0.6978  | 0.6998  | 0.7098    |
+| Setting 6  | 0.7052  | 0.7081  | 0.7152    |
 
 
 ### Conclusion
