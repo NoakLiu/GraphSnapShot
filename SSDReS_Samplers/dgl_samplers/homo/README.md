@@ -44,14 +44,14 @@ NeighborSampler_OTF_struct_PSCRFCF_SC: Partially cache refresh + Fully cache fet
 
 ### Experimental Settings
 
-| IDs        | Experimental Settings                   | Alpha |
-|------------|-----------------------------------------|-------|
-| Setting 1  | fanouts=[20, 20, 20], batch_size = 128  | 2.0   |
-| Setting 2  | fanouts=[10, 10, 10], batch_size = 128  | 2.0   |
-| Setting 3  | fanouts=[5, 5, 5], batch_size = 128     | 2.0   |
-| Setting 4  | fanouts=[20, 20, 20], batch_size = 128  | 1.5   |
-| Setting 5  | fanouts=[10, 10, 10], batch_size = 128  | 1.5   |
-| Setting 6  | fanouts=[5, 5, 5], batch_size = 128     | 1.5   |
+| IDs        | Experimental Settings                                 |
+|------------|-------------------------------------------------------|
+| Setting 1  | fanouts=[20, 20, 20], alpha=2.0, batch_size = 128     |
+| Setting 2  | fanouts=[10, 10, 10], alpha=2.0, batch_size = 128     |
+| Setting 3  | fanouts=[5, 5, 5], alpha=2.0, batch_size = 128        |
+| Setting 4  | fanouts=[20, 20, 20], alpha=1.5, batch_size = 128     |
+| Setting 5  | fanouts=[10, 10, 10], alpha=1.5, batch_size = 128     |
+| Setting 6  | fanouts=[5, 5, 5], alpha=1.5, batch_size = 128        |
 
 ### Impact on Memory and Training Time
 
