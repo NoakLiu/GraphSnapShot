@@ -233,6 +233,102 @@ Note: GPU Usage is roughly equal to " α * fanout structure" (α represents alph
 | Setting 9  | 0.6980  | 0.6950  | 0.7080    |
 | Setting 10 | 0.6970  | 0.6940  | 0.7070    |
 
+# OTF (PSCR FCF mode)
+### Experimental Settings
+| IDs        | Experimental Settings                                      |
+|------------|------------------------------------------------------------|
+| Setting 1  | fanouts=[20, 20, 20], amp_rate=2, refresh_rate=0.3, T=50   |
+| Setting 2  | fanouts=[10, 10, 10], amp_rate=2, refresh_rate=0.3, T=50   |
+| Setting 3  | fanouts=[5, 5, 5], amp_rate=2, refresh_rate=0.3, T=50      |
+| Setting 4  | fanouts=[20, 20, 20], amp_rate=1.5, refresh_rate=0.4, T=50 |
+| Setting 5  | fanouts=[10, 10, 10], amp_rate=1.5, refresh_rate=0.4, T=50 |
+| Setting 6  | fanouts=[5, 5, 5], amp_rate=1.5, refresh_rate=0.4, T=50    |
+
+### Impact on Memory and Training Time
+| IDs        | Loading Time (s) | Memory Usage (MB) | GPU Usage (MB)  |
+|------------|------------------|-------------------|-----------------|
+| Setting 1  | 0.3558           | 21.2783           | 2323.938        |
+| Setting 2  | 0.1344           | 17.3316           | 1471.875        |
+| Setting 3  | 0.0680           | 8.7888            | 2431.359        |
+| Setting 4  | 0.3551           | 20.6677           | 3233.500        |
+| Setting 5  | 0.1354           | 16.8501           | 2216.906        |
+| Setting 6  | 0.0689           | 10.3120           | 1340.594        |
+
+### Impact on Accuracy
+| IDs        | GCN     | GAT     | GraphSAGE |
+|------------|---------|---------|-----------|
+| Setting 1  | 0.7120  | 0.6990  | 0.7210    |
+| Setting 2  | 0.7080  | 0.6960  | 0.7170    |
+| Setting 3  | 0.7050  | 0.6930  | 0.7140    |
+| Setting 4  | 0.7130  | 0.7000  | 0.7220    |
+| Setting 5  | 0.7100  | 0.6980  | 0.7190    |
+| Setting 6  | 0.7060  | 0.6940  | 0.7150    |
+
+
+# OTF (PCF PSCR SC mode)
+
+| IDs        | Experimental Settings                                      |
+|------------|------------------------------------------------------------|
+| Setting 1  | fanouts=[20, 20, 20], amp_rate=1.5, fetch_rate=0.4, T_fetch=10 |
+| Setting 2  | fanouts=[10, 10, 10], amp_rate=1.5, fetch_rate=0.4, T_fetch=10 |
+| Setting 3  | fanouts=[5, 5, 5], amp_rate=1.5, fetch_rate=0.4, T_fetch=10    |
+| Setting 4  | fanouts=[20, 20, 20], amp_rate=2, fetch_rate=0.3, T_fetch=10   |
+| Setting 5  | fanouts=[10, 10, 10], amp_rate=2, fetch_rate=0.3, T_fetch=10   |
+| Setting 6  | fanouts=[5, 5, 5], amp_rate=2, fetch_rate=0.3, T_fetch=10      |
+
+Impact
+
+| IDs        | Loading Time (s) | Memory Usage (MB) | GPU Usage (MB)  |
+|------------|------------------|-------------------|-----------------|
+| Setting 1  | 0.6797           | 14.8317           | 3283.891        |
+| Setting 2  | 0.3963           | 12.6763           | 1304.078        |
+| Setting 3  | 0.2564           | 5.4109            | 1741.734        |
+| Setting 4  | 0.8273           | 15.3318           | 2477.234        |
+| Setting 5  | 0.4560           | 16.6057           | 497.906         |
+| Setting 6  | 0.2931           | 12.7773           | 263.516         |
+
+Accuracy
+| IDs        | GCN     | GAT     | GraphSAGE |
+|------------|---------|---------|-----------|
+| Setting 1  | 0.7120  | 0.6990  | 0.7210    |
+| Setting 2  | 0.7080  | 0.6960  | 0.7170    |
+| Setting 3  | 0.7050  | 0.6930  | 0.7140    |
+| Setting 4  | 0.7130  | 0.7000  | 0.7220    |
+| Setting 5  | 0.7100  | 0.6970  | 0.7190    |
+| Setting 6  | 0.7060  | 0.6940  | 0.7150    |
+
+# OTF (PSCR FCF SC mode)
+### Experimental Settings
+| IDs        | Experimental Settings                                        |
+|------------|--------------------------------------------------------------|
+| Setting 1  | fanouts=[20, 20, 20], amp_rate=1.5, fetch_rate=0.4, T_fetch=50 |
+| Setting 2  | fanouts=[10, 10, 10], amp_rate=1.5, fetch_rate=0.4, T_fetch=50 |
+| Setting 3  | fanouts=[5, 5, 5], amp_rate=1.5, fetch_rate=0.4, T_fetch=50    |
+| Setting 4  | fanouts=[20, 20, 20], amp_rate=2, fetch_rate=0.3, T_fetch=50   |
+| Setting 5  | fanouts=[10, 10, 10], amp_rate=2, fetch_rate=0.3, T_fetch=50   |
+| Setting 6  | fanouts=[5, 5, 5], amp_rate=2, fetch_rate=0.3, T_fetch=50      |
+
+### Impact on Memory and Training Time
+| IDs        | Loading Time (s) | Memory Usage (MB) | GPU Usage (MB)  |
+|------------|------------------|-------------------|-----------------|
+| Setting 1  | 0.3202           | 14.0887           | 1571.062        |
+| Setting 2  | 0.1214           | 10.0932           | 1962.359        |
+| Setting 3  | 0.0585           | 4.3968            | 1220.250        |
+| Setting 4  | 0.3521           | 15.5863           | 1526.328        |
+| Setting 5  | 0.1309           | 13.4031           | 1134.344        |
+| Setting 6  | 0.0672           | 7.4897            | 867.438         |
+
+### Impact on Accuracy
+| IDs        | GCN     | GAT     | GraphSAGE |
+|------------|---------|---------|-----------|
+| Setting 1  | 0.7110  | 0.6980  | 0.7200    |
+| Setting 2  | 0.7070  | 0.6950  | 0.7160    |
+| Setting 3  | 0.7040  | 0.6920  | 0.7130    |
+| Setting 4  | 0.7130  | 0.7010  | 0.7220    |
+| Setting 5  | 0.7100  | 0.6980  | 0.7190    |
+| Setting 6  | 0.7060  | 0.6940  | 0.7150    |
+
+
 
 
 ### Conclusion
