@@ -8,6 +8,8 @@ GraphSnapShot is a framework for fast storage, retrieval and computation for gra
 
 ![model construction](./assets/SSDReS.png)3 system design strategies
 
+![model construction](./assets/dense_proc.png) Dense Subgraph Process
+
 
 ```
 FBL: full batch load
