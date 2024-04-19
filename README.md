@@ -6,11 +6,11 @@ GraphSnapShot is a framework for fast storage, retrieval and computation for gra
 
 ![model construction](./assets/Disk_Cache_Memory_GraphSnapShot.png)
 
-![model construction](./assets/SSDReS.png)3 system design strategies
+![model construction](./assets/SSDReS.png)
 
-![model construction](./assets/dense_proc.png) Dense Subgraph Process
+![model construction](./assets/dense_proc.png)
 
-
+3 system design strategies
 ```
 FBL: full batch load
 OTF: partial cache refresh (on the fly) snapshot
