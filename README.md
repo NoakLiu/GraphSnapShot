@@ -111,6 +111,25 @@ Design of FCR
 ![model construction](./assets/FCR.png)
 
 
+Example of Shrinking Usage of Memory
+```
+Original graph
+Graph(num_nodes=169343, num_edges=1166243,
+      ndata_schemes={'year': Scheme(shape=(1,), dtype=torch.int64), 'feat': Scheme(shape=(128,), dtype=torch.float32)}
+      edata_schemes={})
+
+Dense Graph
+Graph(num_nodes=5982, num_edges=65847,
+      ndata_schemes={'year': Scheme(shape=(1,), dtype=torch.int64), 'feat': Scheme(shape=(128,), dtype=torch.float32), '_ID': Scheme(shape=(), dtype=torch.int64)}
+      edata_schemes={'_ID': Scheme(shape=(), dtype=torch.int64)})
+
+Cached Graph
+Graph(num_nodes=5982, num_edges=30048,
+      ndata_schemes={'year': Scheme(shape=(1,), dtype=torch.int64), 'feat': Scheme(shape=(128,), dtype=torch.float32), '_ID': Scheme(shape=(), dtype=torch.int64)}
+      edata_schemes={'_ID': Scheme(shape=(), dtype=torch.int64)})
+```
+
+Comparison from `num_nodes=169343, num_edges=1166243` to `num_nodes=5982, num_edges=30048`.
 Deployment on homo-graphs
 Import
 ```python

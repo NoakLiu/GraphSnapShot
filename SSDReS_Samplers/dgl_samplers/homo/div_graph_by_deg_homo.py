@@ -1,5 +1,6 @@
 import dgl
 import torch
+from pympler import asizeof
 
 def split_graph_by_degree(graph, degree_threshold):
     """
@@ -54,7 +55,10 @@ graph, high_degree_subgraph, low_degree_subgraph = load_and_split_dataset('ogbn-
 
 print(graph)
 
+print("GRAPH SIZE:",asizeof.asizeof(graph))
+
 print(high_degree_subgraph)
+print("GRAPH sample SIZE:",asizeof.asizeof(high_degree_subgraph))
 
 
 print("High Degree Subgraph Nodes:", high_degree_subgraph.number_of_nodes())
@@ -77,7 +81,6 @@ def sample_neighbors_from_subgraph(subgraph, fanout):
     """
     # Assume all nodes are involved in sampling
     all_nodes = subgraph.nodes()
-    
     # Sample neighbors for all nodes
     sampled_subgraph = dgl.sampling.sample_neighbors(subgraph, all_nodes, fanout)
     
@@ -86,6 +89,9 @@ def sample_neighbors_from_subgraph(subgraph, fanout):
 # Assuming high_degree_subgraph is an already created subgraph
 fanout = 10  # Sample 10 neighbors per node
 sampled_high_degree_subgraph = sample_neighbors_from_subgraph(high_degree_subgraph, fanout)
+print(sampled_high_degree_subgraph)
+
+print("sampled sub graph", asizeof.asizeof(sampled_high_degree_subgraph))
 
 print("Sampled Subgraph has", sampled_high_degree_subgraph.number_of_edges(), "edges")
 
