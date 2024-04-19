@@ -33,6 +33,8 @@ from dgl.dataloading import(
     # FCR_hete,
 )
 
+import psutil
+
 v_t = dgl.__version__
 
 
@@ -44,14 +46,23 @@ def prepare_data(args, device):
     labels = labels["paper"].flatten()
 
     transform = Compose([ToSimple(), AddReverse()])
+    mem_pre_g = psutil.virtual_memory().used
     g = transform(g)
+    mem_after_g = psutil.virtual_memory().used
+
+    g_used = mem_after_g - mem_pre_g
+    print("G USED:",g_used/(1024**2))
+
+    size_in_bytes = sys.getsizeof(g)
+    print("G SIZE:",size_in_bytes)
 
     print("Loaded graph: {}".format(g))
 
     logger = Logger(args.runs)
 
+    mem_pre_sample = psutil.virtual_memory().used
     # train sampler
-    # sampler = MultiLayerNeighborSampler([25, 20])
+    sampler = MultiLayerNeighborSampler([25, 20])
 
     # sampler = NeighborSampler_FCR_struct_hete(
     #     g=g,
@@ -143,14 +154,20 @@ def prepare_data(args, device):
     #     hete_label="paper",
     # )
 
-    sampler = NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete(
-        g=g,
-        fanouts=[25,20],
-        amp_rate=1.5,
-        refresh_rate=0.4,
-        T=50,
-        hete_label="paper",
-    )
+    # sampler = NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete(
+    #     g=g,
+    #     fanouts=[25,20],
+    #     amp_rate=1.5,
+    #     refresh_rate=0.4,
+    #     T=50,
+    #     hete_label="paper",
+    # )
+
+    mem_after_sample = psutil.virtual_memory().used
+
+    mem_used = (mem_after_sample - mem_pre_sample)/(1024**2)
+
+    print("mem used as :",mem_used)
 
     num_workers = args.num_workers
     train_loader = DataLoader(

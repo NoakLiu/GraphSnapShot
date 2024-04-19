@@ -34,8 +34,9 @@ NeighborSampler_OTF_struct_PSCRFCF_SC: Partially cache refresh + Fully cache fet
 
 graph size:
 
-products = 1871.046875 MB
-arxiv
+products = 1454.859375 MB
+arxiv = 404.40625 MB
+mag = 1867.578125 MB
 
 ### Impact on Accuracy
 
