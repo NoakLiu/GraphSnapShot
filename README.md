@@ -130,6 +130,8 @@ Graph(num_nodes=5982, num_edges=30048,
 ```
 
 Comparison from `num_nodes=169343, num_edges=1166243` to `num_nodes=5982, num_edges=30048`.
+
+
 Deployment on homo-graphs
 Import
 ```python
