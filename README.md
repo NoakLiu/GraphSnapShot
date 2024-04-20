@@ -10,6 +10,14 @@ GraphSnapShot is a framework for fast storage, retrieval and computation for gra
 
 ![model construction](./assets/dense_proc.png)
 
+3 kinds of system design
+```
+1. proto - implemented by torch
+2. dglsampler-simple - implemented with baseline of MultiLayerSampler in dgl
+3. dglsampler - implemented with baseline of MultiLayerSampler in dgl
+```
+
+For dglsampler re-design
 3 system design strategies
 ```
 FBL: full batch load
@@ -17,11 +25,17 @@ OTF: partial cache refresh (on the fly) snapshot
 FCR: full cache refresh snapshot
 ```
 
+In detailed:
+```
+1. All methods in OTF and FCR has two modes: independent cache and shared cache
+2. OTF has 4 methods, which are the combination of (full refresh, partial refresh) x (full fetch, partial fetch)
+```
+
 Deployment:
 
 FBL implementation is same as the `MultiLayerSampler` implemented in dgl.
 
-To deploy our projects, we can reach to the Samplers in SSDReS_Sampler by `cd SSDReS_Samplers`, and then find the following file
+To deploy GraphSnapShot,  Samplers in SSDReS_Sampler by `cd SSDReS_Samplers`, and then find the following file
 ```
 NeighborSampler_OTF_struct.py
 NeighborSampler_OTF_nodes.py
@@ -67,12 +81,10 @@ structure-level: reduce the inefficiency of resample whole k-hop structure for e
 
 Downsteam Task: 
 ```
-MultiLayer GCN - ogbn_arxiv / ogbn_products
-MultiLayer SGC - ogbn_arxiv / ogbn_products
-MultiLayer GraphSAGE - ogbn_arxiv / ogbn_products
-MultiLayer MWE-GCN - ogbn_proteins
-MultiLayer MWE-DGCN - proteins
-MutlLayer GAT - proteins
+MultiLayer GCN - ogbn_arxiv / ogbn_products (homo)
+MultiLayer SGC - ogbn_arxiv / ogbn_products (homo)
+MultiLayer GraphSAGE - ogbn_arxiv / ogbn_products (homo)
+MultiLayer RelGraphConv - ogbn_mag (hete)
 ```
 
 Datasets:
@@ -113,25 +125,27 @@ Design of FCR
 ![model construction](./assets/FCR.png)
 
 
-An Example of Shrinking Usage of Memory
-```
+An Example of Memory Reduction for 
 Original Graph
+```
 Graph(num_nodes=169343, num_edges=1166243,
       ndata_schemes={'year': Scheme(shape=(1,), dtype=torch.int64), 'feat': Scheme(shape=(128,), dtype=torch.float32)}
       edata_schemes={})
-
-Dense Graph (degree>30)
+```
+Dense Filter -->Dense Graph (degree>30)
+```
 Graph(num_nodes=5982, num_edges=65847,
       ndata_schemes={'year': Scheme(shape=(1,), dtype=torch.int64), 'feat': Scheme(shape=(128,), dtype=torch.float32), '_ID': Scheme(shape=(), dtype=torch.int64)}
       edata_schemes={'_ID': Scheme(shape=(), dtype=torch.int64)})
-
-Cached Graph (sampled from Densed Graph) - edges storage reduction by 45.6%
+```
+Cached Graph (cached for FCRSampler)
+```
 Graph(num_nodes=5982, num_edges=30048,
       ndata_schemes={'year': Scheme(shape=(1,), dtype=torch.int64), 'feat': Scheme(shape=(128,), dtype=torch.float32), '_ID': Scheme(shape=(), dtype=torch.int64)}
       edata_schemes={'_ID': Scheme(shape=(), dtype=torch.int64)})
 ```
 
-Comparison from `num_nodes=169343, num_edges=1166243` to `num_nodes=5982, num_edges=30048`.
+Overall, achieve a memory reduction from `num_edges=65847` to `num_nodes=5982, num_edges=30048`, edges memory reduction by by 45.6%
 
 
 Deployment on homo-graphs
