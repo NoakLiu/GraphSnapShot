@@ -30,7 +30,7 @@ Dense Graph GraphSnapShot Cache for SSDReS_Samplers
         - OTF_SC
 
 ## figure
-![model construction](./assets/dense_proc.png)
+![model construction](/assets/dense_proc.png)
 
 ## Deployment Sequence
 For homograph
