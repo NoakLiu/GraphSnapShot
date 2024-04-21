@@ -412,6 +412,6 @@ accuracy = [71.3, 62.9, 67.5]
 posttrain_time = [0, 23.6, 82.5]  
 ```
 
-![model construction](assets/res.png)
+![model construction](/assets/res.png)
 
 The main idea of this framework is `Static Pre-Sampling and Dynamic Re-Sampling` for Efficient Graph Learning Storage and Retrieval.
