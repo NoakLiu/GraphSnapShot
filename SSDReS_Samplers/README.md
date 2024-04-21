@@ -48,3 +48,4 @@ For hetegraph
 
 
 ## analysis
+The key point of GraphSnapShot is to cache the local structure instead of whole graph input for memory reduction and sampling efficiency.
