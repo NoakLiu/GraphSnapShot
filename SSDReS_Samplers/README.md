@@ -45,7 +45,11 @@ For hetegraph
 
 ## figure (mem reduction-dataset, test on training)
 
+![homo mem reduction](/results/homo/sample_efficiency_homo_arxiv.png)
 
+![homo mem reduction](/results/homo/sample_efficiency_homo_products.png)
+
+![hete mem reduction](/results/hete/sample_efficiency_hete_mag.png)
 
 ## analysis
 The key point of GraphSnapShot is to cache the local structure instead of whole graph input for memory reduction and sampling efficiency.
