@@ -154,6 +154,7 @@ Dense Graph GraphSnapShot Cache for SSDReS_Samplers
 - For dense graphs, SSDReS methods will be deployed
 
 #### SSDReS method
+```
 - dgl samplers
     - hete
         - FCR_hete
@@ -177,6 +178,7 @@ Dense Graph GraphSnapShot Cache for SSDReS_Samplers
         - FCR_SC
         - OTF
         - OTF_SC
+```
 
 #### Deployment Sequence
 For homograph

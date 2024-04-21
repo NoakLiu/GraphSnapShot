@@ -8,15 +8,7 @@ Dense Graph GraphSnapShot Cache for SSDReS_Samplers
 
 # SSDReS method
 
-| dgl samplers | | | dgl samplers simple | |
-|:-------------|:---|:|:---------------------|:---|
-| **hete**     | **homo** | | **hete**           | **homo** |
-| FCR_hete     | FCR      | | FCR_hete           | FCR      |
-| FCR_SC_hete  | FCR_SC   | | FCR_SC_hete        | FCR_SC   |
-| OTF((PR, FR)x(PF, FF))_hete | OTF((PR, FR)x(PF, FF)) | | OTF_hete           | OTF      |
-| OTF((PR, FR)x(PF, FF))_SC_hete | OTF((PR, FR)x(PF, FF))_SC | | OTF_SC_hete        | OTF_SC   |
-
-
+```
 - dgl samplers
     - hete
         - FCR_hete
@@ -40,6 +32,7 @@ Dense Graph GraphSnapShot Cache for SSDReS_Samplers
         - FCR_SC
         - OTF
         - OTF_SC
+```
 
 ## figure
 ![model construction](/assets/dense_proc.png)
