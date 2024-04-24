@@ -462,3 +462,92 @@ sampler = NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete(
     hete_label="paper",
 )
 ```
+
+#### Experimental Results
+
+FBL
+setting
+```
+'ogbn-products', threshold=30
+sampler = NeighborSampler(
+    [5, 5, 5],  # fanout for [layer-0, layer-1, layer-2]
+    # prefetch_node_feats=["feat"],
+    # prefetch_labels=["label"],
+    # fused=fused_sampling,
+)
+```
+```
+lstime.mean (s): 0.014647597649449685
+lsmem.mean (MB): 0.24154361263736263
+Epoch 00002 | Loss 0.0000 | Time 15.8059
+sampler memory (MB): 0.0
+sampler comp (MB): 791.25
+```
+
+Time reduction in FCR
+FBL
+FCR setting1
+```
+'ogbn-products', threshold = 30
+sampler = NeighborSampler_FCR_struct(
+    g=g,
+    fanouts=[5,5,5],  # fanout for [layer-0, layer-1, layer-2] [2,2,2]
+    alpha=1.5, T=50,
+    # prefetch_node_feats=["feat"],
+    # prefetch_labels=["label"],
+    # fused=fused_sampling,
+)
+```
+```
+lstime.mean (s): 0.011630635267357832
+lsmem.mean (MB): -0.03964915293040293
+Epoch 00002 | Loss 0.0000 | Time 12.6349
+sampler memory (MB): 1548.828125
+sampler comp (MB): 1418.953125
+```
+FCR setting2
+FCR setting3
+FCR setting4
+FCR setting5
+
+Time reduction in OTF(PF, FF)x(PR, FR)
+FBL
+解释 PF, PR含义,对于构建application(同质化的体验，还是集中的使用)
+OTF(PF, FF)x(PR, FR) settings
+
+Time reduction with refresh rate, fetch rate, T_fetch, T_refresh
+refresh rate setting1
+refresh rate setting2
+refresh rate setting3
+refresh rate setting4
+refresh rate setting5
+
+fetch rate setting1
+fetch rate setting2
+fetch rate setting3
+fetch rate setting4
+fetch rate setting5
+
+Analysis: why
+
+Memory reduction for shared cache mode
+    shared cache 画图解释
+    1. FCR, FCR-SC
+    2. OTF, OTF-SC
+
+Analysis: why
+
+Memory reduction with amplication rate
+    amplication rate画图解释, with refresh and fetch
+
+Analysis: why
+
+Accuracy Ablation
+
+Analysis: why
+
+Accuracy Ablation with refresh rate, fetch rate, T_fetch, T_refresh
+
+Analysis: why
+
+伪代码

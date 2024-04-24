@@ -58,7 +58,9 @@ print(high_degree_subgraph)
 
 
 print("High Degree Subgraph Nodes:", high_degree_subgraph.number_of_nodes())
+print("High Degree Subgraph Edges:", high_degree_subgraph.number_of_edges())
 print("Low Degree Subgraph Nodes:", low_degree_subgraph.number_of_nodes())
+print("Low Degree Subgraph Edges:", low_degree_subgraph.number_of_edges())
 
 
 
