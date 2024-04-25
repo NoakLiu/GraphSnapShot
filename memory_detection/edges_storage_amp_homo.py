@@ -59,4 +59,4 @@ fanout = 10
 results = gpu_usage_simulation(dataset_name, threshold, amp_rates, fanout)
 
 print(results)
-plot_results(results)
+# plot_results(results)

@@ -8,6 +8,7 @@ def gpu_usage_simulation(dataset_name, thresholds, amp_rate, fanout):
     dataset = DglNodePropPredDataset(name=dataset_name)
     graph, _ = dataset[0]
     degrees = graph.in_degrees() + graph.out_degrees()
+    baseline = graph.num_edges()
     
     # Results storage
     results = []
@@ -29,7 +30,7 @@ def gpu_usage_simulation(dataset_name, thresholds, amp_rate, fanout):
         total_edges = sparse_edges + resampled_dense_edges
         results.append((threshold, sparse_edges, resampled_dense_edges, total_edges))
     
-    return results
+    return results, baseline
 
 def plot_results(results, dataset_name):
     # Plotting the results
@@ -58,7 +59,10 @@ thresholds = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140]
 amp_rate = 1.5
 fanout = 10
 
-results = gpu_usage_simulation(dataset_name, thresholds, amp_rate, fanout)
+results, baseline = gpu_usage_simulation(dataset_name, thresholds, amp_rate, fanout)
 
 print(results)
-plot_results(results, dataset_name)
+print(baseline)
+# plot_results(results, dataset_name)
+# arxiv - 1166243
+# products - 123718280

@@ -15,6 +15,7 @@ def gpu_usage_simulation(dataset_name, thresholds, amp_rate, fanout):
         node_type = 'paper'
         # Calculate degrees only for 'paper' nodes
         degrees = graph.in_degrees(etype=('paper', 'cites', 'paper')) + graph.out_degrees(etype=('paper', 'cites', 'paper'))
+        baseline = graph.number_of_edges(etype=('paper', 'cites', 'paper'))
     else:
         raise Exception("Specified node type 'paper' not found in graph")
 
@@ -43,7 +44,7 @@ def gpu_usage_simulation(dataset_name, thresholds, amp_rate, fanout):
         total_edges = sparse_edges + resampled_dense_edges
         results.append((threshold, sparse_edges, resampled_dense_edges, total_edges))
     
-    return results
+    return results, baseline
 
 def plot_results(results, dataset_name):
     # Unpack the results
@@ -77,7 +78,10 @@ thresholds = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 amp_rate = 1.5
 fanout = 10
 
-results = gpu_usage_simulation(dataset_name, thresholds, amp_rate, fanout)
+results, baseline = gpu_usage_simulation(dataset_name, thresholds, amp_rate, fanout)
 
 print(results)
-plot_results(results, dataset_name)
+print(baseline)
+# plot_results(results, dataset_name)
+
+# baseline ogbn-mag 5416271

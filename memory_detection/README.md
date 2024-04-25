@@ -9,6 +9,12 @@
     - 2. deploy homo SSDReS samplers such as FCR_hete, FCR-SC_hete, OTF((PR, FR)x(PF, FF))_hete, OTF((PR, FR)x(PF, FF))-SC_hete on dense graph
     - 3. deploy FBL on sparse graph
 
+## Baseline Storage
+- For whole FBL methods, the storage can be computed as follows (edges number):
+    - 1. ogbn-arxiv 1166243
+    - 2. ogbn-products 123718280
+    - 3. ogbn-mag 5416271
+
 ## GPU Usage Figure
 ![model construction](/results/hete/gpu_by_thrs_mag.png)
 

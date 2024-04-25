@@ -189,13 +189,21 @@ Dense Graph GraphSnapShot Cache for SSDReS_Samplers
     - 2. deploy homo SSDReS samplers such as FCR_hete, FCR-SC_hete, OTF((PR, FR)x(PF, FF))_hete, OTF((PR, FR)x(PF, FF))-SC_hete on dense graph
     - 3. deploy FBL on sparse graph
 
-#### Figures for memory reduction
+#### Figures for Memory reduction
 
 ![homo mem reduction](/results/homo/sample_efficiency_homo_arxiv.png)
 
 ![homo mem reduction](/results/homo/sample_efficiency_homo_products.png)
 
 ![hete mem reduction](/results/hete/sample_efficiency_hete_mag.png)
+
+#### Figures for GPU reduction
+![model construction](/results/hete/gpu_by_thrs_mag.png)
+
+![model construction](/results/homo/gpu_by_thrs_arxiv.png)
+
+![model construction](/results/homo/gpu_by_thrs_products.png)
+
 
 #### Analysis
 The key point of GraphSnapShot is to cache the local structure instead of whole graph input for memory reduction and sampling efficiency.
