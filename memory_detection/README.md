@@ -1,20 +1,20 @@
-## Figure
+#### Sparse & Dense Processing for GPU Usage Reducation
+- For homograph
+    - 1. python div_graph_by_deg_homo.py --> dense graph, sparse graph
+    - 2. deploy homo SSDReS samplers such as FCR, FCR-SC, OTF((PR, FR)x(PF, FF)), OTF((PR, FR)x(PF, FF))-SC on dense graph
+    - 3. deploy FBL on sparse graph
+
+- For hetegraph
+    - 1. python div_graph_by_deg_hete.py --> dense graph, sparse graph
+    - 2. deploy homo SSDReS samplers such as FCR_hete, FCR-SC_hete, OTF((PR, FR)x(PF, FF))_hete, OTF((PR, FR)x(PF, FF))-SC_hete on dense graph
+    - 3. deploy FBL on sparse graph
+
+## GPU Usage Figure
 ![model construction](/results/hete/gpu_by_thrs_mag.png)
 
 ![model construction](/results/homo/gpu_by_thrs_arxiv.png)
 
 ![model construction](/results/homo/gpu_by_thrs_products.png)
-
-## Sparse Dense Processing
-For homograph
-    1. python div_graph_by_deg_homo.py --> dense graph, sparse graph
-    2. deploy homo SSDReS samplers such as FCR, FCR-SC, OTF((PR, FR)x(PF, FF)), OTF((PR, FR)x(PF, FF))-SC on dense graph
-    3. deploy FBL on sparse graph
-
-For hetegraph
-    1. python div_graph_by_deg_hete.py --> dense graph, sparse graph
-    2. deploy homo SSDReS samplers such as FCR_hete, FCR-SC_hete, OTF((PR, FR)x(PF, FF))_hete, OTF((PR, FR)x(PF, FF))-SC_hete on dense graph
-    3. deploy FBL on sparse graph
 
 ## Analysis
 The plots illustrate the GPU usage in terms of the number of edges for three datasets (ogbn-arxiv, ogbn-products, and ogbn-mag) at various node degree thresholds. They show the efficiency of handling dense and sparse parts of graphs separately while optimizing GPU usage.
