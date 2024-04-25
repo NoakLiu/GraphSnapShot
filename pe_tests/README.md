@@ -1100,7 +1100,7 @@ lsmem.mean 3489.088622625216
 ```
 
 ### Runtime Memory Reduction Visualization
-![runtime mem reduction](/results/homo/runtime_mem_products)
+![runtime mem reduction](/results/homo/runtime_mem_products.png)
 
 ### Analysis
 From the visualizations and data provided in the table, it is evident that the computational methods FCR, FCR-shared cache, OTF, and OTF-shared cache demonstrate significant improvements in reducing runtime memory usage compared to the baseline FBL method. 
