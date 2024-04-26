@@ -516,7 +516,7 @@ Epoch 00002 | Loss 0.0000 | Time 12.6349
 sampler memory (MB): 1548.828125
 sampler comp (MB): 1418.953125
 ```
-FCR setting2
+<!-- FCR setting2
 FCR setting3
 FCR setting4
 FCR setting5
@@ -561,4 +561,4 @@ Accuracy Ablation with refresh rate, fetch rate, T_fetch, T_refresh
 
 Analysis: why
 
-伪代码
+伪代码 -->
