@@ -474,7 +474,7 @@ sampler = NeighborSampler_OTF_struct_PSCRFCF_shared_cache_hete(
 )
 ```
 
-#### Experimental Results
+<!-- #### Experimental Results
 
 FBL
 setting
@@ -515,7 +515,7 @@ lsmem.mean (MB): -0.03964915293040293
 Epoch 00002 | Loss 0.0000 | Time 12.6349
 sampler memory (MB): 1548.828125
 sampler comp (MB): 1418.953125
-```
+``` -->
 <!-- FCR setting2
 FCR setting3
 FCR setting4
