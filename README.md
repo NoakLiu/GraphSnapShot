@@ -566,6 +566,7 @@ Analysis: why
 ### Citation
 If you find GraphSnapShot useful or relevant to your project and research, please kindly cite our paper:
 
+```
 @article{liu2024graphsnapshotgraphmachinelearning,
       title={GraphSnapShot: Graph Machine Learning Acceleration with Fast Storage and Retrieval}, 
       author={Dong Liu and Roger Waleffe and Meng Jiang and Shivaram Venkataraman},
@@ -575,3 +576,4 @@ If you find GraphSnapShot useful or relevant to your project and research, pleas
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2406.17918}, 
 }
+```
