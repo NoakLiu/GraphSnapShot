@@ -2,7 +2,7 @@
 
 Up to **30\%** training acceleration and **73\%** memory reduction for lossless graph ML training with GraphSnapShot!
 
-GraphSnapShot is a framework for fast storage, retrieval and computation for graph learning. It can quickly store and update the local topology of graph structure, just like take `snapshots` of the graphs.
+GraphSnapShot is a framework for caching local structure for fast graph learning, it can achieve fast storage, retrieval and computation for graph learning at large scale. It can quickly store and update the local topology of graph structure, just like take `snapshots` of the graphs.
 
 ![model construction](./assets/Disk_Cache_Memory_GraphSnapShot.png)
 
