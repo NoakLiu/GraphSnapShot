@@ -1,5 +1,11 @@
 ### GraphSnapShot
 
+News 5/21: GraphSnapShot has been accepted to MLArchSys 2025 as Oral Presentation!!!
+
+News 4/1: GraphSnapShot has been accepted to MLsys 2025 YPS!!!
+
+News 3/25: GraphSnapShot has been accepted to MASC-SLL 2025!!!
+
 Up to **30\%** training acceleration and **73\%** memory reduction for lossless graph ML training with GraphSnapShot!
 
 GraphSnapShot is a framework for caching local structure for fast graph learning, it can achieve fast storage, retrieval and computation for graph learning at large scale. It can quickly store and update the local topology of graph structure, just like take `snapshots` of the graphs.
