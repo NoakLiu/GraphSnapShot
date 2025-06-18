@@ -574,12 +574,12 @@ If you find GraphSnapShot useful or relevant to your project and research, pleas
 
 ```
 @inproceedings{
-liu2025graphsnapshot,
-title={GraphSnapShot: A System for Graph Machine Learning Acceleration},
-author={Dong Liu and Yanxuan Yu},
-booktitle={Machine Learning for Computer Architecture and Systems 2025},
-year={2025},
-url={https://openreview.net/forum?id=KeHes2SVxs}
+    liu2025graphsnapshot,
+    title={GraphSnapShot: A System for Graph Machine Learning Acceleration},
+    author={Dong Liu and Yanxuan Yu},
+    booktitle={Machine Learning for Computer Architecture and Systems 2025},
+    year={2025},
+    url={https://openreview.net/forum?id=KeHes2SVxs}
 }
 
 @article{liu2024graphsnapshotgraphmachinelearning,
@@ -591,5 +591,4 @@ url={https://openreview.net/forum?id=KeHes2SVxs}
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2406.17918}, 
 }
-
 ```
