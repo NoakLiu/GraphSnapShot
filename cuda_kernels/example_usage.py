@@ -21,14 +21,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
     import graphsnapshot_cuda
     CUDA_AVAILABLE = True
-    print("✓ GraphSnapShot CUDA kernels loaded successfully")
+    print("GraphSnapShot CUDA kernels loaded successfully")
 except ImportError:
     try:
         import graphsnapshot_cpu
         CUDA_AVAILABLE = False
         print("⚠ CUDA kernels not available, using CPU fallback")
     except ImportError:
-        print("❌ No GraphSnapShot kernels available")
+        print("No GraphSnapShot kernels available")
         sys.exit(1)
 
 def create_sample_graph(num_nodes=1000, num_edges=5000, device='cuda'):
@@ -124,11 +124,11 @@ def example_fcr_sampling():
     sampled_neighbors = result[0]
     neighbor_counts = result[1]
     
-    print(f"✓ Sampling completed in {end_time - start_time:.4f} seconds")
-    print(f"✓ Sampled neighbors shape: {sampled_neighbors.shape}")
-    print(f"✓ Neighbor counts shape: {neighbor_counts.shape}")
-    print(f"✓ Average neighbors per seed: {neighbor_counts.float().mean():.2f}")
-    print(f"✓ Total neighbors sampled: {neighbor_counts.sum().item()}")
+    print(f"Sampling completed in {end_time - start_time:.4f} seconds")
+    print(f"Sampled neighbors shape: {sampled_neighbors.shape}")
+    print(f"Neighbor counts shape: {neighbor_counts.shape}")
+    print(f"Average neighbors per seed: {neighbor_counts.float().mean():.2f}")
+    print(f"Total neighbors sampled: {neighbor_counts.sum().item()}")
 
 def example_graph_filtering():
     """Example of graph structure masking and filtering"""
@@ -179,11 +179,11 @@ def example_graph_filtering():
     
     output_src, output_dst, output_weights, valid_nodes, valid_edges, node_mapping, edge_mapping = result
     
-    print(f"✓ Filtering completed in {end_time - start_time:.4f} seconds")
-    print(f"✓ Original graph: {src_nodes.size(0)} edges")
-    print(f"✓ Filtered graph: {valid_edges.item()} valid edges")
-    print(f"✓ Valid nodes: {valid_nodes.item()}")
-    print(f"✓ Compression ratio: {(1 - valid_edges.item() / src_nodes.size(0)) * 100:.1f}%")
+    print(f"Filtering completed in {end_time - start_time:.4f} seconds")
+    print(f"Original graph: {src_nodes.size(0)} edges")
+    print(f"Filtered graph: {valid_edges.item()} valid edges")
+    print(f"Valid nodes: {valid_nodes.item()}")
+    print(f"Compression ratio: {(1 - valid_edges.item() / src_nodes.size(0)) * 100:.1f}%")
 
 def example_multi_hop_sampling():
     """Example of multi-hop neighbor aggregation"""
@@ -238,14 +238,14 @@ def example_multi_hop_sampling():
     
     hop_neighbors, hop_counts, visited_mask = result
     
-    print(f"✓ Multi-hop aggregation completed in {end_time - start_time:.4f} seconds")
-    print(f"✓ Hop neighbors shape: {hop_neighbors.shape}")
-    print(f"✓ Hop counts shape: {hop_counts.shape}")
-    print(f"✓ Visited mask shape: {visited_mask.shape}")
+    print(f"Multi-hop aggregation completed in {end_time - start_time:.4f} seconds")
+    print(f"Hop neighbors shape: {hop_neighbors.shape}")
+    print(f"Hop counts shape: {hop_counts.shape}")
+    print(f"Visited mask shape: {visited_mask.shape}")
     
     for hop in range(num_hops):
         avg_neighbors = hop_counts[:, hop].float().mean()
-        print(f"✓ Hop {hop + 1}: Average {avg_neighbors:.2f} neighbors per seed")
+        print(f"Hop {hop + 1}: Average {avg_neighbors:.2f} neighbors per seed")
 
 def example_performance_comparison():
     """Compare performance between CUDA and CPU implementations"""
@@ -332,9 +332,9 @@ def example_performance_comparison():
     avg_cpu_time = np.mean(cpu_times)
     speedup = avg_cpu_time / avg_cuda_time
     
-    print(f"✓ Average CUDA time: {avg_cuda_time:.4f} seconds")
-    print(f"✓ Average CPU time: {avg_cpu_time:.4f} seconds")
-    print(f"✓ CUDA speedup: {speedup:.2f}x")
+    print(f"Average CUDA time: {avg_cuda_time:.4f} seconds")
+    print(f"Average CPU time: {avg_cpu_time:.4f} seconds")
+    print(f"CUDA speedup: {speedup:.2f}x")
 
 def main():
     """Main function to run all examples"""
@@ -343,8 +343,8 @@ def main():
     
     # Check if CUDA is available
     if torch.cuda.is_available():
-        print(f"✓ CUDA available: {torch.cuda.get_device_name()}")
-        print(f"✓ CUDA version: {torch.version.cuda}")
+        print(f"CUDA available: {torch.cuda.get_device_name()}")
+        print(f"CUDA version: {torch.version.cuda}")
     else:
         print("⚠ CUDA not available, using CPU")
     
@@ -356,11 +356,11 @@ def main():
         example_performance_comparison()
         
         print("\n" + "="*60)
-        print("✓ All examples completed successfully!")
+        print("All examples completed successfully!")
         print("="*60)
         
     except Exception as e:
-        print(f"❌ Error running examples: {e}")
+        print(f"Error running examples: {e}")
         import traceback
         traceback.print_exc()
 
