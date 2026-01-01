@@ -1,5 +1,7 @@
 ### GraphSnapShot
 
+🔥🔥🔥 News 9/12: Added CUDA kernel implementation for GraphSnapShot!!!
+
 🔥🔥🔥 News 5/21: GraphSnapShot has been accepted to MLArchSys 2025 as Oral Presentation!!!
 
 🔥🔥🔥 News 4/1: GraphSnapShot has been accepted to MLsys 2025 YPS!!!
