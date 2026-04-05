@@ -1,14 +1,14 @@
 ### GraphSnapShot
 
-🔥🔥🔥 News: FPGA **NMPE** (Near-Memory Processing Engine) reference RTL + Python behavioral model — see [`fpga/nmpe/`](fpga/nmpe/README.md).
+🔥🔥🔥 News 4/5/2026: FPGA **NMPE** (Near-Memory Processing Engine) reference RTL + Python behavioral model — see [`fpga/nmpe/`](fpga/nmpe/README.md).
 
-🔥🔥🔥 News 9/12: Added CUDA kernel implementation for GraphSnapShot!!!
+🔥🔥🔥 News 9/12/2025: Added CUDA kernel implementation for GraphSnapShot!!!
 
-🔥🔥🔥 News 5/21: GraphSnapShot has been accepted to MLArchSys 2025 as Oral Presentation!!!
+🔥🔥🔥 News 5/21/2025: GraphSnapShot has been accepted to MLArchSys 2025 as Oral Presentation!!!
 
-🔥🔥🔥 News 4/1: GraphSnapShot has been accepted to MLsys 2025 YPS!!!
+🔥🔥🔥 News 4/1/2025: GraphSnapShot has been accepted to MLsys 2025 YPS!!!
 
-🔥🔥🔥 News 3/25: GraphSnapShot has been accepted to MASC-SLL 2025!!!
+🔥🔥🔥 News 3/25/2025: GraphSnapShot has been accepted to MASC-SLL 2025!!!
 
 Up to **30\%** training acceleration and **73\%** memory reduction for lossless graph ML training with GraphSnapShot!
 
