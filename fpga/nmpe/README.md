@@ -45,7 +45,3 @@ Edit `set_part` in `run_vre_hls.tcl` for your FPGA.
 
 - Samplers: `SSDReS_Samplers/`, `examples/dgl/`
 - CUDA: `cuda_kernels/`
-
-## Citation
-
-Cite the GraphSnapShot / GraphSnapshot line of work you use in publications.
