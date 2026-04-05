@@ -256,7 +256,3 @@ These CUDA kernels are designed to integrate seamlessly with the GraphSnapShot f
 2. **OTF Integration**: Dynamic cache management for on-the-fly sampling
 3. **FCR Integration**: Full cache refresh with amplification
 4. **Memory Management**: GraphSnapShot memory optimization
-
-## License
-
-This code is part of the GraphSnapShot project and follows the same licensing terms.

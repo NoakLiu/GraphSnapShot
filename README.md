@@ -1,5 +1,7 @@
 ### GraphSnapShot
 
+🔥🔥🔥 News: FPGA **NMPE** (Near-Memory Processing Engine) reference RTL + Python behavioral model — see [`fpga/nmpe/`](fpga/nmpe/README.md).
+
 🔥🔥🔥 News 9/12: Added CUDA kernel implementation for GraphSnapShot!!!
 
 🔥🔥🔥 News 5/21: GraphSnapShot has been accepted to MLArchSys 2025 as Oral Presentation!!!
@@ -24,6 +26,8 @@ GraphSnapShot is a framework for caching local structure for fast graph learning
 2. dglsampler-simple - implemented with baseline of MultiLayerSampler in dgl
 3. dglsampler - implemented with baseline of MultiLayerSampler in dgl
 ```
+
+**FPGA near-memory path (NMPE)** — optional acceleration for graph **vector retrieval** (SEMHS slab DMA → on-chip feature gather → in-situ mean aggregation → HBM staging), co-designed with the disk layout and GraphSDSampler tier `ℓ=0`. Source: [`fpga/nmpe/`](fpga/nmpe/README.md) (SystemVerilog integration shells + [`nmpe_reference.py`](fpga/nmpe/sim/nmpe_reference.py) golden model).
 
 For dglsampler re-design
 3 system design strategies
